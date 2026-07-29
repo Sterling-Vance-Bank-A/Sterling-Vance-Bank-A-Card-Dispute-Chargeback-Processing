@@ -14,6 +14,7 @@ erDiagram
         text customer_id PK
         text name
         text email
+        text phone
         text risk_flag
         text created_at
     }
@@ -21,6 +22,7 @@ erDiagram
     analysts {
         text analyst_id PK
         text name
+        text email
         text role
         int active
     }
@@ -36,6 +38,7 @@ erDiagram
         text account_id PK
         text customer_id FK
         text status
+        real credit_limit
         text opened_at
     }
 
@@ -54,6 +57,7 @@ erDiagram
         text reason_code
         text status
         real amount
+        text evidence_notes
         text opened_at
         text assigned_analyst_id FK
         text resolved_at
