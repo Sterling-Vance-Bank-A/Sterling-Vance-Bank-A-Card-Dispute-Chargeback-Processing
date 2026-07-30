@@ -1,11 +1,13 @@
 import asyncio
 import sqlite3
 import os
+import sys
 
 import mcp.types as types
 from mcp.server import Server, NotificationOptions
 from mcp.server.models import InitializationOptions
 from mcp.server.stdio import stdio_server
+from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
 
 app = Server("sterling-vance-dispute-server")
 
@@ -245,7 +247,8 @@ async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
     raise ValueError(f"Unknown tool: {name}")
 
 
-async def main():
+async def run_stdio():
+    """Local development transport: single machine, single analyst."""
     async with stdio_server() as (read_stream, write_stream):
         init_options = InitializationOptions(
             server_name="sterling-vance-dispute-server",
@@ -258,5 +261,32 @@ async def main():
         await app.run(read_stream, write_stream, init_options)
 
 
+async def run_http():
+    """Production transport: reachable over the network so multiple
+    analysts across branches can connect to the same live server,
+    instead of each running a separate local copy."""
+    from starlette.applications import Starlette
+    from starlette.routing import Mount
+    import uvicorn
+
+    session_manager = StreamableHTTPSessionManager(app=app)
+
+    starlette_app = Starlette(
+        routes=[Mount("/mcp", app=session_manager.handle_request)],
+    )
+
+    config = uvicorn.Config(starlette_app, host="127.0.0.1", port=8000)
+    server = uvicorn.Server(config)
+
+    async with session_manager.run():
+        await server.serve()
+
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    # Transport selection: stdio for local development (default),
+    # Streamable HTTP for production multi-analyst deployment.
+    # Run with: python server.py --http
+    if "--http" in sys.argv:
+        asyncio.run(run_http())
+    else:
+        asyncio.run(run_stdio())
