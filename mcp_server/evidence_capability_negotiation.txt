@@ -1,0 +1,2 @@
+=== Server capabilities ===
+experimental={} logging=None prompts=None resources=None tools=ToolsCapability(listChanged=True) completions=None tasks=None
