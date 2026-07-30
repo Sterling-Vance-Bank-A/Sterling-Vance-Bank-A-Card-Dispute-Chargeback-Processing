@@ -1,0 +1,17 @@
+=== Connected over Streamable HTTP ===
+Server capabilities: experimental={} logging=None prompts=None resources=None tools=ToolsCapability(listChanged=False) completions=None tasks=None
+
+=== Available tools ===
+- get_dispute_details
+- get_transaction_history
+- get_merchant_info
+- process_refund
+
+=== get_dispute_details(DISP-001) over HTTP ===
+{'dispute_id': 'DISP-001', 'transaction_id': 'TXN-002',
+ 'reason_code': 'duplicate_charge', 'status': 'refunded', 
+ 'amount': 29.99, 'evidence_notes': 'Customer reports being charged $29.99 twice
+  on 2026-07-20 at Brew & Go Coffee. TXN-001 and TXN-002 share the same merchant, 
+ amount, and date. Customer provided order receipt for only one coffee.
+  Merchant risk score: 5 (low). No prior disputes with this merchant.', 'opened_at': '2026-07-28 08:15:00', 
+  'assigned_analyst_id': 'ANL-001', 'resolved_at': '2026-07-30 10:52:27'}
