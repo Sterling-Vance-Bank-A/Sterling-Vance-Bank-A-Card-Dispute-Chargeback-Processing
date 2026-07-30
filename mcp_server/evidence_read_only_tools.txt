@@ -1,10 +1,20 @@
+=== Server capabilities ===
+experimental={} logging=None prompts=None resources=None tools=ToolsCapability(listChanged=True) completions=None tasks=None
+
 === Available tools ===
 - get_dispute_details
 - get_transaction_history
 - get_merchant_info
+- process_refund
 
 === get_dispute_details(DISP-001) ===
-{'dispute_id': 'DISP-001', 'transaction_id': 'TXN-002', 
-'reason_code': 'duplicate_charge', 'status': 'open', 'amount': 29.99, 
-'evidence_notes': 'Customer reports being charged $29.99 twice on 2026-07-20 at Brew & Go Coffee...', 
-'opened_at': '2026-07-28 08:15:00', 'assigned_analyst_id': 'ANL-001', 'resolved_at': None}
+{'dispute_id': 'DISP-001', 'transaction_id': 'TXN-002', 'reason_code': 'duplicate_charge', 'status': 'open', 'amount': 29.99, 'evidence_notes': 'Customer reports being charged $29.99 twice on 2026-07-20 at Brew & Go Coffee. TXN-001 and TXN-002 share the same merchant, amount, and date. Customer provided order receipt for only one coffee. Merchant risk score: 5 (low). No prior disputes with this merchant.', 'opened_at': '2026-07-28 08:15:00', 'assigned_analyst_id': 'ANL-001', 'resolved_at': None}
+
+=== get_transaction_history(ACC-001) ===
+[{'transaction_id': 'TXN-001', 'account_id': 'ACC-001', 'merchant_id': 'MERCH-001', 'amount': 29.99, 'txn_date': '2026-07-20', 'status': 'settled'}, {'transaction_id': 'TXN-002', 'account_id': 'ACC-001', 'merchant_id': 'MERCH-001', 'amount': 29.99, 'txn_date': '2026-07-20', 'status': 'settled'}]
+
+=== get_merchant_info(MERCH-001) ===
+{'merchant_id': 'MERCH-001', 'name': 'Brew & Go Coffee', 'category': 'food_beverage', 'risk_score': 5}
+
+=== get_merchant_info(MERCH-999) — should not be found ===
+No merchant found with ID MERCH-999

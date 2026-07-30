@@ -27,6 +27,24 @@ async def main():
             for content in call_result.content:
                 print(content.text)
 
+            print()
+            print("=== get_transaction_history(ACC-001) ===")
+            call_result = await session.call_tool("get_transaction_history", {"account_id": "ACC-001"})
+            for content in call_result.content:
+                print(content.text)
+
+            print()
+            print("=== get_merchant_info(MERCH-001) ===")
+            call_result = await session.call_tool("get_merchant_info", {"merchant_id": "MERCH-001"})
+            for content in call_result.content:
+                print(content.text)
+
+            print()
+            print("=== get_merchant_info(MERCH-999) — should not be found ===")
+            call_result = await session.call_tool("get_merchant_info", {"merchant_id": "MERCH-999"})
+            for content in call_result.content:
+                print(content.text)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

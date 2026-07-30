@@ -9,7 +9,28 @@ from mcp.server.models import InitializationOptions
 from mcp.server.stdio import stdio_server
 from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
 
-app = Server("sterling-vance-dispute-server")
+class DisputeServer(Server):
+    """Subclass so that ANY transport asking this server for its default
+    initialization options (stdio explicitly, or the HTTP session manager
+    internally/implicitly) gets the SAME honest capability declaration.
+
+    Without this override, StreamableHTTPSessionManager calls
+    app.create_initialization_options() with no arguments internally, which
+    falls back to NotificationOptions() (tools_changed=False) — meaning the
+    HTTP transport would falsely declare no notification support, even
+    though this server genuinely fires tools/list_changed. That mismatch is
+    exactly the kind of dishonest capability negotiation this assignment
+    warns against.
+    """
+
+    def create_initialization_options(self, notification_options=None, experimental_capabilities=None):
+        return super().create_initialization_options(
+            notification_options=notification_options or NotificationOptions(tools_changed=True),
+            experimental_capabilities=experimental_capabilities or {},
+        )
+
+
+app = DisputeServer("sterling-vance-dispute-server")
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "..", "db", "sterling_vance.db")
 
@@ -56,7 +77,11 @@ async def list_tools() -> list[types.Tool]:
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "dispute_id": {"type": "string", "description": "The dispute ID to look up, e.g. 'DISP-001'"}
+                    "dispute_id": {
+                        "type": "string",
+                        "pattern": "^DISP-\\d{3,}$",
+                        "description": "The dispute ID to look up, e.g. 'DISP-001'",
+                    }
                 },
                 "required": ["dispute_id"],
                 "additionalProperties": False,
@@ -68,7 +93,11 @@ async def list_tools() -> list[types.Tool]:
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "account_id": {"type": "string", "description": "The account ID to look up transactions for"}
+                    "account_id": {
+                        "type": "string",
+                        "pattern": "^ACC-\\d{3,}$",
+                        "description": "The account ID to look up transactions for, e.g. 'ACC-001'",
+                    }
                 },
                 "required": ["account_id"],
                 "additionalProperties": False,
@@ -80,7 +109,11 @@ async def list_tools() -> list[types.Tool]:
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "merchant_id": {"type": "string", "description": "The merchant ID to look up"}
+                    "merchant_id": {
+                        "type": "string",
+                        "pattern": "^MERCH-\\d{3,}$",
+                        "description": "The merchant ID to look up, e.g. 'MERCH-001'",
+                    }
                 },
                 "required": ["merchant_id"],
                 "additionalProperties": False,
@@ -96,8 +129,16 @@ async def list_tools() -> list[types.Tool]:
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "dispute_id": {"type": "string", "description": "The dispute ID to refund, e.g. 'DISP-001'"},
-                    "analyst_id": {"type": "string", "description": "The analyst attempting this action, e.g. 'ANL-001'"},
+                    "dispute_id": {
+                        "type": "string",
+                        "pattern": "^DISP-\\d{3,}$",
+                        "description": "The dispute ID to refund, e.g. 'DISP-001'",
+                    },
+                    "analyst_id": {
+                        "type": "string",
+                        "pattern": "^ANL-\\d{3,}$",
+                        "description": "The analyst attempting this action, e.g. 'ANL-001'",
+                    },
                 },
                 "required": ["dispute_id", "analyst_id"],
                 "additionalProperties": False,
@@ -117,8 +158,16 @@ async def list_tools() -> list[types.Tool]:
                 inputSchema={
                     "type": "object",
                     "properties": {
-                        "dispute_id": {"type": "string", "description": "The dispute ID to escalate"},
-                        "analyst_id": {"type": "string", "description": "The senior analyst performing the escalation"},
+                        "dispute_id": {
+                            "type": "string",
+                            "pattern": "^DISP-\\d{3,}$",
+                            "description": "The dispute ID to escalate, e.g. 'DISP-001'",
+                        },
+                        "analyst_id": {
+                            "type": "string",
+                            "pattern": "^ANL-\\d{3,}$",
+                            "description": "The senior analyst performing the escalation, e.g. 'ANL-002'",
+                        },
                     },
                     "required": ["dispute_id", "analyst_id"],
                     "additionalProperties": False,
