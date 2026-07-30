@@ -1,0 +1,11 @@
+=== Case 1: Junior analyst (ANL-001) attempts large refund on DISP-002 ($899) ===
+REJECTED: Analyst ANL-001 is junior and not authorized to approve a refund of $899.0 (over $500.0 threshold). Requires senior analyst.
+
+=== Case 2: Senior analyst (ANL-002) attempts same refund on DISP-002 ===
+APPROVED: Dispute DISP-002 ($899.0) refunded by analyst ANL-002.
+
+=== Case 3: Attempt to refund DISP-002 again (already resolved) ===
+REJECTED: Dispute DISP-002 has status 'refunded' — cannot refund an already-resolved dispute.
+
+=== Case 4: Junior analyst (ANL-001) approves small refund on DISP-001 ($29.99) ===
+APPROVED: Dispute DISP-001 ($29.99) refunded by analyst ANL-001.

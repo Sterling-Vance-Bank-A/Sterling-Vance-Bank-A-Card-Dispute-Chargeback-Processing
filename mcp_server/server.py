@@ -14,7 +14,7 @@ DB_PATH = os.path.join(os.path.dirname(__file__), "..", "db", "sterling_vance.db
 
 def get_connection():
     conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row  # عشان نقدر نوصل للأعمدة بالاسم مش بس بالترقيم
+    conn.row_factory = sqlite3.Row
     return conn
 
 
@@ -66,6 +66,29 @@ async def list_tools() -> list[types.Tool]:
                 "additionalProperties": False,
             },
         ),
+        types.Tool(
+            name="process_refund",
+            description=(
+                "Approve a refund for a dispute. Only allowed if the dispute is "
+                "still open/investigating, and only senior analysts may approve "
+                "refunds over $500."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "dispute_id": {
+                        "type": "string",
+                        "description": "The dispute ID to refund, e.g. 'DISP-001'",
+                    },
+                    "analyst_id": {
+                        "type": "string",
+                        "description": "The analyst attempting this action, e.g. 'ANL-001'",
+                    },
+                },
+                "required": ["dispute_id", "analyst_id"],
+                "additionalProperties": False,
+            },
+        ),
     ]
 
 
@@ -106,6 +129,58 @@ async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
         if row is None:
             return [types.TextContent(type="text", text=f"No merchant found with ID {arguments['merchant_id']}")]
         return [types.TextContent(type="text", text=str(dict(row)))]
+
+    elif name == "process_refund":
+        dispute_id = arguments["dispute_id"]
+        analyst_id = arguments["analyst_id"]
+
+        # --- Layer 2: Business validation (beyond schema) ---
+        cursor.execute("SELECT * FROM disputes WHERE dispute_id = ?", (dispute_id,))
+        dispute = cursor.fetchone()
+        if dispute is None:
+            conn.close()
+            return [types.TextContent(type="text", text=f"REJECTED: No dispute found with ID {dispute_id}")]
+
+        if dispute["status"] not in ("open", "investigating"):
+            conn.close()
+            return [types.TextContent(
+                type="text",
+                text=(
+                    f"REJECTED: Dispute {dispute_id} has status '{dispute['status']}' "
+                    "— cannot refund an already-resolved dispute."
+                ),
+            )]
+
+        # --- Layer 3: Authorization check (in the handler, not the schema) ---
+        cursor.execute("SELECT * FROM analysts WHERE analyst_id = ?", (analyst_id,))
+        analyst = cursor.fetchone()
+        if analyst is None:
+            conn.close()
+            return [types.TextContent(type="text", text=f"REJECTED: No analyst found with ID {analyst_id}")]
+
+        REFUND_THRESHOLD = 500.0
+        if analyst["role"] == "junior" and dispute["amount"] > REFUND_THRESHOLD:
+            conn.close()
+            return [types.TextContent(
+                type="text",
+                text=(
+                    f"REJECTED: Analyst {analyst_id} is junior and not authorized to "
+                    f"approve a refund of ${dispute['amount']} (over ${REFUND_THRESHOLD} "
+                    "threshold). Requires senior analyst."
+                ),
+            )]
+
+        # --- All checks passed: perform the refund ---
+        cursor.execute(
+            "UPDATE disputes SET status = 'refunded', resolved_at = datetime('now') WHERE dispute_id = ?",
+            (dispute_id,),
+        )
+        conn.commit()
+        conn.close()
+        return [types.TextContent(
+            type="text",
+            text=f"APPROVED: Dispute {dispute_id} (${dispute['amount']}) refunded by analyst {analyst_id}.",
+        )]
 
     conn.close()
     raise ValueError(f"Unknown tool: {name}")
