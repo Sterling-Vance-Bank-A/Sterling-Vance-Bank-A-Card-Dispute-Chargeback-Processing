@@ -1,0 +1,10 @@
+=== Available tools ===
+- get_dispute_details
+- get_transaction_history
+- get_merchant_info
+
+=== get_dispute_details(DISP-001) ===
+{'dispute_id': 'DISP-001', 'transaction_id': 'TXN-002', 
+'reason_code': 'duplicate_charge', 'status': 'open', 'amount': 29.99, 
+'evidence_notes': 'Customer reports being charged $29.99 twice on 2026-07-20 at Brew & Go Coffee...', 
+'opened_at': '2026-07-28 08:15:00', 'assigned_analyst_id': 'ANL-001', 'resolved_at': None}
