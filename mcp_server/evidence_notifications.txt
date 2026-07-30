@@ -1,0 +1,17 @@
+=== BEFORE trigger: available tools ===
+- get_dispute_details
+- get_transaction_history
+- get_merchant_info
+- process_refund
+escalate_dispute visible? False
+
+=== Firing trigger: junior analyst attempts large refund on DISP-002 ($899) ===
+REJECTED: Analyst ANL-001 is junior and not authorized to approve a refund of $899.0 (over $500.0 threshold). Requires senior analyst. This dispute is escalated — senior tools are now available.
+
+=== AFTER trigger: available tools (same session, no reconnect) ===
+- get_dispute_details
+- get_transaction_history
+- get_merchant_info
+- process_refund
+- escalate_dispute
+escalate_dispute visible? True
