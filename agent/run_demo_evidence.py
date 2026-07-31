@@ -19,9 +19,10 @@ from mcp import StdioServerParameters
 
 from agent_client import DisputeAgentClient
 
-REPO_ROOT = os.path.dirname(os.path.abspath(__file__))
+AGENT_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.dirname(AGENT_DIR)
 DB_PATH = os.path.join(REPO_ROOT, "db", "sterling_vance.db")
-EVIDENCE_DIR = os.path.join(REPO_ROOT, "evidence")
+EVIDENCE_DIR = os.path.join(AGENT_DIR, "evidence")
 os.makedirs(EVIDENCE_DIR, exist_ok=True)
 
 
@@ -45,7 +46,11 @@ def save(name: str, text: str):
 def new_server_params() -> StdioServerParameters:
     # A fresh process per scenario => session_state (escalation flag) starts
     # clean every time, exactly like a brand-new analyst session would.
-    return StdioServerParameters(command="python", args=["mcp_server/server.py"], cwd=REPO_ROOT)
+    return StdioServerParameters(
+        command=r"C:\Users\omari\AppData\Local\Programs\Python\Python312\python.exe",
+        args=["mcp_server/server.py"],
+        cwd=REPO_ROOT
+    )
 
 
 async def tc01_handshake_discovery_and_read():
@@ -201,6 +206,26 @@ async def tc07_prompt_template_used():
     save("tc07_prompt_template_used.txt", "\n".join(lines))
 
 
+async def tc08_real_llm_sampling():
+    """Sampling with a real LLM: calls summarize_dispute_evidence which
+    triggers sampling/createMessage back through the client's OpenRouter
+    model — proving the reasoning is done by a real external LLM, not the
+    server itself."""
+    lines = []
+    async with DisputeAgentClient(new_server_params()) as client:
+        lines.append("=== tc08: Real LLM Sampling via OpenRouter ===")
+        lines.append("Calling summarize_dispute_evidence for DISP-002 ($899 unauthorized_transaction)")
+        result = await client.call_tool_gated(
+            "summarize_dispute_evidence", {"dispute_id": "DISP-002"}
+        )
+        lines.append("")
+        lines.append("LLM-generated summary:")
+        for c in result.content:
+            lines.append(c.text)
+
+    save("tc08_real_llm_sampling.txt", "\n".join(lines))
+
+
 async def main():
     reset_db()
     await tc01_handshake_discovery_and_read()
@@ -212,6 +237,7 @@ async def main():
     await tc05_missing_capability_blocked()
     await tc06_resource_read()
     await tc07_prompt_template_used()
+    await tc08_real_llm_sampling()
     print("\nAll evidence generated in evidence/")
 
 

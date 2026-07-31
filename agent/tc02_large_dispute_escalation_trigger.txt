@@ -1,5 +1,0 @@
-Tools BEFORE trigger: ['get_dispute_details', 'get_merchant_info', 'get_transaction_history', 'process_refund', 'scan_repeat_dispute_patterns']
-Junior attempts $899 refund on DISP-002:
-REJECTED: Analyst ANL-001 is junior and not authorized to approve a refund of $899.0 (over $500.0 threshold). Requires senior analyst. This dispute is escalated — senior tools are now available.
-Tools AFTER trigger (no reconnect): ['escalate_dispute', 'get_dispute_details', 'get_merchant_info', 'get_transaction_history', 'process_refund', 'scan_repeat_dispute_patterns']
-escalate_dispute now visible? True

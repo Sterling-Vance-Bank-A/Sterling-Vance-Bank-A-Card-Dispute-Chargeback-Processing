@@ -1,0 +1,3 @@
+Server capabilities: experimental={} logging=None prompts=PromptsCapability(list_changed=False) resources=ResourcesCapability(subscribe=False, list_changed=False) tools=ToolsCapability(list_changed=True) completions=None extensions=None tasks=None
+elicitation declared? False
+BLOCKED CLIENT-SIDE, as expected: Refusing to call 'process_refund': server did not declare 'elicitation' capability at initialize.

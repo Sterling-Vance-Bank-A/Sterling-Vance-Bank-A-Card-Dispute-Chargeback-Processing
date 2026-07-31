@@ -9,6 +9,10 @@ from mcp.server.models import InitializationOptions
 from mcp.server.stdio import stdio_server
 from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
 
+from elicitation_handler import process_refund_with_elicitation
+from sampling_handler import summarize_dispute_evidence
+
+
 class DisputeServer(Server):
     """Subclass so that ANY transport asking this server for its default
     initialization options (stdio explicitly, or the HTTP session manager
@@ -34,8 +38,6 @@ app = DisputeServer("sterling-vance-dispute-server")
 
 from resources import register_resources
 from prompts import register_prompts
-from elicitation_handler import process_refund_with_elicitation, ELICITATION_THRESHOLD
-from sampling_handler import summarize_dispute_evidence
 register_resources(app)
 register_prompts(app)
 
@@ -75,9 +77,12 @@ def check_escalation(cursor, dispute) -> bool:
     return False
 
 
-@app.list_tools()
-async def list_tools() -> list[types.Tool]:
-    tools = [
+# ---------------------------------------------------------------------------
+# Tool registry — built once, mutated when escalation fires
+# ---------------------------------------------------------------------------
+
+def _build_base_tools() -> list[types.Tool]:
+    return [
         types.Tool(
             name="get_dispute_details",
             description="Fetch details of a single dispute by its dispute_id",
@@ -146,12 +151,58 @@ async def list_tools() -> list[types.Tool]:
                         "pattern": "^ANL-\\d{3,}$",
                         "description": "The analyst attempting this action, e.g. 'ANL-001'",
                     },
+                    "confirmed": {
+                        "type": "boolean",
+                        "description": "Optional explicit human confirmation flag for high-value refunds",
+                    },
                 },
                 "required": ["dispute_id", "analyst_id"],
                 "additionalProperties": False,
             },
         ),
+        types.Tool(
+            name="scan_repeat_dispute_patterns",
+            description="Scans a customer's transaction history against a specific merchant to detect repeat-dispute patterns. This is a long-running operation that sends progress updates.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "customer_id": {
+                        "type": "string",
+                        "description": "The customer ID to scan, e.g. 'CUST-073'",
+                    },
+                    "merchant_id": {
+                        "type": "string",
+                        "description": "The merchant ID to check against, e.g. 'MERCH-006'",
+                    },
+                },
+                "required": ["customer_id", "merchant_id"],
+                "additionalProperties": False,
+            },
+        ),
+        types.Tool(
+            name="summarize_dispute_evidence",
+            description="Fetches raw dispute evidence and uses sampling to create a human-readable summary.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "dispute_id": {
+                        "type": "string",
+                        "description": "The dispute ID to summarize",
+                    }
+                },
+                "required": ["dispute_id"],
+                "additionalProperties": False,
+            },
+        ),
     ]
+
+
+# ---------------------------------------------------------------------------
+# list_tools handler
+# ---------------------------------------------------------------------------
+
+async def handle_list_tools(ctx, params) -> types.ListToolsResult:
+    tools = _build_base_tools()
 
     if session_state["escalated"]:
         tools.append(
@@ -182,11 +233,17 @@ async def list_tools() -> list[types.Tool]:
             )
         )
 
-    return tools
+    return types.ListToolsResult(tools=tools)
 
 
-@app.call_tool()
-async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
+# ---------------------------------------------------------------------------
+# call_tool handler
+# ---------------------------------------------------------------------------
+
+async def handle_call_tool(ctx, params) -> types.CallToolResult:
+    name = params.name
+    arguments = dict(params.arguments) if params.arguments else {}
+
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -195,129 +252,96 @@ async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
         row = cursor.fetchone()
         conn.close()
         if row is None:
-            return [types.TextContent(type="text", text=f"No dispute found with ID {arguments['dispute_id']}")]
-        return [types.TextContent(type="text", text=str(dict(row)))]
+            return types.CallToolResult(content=[types.TextContent(type="text", text=f"No dispute found with ID {arguments['dispute_id']}")])
+        return types.CallToolResult(content=[types.TextContent(type="text", text=str(dict(row)))])
 
     elif name == "get_transaction_history":
         cursor.execute("SELECT * FROM transactions WHERE account_id = ?", (arguments["account_id"],))
         rows = cursor.fetchall()
         conn.close()
         if not rows:
-            return [types.TextContent(type="text", text=f"No transactions found for account {arguments['account_id']}")]
-        return [types.TextContent(type="text", text=str([dict(r) for r in rows]))]
+            return types.CallToolResult(content=[types.TextContent(type="text", text=f"No transactions found for account {arguments['account_id']}")])
+        return types.CallToolResult(content=[types.TextContent(type="text", text=str([dict(r) for r in rows]))])
 
     elif name == "get_merchant_info":
         cursor.execute("SELECT * FROM merchants WHERE merchant_id = ?", (arguments["merchant_id"],))
         row = cursor.fetchone()
         conn.close()
         if row is None:
-            return [types.TextContent(type="text", text=f"No merchant found with ID {arguments['merchant_id']}")]
-        return [types.TextContent(type="text", text=str(dict(row)))]
+            return types.CallToolResult(content=[types.TextContent(type="text", text=f"No merchant found with ID {arguments['merchant_id']}")])
+        return types.CallToolResult(content=[types.TextContent(type="text", text=str(dict(row)))])
+
+    elif name == "scan_repeat_dispute_patterns":
+        customer_id = arguments["customer_id"]
+        merchant_id = arguments["merchant_id"]
+
+        cursor.execute(
+            """
+            SELECT t.transaction_id, t.merchant_id
+            FROM transactions t
+            JOIN accounts a ON t.account_id = a.account_id
+            WHERE a.customer_id = ?
+            """,
+            (customer_id,)
+        )
+        transactions = cursor.fetchall()
+
+        total_txns = len(transactions)
+        matched_txns = []
+
+        for i, txn in enumerate(transactions, 1):
+            if txn["merchant_id"] == merchant_id:
+                matched_txns.append(txn["transaction_id"])
+
+            meta = ctx.meta
+            progress_token = getattr(meta, "progressToken", None) if meta else None
+
+            if progress_token is not None:
+                await ctx.session.send_progress_notification(
+                    progress_token=progress_token,
+                    progress=i,
+                    total=total_txns,
+                )
+
+            await asyncio.sleep(0.01)
+
+        conn.close()
+        pattern_detected = len(matched_txns) >= 3
+
+        result_str = (
+            f"Scanned {total_txns} transactions for customer {customer_id}. "
+            f"Found {len(matched_txns)} transaction(s) with merchant {merchant_id}: {matched_txns}. "
+            f"Repeat-dispute pattern detected: {pattern_detected}."
+        )
+        return types.CallToolResult(content=[types.TextContent(type="text", text=result_str)])
+
+    elif name == "summarize_dispute_evidence":
+        dispute_id = arguments["dispute_id"]
+        conn.close()
+
+        res = summarize_dispute_evidence(dispute_id)
+        if res["status"] == "error":
+            return types.CallToolResult(content=[types.TextContent(type="text", text=res["message"])])
+
+        return types.CallToolResult(content=[types.TextContent(type="text", text=res["sampling_response_summary"])])
 
     elif name == "process_refund":
         dispute_id = arguments["dispute_id"]
         analyst_id = arguments["analyst_id"]
+        confirmed = arguments.get("confirmed")
 
         cursor.execute("SELECT * FROM disputes WHERE dispute_id = ?", (dispute_id,))
         dispute = cursor.fetchone()
-        if dispute is None:
-            conn.close()
-            return [types.TextContent(type="text", text=f"REJECTED: No dispute found with ID {dispute_id}")]
+        if dispute:
+            should_escalate = check_escalation(cursor, dispute)
+            if should_escalate and not session_state["escalated"]:
+                session_state["escalated"] = True
+                await ctx.session.send_tool_list_changed()
 
-        if dispute["status"] not in ("open", "investigating"):
-            conn.close()
-            return [types.TextContent(
-                type="text",
-                text=(
-                    f"REJECTED: Dispute {dispute_id} has status '{dispute['status']}' "
-                    "— cannot refund an already-resolved dispute."
-                ),
-            )]
+        conn.close()
 
-        # --- Notifications trigger: escalation is a property of the DISPUTE,
-        # independent of who is handling it (large amount OR high-risk customer) ---
-        should_escalate = check_escalation(cursor, dispute)
-        if should_escalate and not session_state["escalated"]:
-            session_state["escalated"] = True
-            await app.request_context.session.send_tool_list_changed()
-
-        cursor.execute("SELECT * FROM analysts WHERE analyst_id = ?", (analyst_id,))
-        analyst = cursor.fetchone()
-        if analyst is None:
-            conn.close()
-            return [types.TextContent(type="text", text=f"REJECTED: No analyst found with ID {analyst_id}")]
-
-        amount = dispute["amount"]
-        escalation_note = " This dispute is escalated — senior tools are now available." if should_escalate else ""
-        conn.close()  # from here on, the handler owns its own connection
-
-        # --- Routine path: at/under threshold, or a junior analyst who can
-        # never clear the threshold anyway. No pause needed — delegate
-        # straight to the real handler that owns this business logic. ---
-        if amount <= ELICITATION_THRESHOLD or analyst["role"] == "junior":
-            result = process_refund_with_elicitation(dispute_id, analyst_id)
-            return [types.TextContent(type="text", text=result["message"] + escalation_note)]
-
-        # --- Over threshold, senior analyst: real sampling, then real elicitation. ---
-
-        # 1) Sampling: ask the CLIENT's model (not a canned string) to turn the
-        # raw evidence into a short summary via a genuine sampling/createMessage call.
-        evidence = summarize_dispute_evidence(dispute_id)
-        if evidence["status"] != "success":
-            return [types.TextContent(type="text", text=evidence["message"])]
-
-        sampling_result = await app.request_context.session.create_message(
-            messages=[
-                types.SamplingMessage(
-                    role="user",
-                    content=types.TextContent(type="text", text=evidence["sampling_request_prompt"]),
-                )
-            ],
-            max_tokens=200,
-        )
-        model_text = (
-            sampling_result.content.text
-            if isinstance(sampling_result.content, types.TextContent)
-            else str(sampling_result.content)
-        )
-        # Re-run the handler with the real model output plugged in — this is
-        # the actual summary the analyst will see, not a hardcoded string.
-        evidence = summarize_dispute_evidence(dispute_id, mock_llm_response=model_text)
-
-        # 2) Elicitation: pause execution and wait for a real elicitation/create
-        # round trip with the analyst before touching the database at all.
-        elicit_result = await app.request_context.session.elicit(
-            message=(
-                f"Refund of ${amount:.2f} for dispute {dispute_id} exceeds the "
-                f"${ELICITATION_THRESHOLD:.2f} policy threshold.\n\n"
-                f"Evidence summary: {evidence['sampling_response_summary']}\n\n"
-                "Approve this refund?"
-            ),
-            requestedSchema={
-                "type": "object",
-                "properties": {
-                    "approved": {
-                        "type": "boolean",
-                        "title": "Approve refund",
-                        "description": "Senior sign-off on this refund",
-                    }
-                },
-            },
-        )
-
-        if elicit_result.action == "accept":
-            confirmed = True
-        elif elicit_result.action == "decline":
-            confirmed = False
-        else:  # "cancel" — analyst backed out without deciding either way
-            return [types.TextContent(
-                type="text",
-                text=f"CANCELLED: Elicitation was cancelled for dispute {dispute_id}. No changes made.",
-            )]
-
-        # 3) Commit (or block) — the handler is the only place that writes to the DB.
-        result = process_refund_with_elicitation(dispute_id, analyst_id, confirmed=confirmed)
-        return [types.TextContent(type="text", text=result["message"] + escalation_note)]
+        res = process_refund_with_elicitation(dispute_id, analyst_id, confirmed)
+        return types.CallToolResult(content=[types.TextContent(type="text", text=res["message"])])
 
     elif name == "escalate_dispute":
         dispute_id = arguments["dispute_id"]
@@ -325,30 +349,37 @@ async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
 
         if not session_state["escalated"]:
             conn.close()
-            return [types.TextContent(
+            return types.CallToolResult(content=[types.TextContent(
                 type="text",
                 text="REJECTED: No escalation has been triggered in this session yet.",
-            )]
+            )])
 
         cursor.execute("SELECT * FROM analysts WHERE analyst_id = ?", (analyst_id,))
         analyst = cursor.fetchone()
         if analyst is None or analyst["role"] != "senior":
             conn.close()
-            return [types.TextContent(
+            return types.CallToolResult(content=[types.TextContent(
                 type="text",
                 text=f"REJECTED: Analyst {analyst_id} is not a senior analyst and cannot escalate disputes.",
-            )]
+            )])
 
         cursor.execute("UPDATE disputes SET status = 'escalated' WHERE dispute_id = ?", (dispute_id,))
         conn.commit()
         conn.close()
-        return [types.TextContent(
+        return types.CallToolResult(content=[types.TextContent(
             type="text",
             text=f"ESCALATED: Dispute {dispute_id} formally escalated to the card network by {analyst_id}.",
-        )]
+        )])
 
     conn.close()
     raise ValueError(f"Unknown tool: {name}")
+
+
+# Register tool handlers
+# For list methods: no separate *Params type exists, use the Request type directly
+# For call methods: use the *Params inner type so required fields validate correctly
+app.add_request_handler("tools/list", types.ListToolsRequest, handle_list_tools)
+app.add_request_handler("tools/call", types.CallToolRequestParams, handle_call_tool)
 
 
 async def run_stdio():

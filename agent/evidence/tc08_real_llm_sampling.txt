@@ -1,0 +1,5 @@
+=== tc08: Real LLM Sampling via OpenRouter ===
+Calling summarize_dispute_evidence for DISP-002 ($899 unauthorized_transaction)
+
+LLM-generated summary:
+Dispute DISP-002 ($ 899.00) at TechGadgets Online carries a elevated risk score of 45/100. Evidence indicates unauthorized_transaction claims with notes: 'Customer denies purchasing from TechGadgets Online on 2026-07-25. Reports card w...'.

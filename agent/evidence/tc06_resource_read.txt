@@ -1,7 +1,7 @@
-Discovered resources: [AnyUrl('policy://disputes/reason-codes')]
+Discovered resources: ['policy://disputes/reason-codes']
 --- policy://disputes/reason-codes (first 400 chars) ---
 ================================================================================
-STERLING VANCE BANK â€” DISPUTE & CHARGEBACK REASON CODE POLICY
+STERLING VANCE BANK — DISPUTE & CHARGEBACK REASON CODE POLICY
 Internal reference. Applies to all card-not-present and card-present disputes.
 ================================================================================
 

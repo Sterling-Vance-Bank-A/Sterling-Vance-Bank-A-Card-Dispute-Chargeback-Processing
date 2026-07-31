@@ -9,6 +9,9 @@ model (or analyst) to work from.
 
 Registers against the SAME low-level `Server` instance as server.py — call
 `register_prompts(app)` once, before `app.run()`.
+
+Uses add_request_handler with the correct 3-argument signature:
+(method_name, params_type, handler_fn).
 """
 
 import mcp.types as types
@@ -17,31 +20,31 @@ DENIAL_PROMPT_NAME = "draft_denial_explanation"
 
 
 def register_prompts(app):
-    @app.list_prompts()
-    async def list_prompts() -> list[types.Prompt]:
-        return [
-            types.Prompt(
-                name=DENIAL_PROMPT_NAME,
-                description=(
-                    "Draft a clear, professional, customer-facing "
-                    "explanation for why a dispute was denied."
-                ),
-                arguments=[
-                    types.PromptArgument(
-                        name="dispute_id",
-                        description="The dispute ID being denied, e.g. 'DISP-003'",
-                        required=True,
-                    )
-                ],
-            )
-        ]
+    async def handle_list_prompts(ctx, params) -> types.ListPromptsResult:
+        return types.ListPromptsResult(
+            prompts=[
+                types.Prompt(
+                    name=DENIAL_PROMPT_NAME,
+                    description=(
+                        "Draft a clear, professional, customer-facing "
+                        "explanation for why a dispute was denied."
+                    ),
+                    arguments=[
+                        types.PromptArgument(
+                            name="dispute_id",
+                            description="The dispute ID being denied, e.g. 'DISP-003'",
+                            required=True,
+                        )
+                    ],
+                )
+            ]
+        )
 
-    @app.get_prompt()
-    async def get_prompt(name: str, arguments: dict | None) -> types.GetPromptResult:
-        if name != DENIAL_PROMPT_NAME:
-            raise ValueError(f"Unknown prompt: {name}")
+    async def handle_get_prompt(ctx, params) -> types.GetPromptResult:
+        if params.name != DENIAL_PROMPT_NAME:
+            raise ValueError(f"Unknown prompt: {params.name}")
 
-        dispute_id = (arguments or {}).get("dispute_id", "<dispute_id>")
+        dispute_id = (params.arguments or {}).get("dispute_id", "<dispute_id>")
 
         instruction = (
             f"Write a clear, professional, empathetic explanation to the "
@@ -68,3 +71,14 @@ def register_prompts(app):
                 )
             ],
         )
+
+    app.add_request_handler(
+        "prompts/list",
+        types.ListPromptsRequest,
+        handle_list_prompts,
+    )
+    app.add_request_handler(
+        "prompts/get",
+        types.GetPromptRequestParams,
+        handle_get_prompt,
+    )

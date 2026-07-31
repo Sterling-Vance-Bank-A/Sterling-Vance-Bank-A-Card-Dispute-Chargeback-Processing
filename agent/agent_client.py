@@ -57,20 +57,60 @@ class DisputeAgentClient:
             return types.ElicitResult(action="accept", content={})
         return types.ElicitResult(action="decline")
 
-    async def _default_sampling_responder(self, messages: list, system_prompt, max_tokens: int) -> types.CreateMessageResult:
-        """Fallback: no real model attached, so just echo the raw evidence
-        prompt back as the 'summary'. Real callers should pass their own
-        sampling_responder that actually calls a model."""
-        last_text = ""
-        for m in messages:
-            block = m.content if not isinstance(m.content, list) else m.content[0]
-            if isinstance(block, types.TextContent):
-                last_text = block.text
-        return types.CreateMessageResult(
-            role="assistant",
-            content=types.TextContent(type="text", text=last_text),
-            model="no-model-attached",
-        )
+    async def _default_sampling_responder(
+        self, messages: list, system_prompt, max_tokens: int
+    ) -> types.CreateMessageResult:
+        """Real sampling: calls OpenRouter (OpenAI-compatible) to generate a
+        genuine LLM summary of the dispute evidence.
+        Falls back gracefully to echo if the API key is missing or the call fails."""
+        import os
+        try:
+            from openai import AsyncOpenAI
+            from dotenv import load_dotenv
+            load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
+
+            api_key = os.getenv("OPENROUTER_API_KEY")
+            if not api_key:
+                raise EnvironmentError("OPENROUTER_API_KEY not set in agent/.env")
+
+            client = AsyncOpenAI(
+                api_key=api_key,
+                base_url="https://openrouter.ai/api/v1",
+            )
+
+            openai_messages = []
+            if system_prompt:
+                openai_messages.append({"role": "system", "content": str(system_prompt)})
+            for m in messages:
+                block = m.content if not isinstance(m.content, list) else m.content[0]
+                if isinstance(block, types.TextContent):
+                    openai_messages.append({"role": m.role, "content": block.text})
+
+            response = await client.chat.completions.create(
+                model="openai/gpt-4o-mini",
+                messages=openai_messages,
+                max_tokens=max_tokens or 512,
+            )
+            summary = response.choices[0].message.content
+            log.info("LLM sampling complete via OpenRouter (gpt-4o-mini)")
+            return types.CreateMessageResult(
+                role="assistant",
+                content=types.TextContent(type="text", text=summary),
+                model="openai/gpt-4o-mini",
+            )
+        except Exception as e:
+            log.warning("LLM sampling failed (%s) — falling back to echo", e)
+            last_text = ""
+            for m in messages:
+                block = m.content if not isinstance(m.content, list) else m.content[0]
+                if isinstance(block, types.TextContent):
+                    last_text = block.text
+            return types.CreateMessageResult(
+                role="assistant",
+                content=types.TextContent(type="text", text=last_text),
+                model="no-model-attached",
+            )
+
 
     async def _elicitation_callback(self, context, params) -> types.ElicitResult:
         """SDK-facing hook: the server called session.elicit(...). Forward
@@ -122,11 +162,17 @@ class DisputeAgentClient:
         if isinstance(message, Exception):
             log.warning("Session error: %s", message)
             return
-        if isinstance(message, types.ServerNotification) and isinstance(
-            message.root, types.ToolListChangedNotification
-        ):
+        if isinstance(message, types.ToolListChangedNotification):
             log.info("notifications/tools/list_changed received — refreshing tool list")
             await self.refresh_tools()
+        elif isinstance(message, types.ServerNotification):
+            # fallback for SDK versions that wrap in ServerNotification
+            try:
+                if isinstance(message.root, types.ToolListChangedNotification):
+                    log.info("notifications/tools/list_changed received — refreshing tool list")
+                    await self.refresh_tools()
+            except AttributeError:
+                pass
 
     async def refresh_tools(self) -> dict[str, types.Tool]:
         result = await self.session.list_tools()
