@@ -1,0 +1,17 @@
+# Sterling Vance Bank MCP Server & Client Dependencies
+
+# Model Context Protocol SDK
+mcp>=1.2.0
+
+# OpenAI & OpenRouter API Client (for LLM Sampling)
+openai>=1.0.0
+python-dotenv>=1.0.0
+httpx>=0.25.0
+
+# Production Streamable HTTP Transport & ASGI Web Server
+starlette>=0.27.0
+uvicorn>=0.22.0
+anyio>=3.7.0
+
+# JSON Schema Validation & Utils
+jsonschema>=4.18.0
