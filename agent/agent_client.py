@@ -27,13 +27,60 @@ class DisputeAgentClient:
     """Async context manager wrapping one MCP session against the
     Sterling Vance dispute server."""
 
-    def __init__(self, server_params: StdioServerParameters):
+    def __init__(
+        self,
+        server_params: StdioServerParameters,
+        elicitation_responder=None,
+        sampling_responder=None,
+    ):
         self.server_params = server_params
         self._stdio_ctx = None
         self._session_ctx = None
         self.session: Optional[ClientSession] = None
         self.server_capabilities: Optional[types.ServerCapabilities] = None
         self.tools: dict[str, types.Tool] = {}
+
+        # Allow the caller (a human-facing CLI, an automated demo/test) to
+        # plug in how elicitation questions get answered and how sampling
+        # requests get a model response. Default to safe, deterministic
+        # behavior so nothing hangs if nobody supplies one.
+        self._elicitation_responder = elicitation_responder or self._default_elicitation_responder
+        self._sampling_responder = sampling_responder or self._default_sampling_responder
+
+    async def _default_elicitation_responder(self, message: str, requested_schema: dict) -> types.ElicitResult:
+        """Fallback: print the server's question and read the analyst's
+        decision from the terminal. Used when nobody supplies a custom
+        responder (e.g. an automated test)."""
+        print(f"\n[ELICITATION REQUEST FROM SERVER]\n{message}\n")
+        answer = input("Approve? [y/n]: ").strip().lower()
+        if answer in ("y", "yes"):
+            return types.ElicitResult(action="accept", content={})
+        return types.ElicitResult(action="decline")
+
+    async def _default_sampling_responder(self, messages: list, system_prompt, max_tokens: int) -> types.CreateMessageResult:
+        """Fallback: no real model attached, so just echo the raw evidence
+        prompt back as the 'summary'. Real callers should pass their own
+        sampling_responder that actually calls a model."""
+        last_text = ""
+        for m in messages:
+            block = m.content if not isinstance(m.content, list) else m.content[0]
+            if isinstance(block, types.TextContent):
+                last_text = block.text
+        return types.CreateMessageResult(
+            role="assistant",
+            content=types.TextContent(type="text", text=last_text),
+            model="no-model-attached",
+        )
+
+    async def _elicitation_callback(self, context, params) -> types.ElicitResult:
+        """SDK-facing hook: the server called session.elicit(...). Forward
+        the actual question to whatever responder was configured."""
+        return await self._elicitation_responder(params.message, params.requested_schema)
+
+    async def _sampling_callback(self, context, params) -> types.CreateMessageResult:
+        """SDK-facing hook: the server called session.create_message(...).
+        Forward the actual request to whatever responder was configured."""
+        return await self._sampling_responder(params.messages, params.system_prompt, params.max_tokens)
 
     async def __aenter__(self) -> "DisputeAgentClient":
         self._stdio_ctx = stdio_client(self.server_params)
@@ -43,7 +90,16 @@ class DisputeAgentClient:
         # server sends outside of direct request/response — including
         # notifications/tools/list_changed. This is what makes discovery
         # live instead of a one-time snapshot.
-        self._session_ctx = ClientSession(read, write, message_handler=self._handle_message)
+        # elicitation_callback / sampling_callback are what actually answer
+        # session.elicit(...) / session.create_message(...) requests coming
+        # FROM the server — without these, those calls hang forever.
+        self._session_ctx = ClientSession(
+            read,
+            write,
+            message_handler=self._handle_message,
+            elicitation_callback=self._elicitation_callback,
+            sampling_callback=self._sampling_callback,
+        )
         self.session = await self._session_ctx.__aenter__()
 
         # The real opening handshake: server states its capabilities, we
