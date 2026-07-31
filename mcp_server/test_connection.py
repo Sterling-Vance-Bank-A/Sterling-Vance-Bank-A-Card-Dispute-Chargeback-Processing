@@ -1,12 +1,13 @@
 import asyncio
+import sys
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 
 async def main():
     server_params = StdioServerParameters(
-        command="python",
-        args=["server.py"],
+        command=sys.executable,
+        args=["mcp_server/server.py"],
     )
 
     async with stdio_client(server_params) as (read, write):

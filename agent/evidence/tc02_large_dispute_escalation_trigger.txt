@@ -1,5 +1,5 @@
 Tools BEFORE trigger: ['get_dispute_details', 'get_merchant_info', 'get_transaction_history', 'process_refund', 'scan_repeat_dispute_patterns', 'summarize_dispute_evidence']
 Junior attempts $899 refund on DISP-002:
 REJECTED: Junior analyst ANL-001 cannot approve refunds > $500.00.
-Tools AFTER trigger (no reconnect): ['get_dispute_details', 'get_merchant_info', 'get_transaction_history', 'process_refund', 'scan_repeat_dispute_patterns', 'summarize_dispute_evidence']
-escalate_dispute now visible? False
+Tools AFTER trigger (no reconnect): ['escalate_dispute', 'get_dispute_details', 'get_merchant_info', 'get_transaction_history', 'process_refund', 'scan_repeat_dispute_patterns', 'summarize_dispute_evidence']
+escalate_dispute now visible? True
