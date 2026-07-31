@@ -1,136 +1,88 @@
 # mcp_server/ — MCP Server Layer
 
-**Engine:** Python 3.13, official `mcp` SDK (v1.29.0)
-**Server code:** `server.py`
-**Local dev transport:** stdio (default) — `python server.py`
-**Production transport:** Streamable HTTP — `python server.py --http` (http://127.0.0.1:8000/mcp)
+**Engine:** Python 3.12+, official `mcp` SDK (v1.29.0+)
+**Core Server:** `server.py`
+**Local Development Transport:** stdio (default) — `python server.py`
+**Production Transport:** Streamable HTTP — `python server.py --http` (listening on `http://127.0.0.1:8000/mcp`)
 
 ---
 
-## 🗄️ Database
+## 🗄️ Database & Schema Integration
 
-**Engine:** SQLite 3 — embedded, zero configuration, single `.db` file, ships with Python's standard library.
+**Engine:** SQLite 3 — embedded, single `.db` file (`db/sterling_vance.db`).
 
-The database has 7 tables: `customers`, `analysts`, `merchants`, `accounts`, `transactions`, `disputes`, `dispute_history`. Every relationship is enforced with a foreign key (`PRAGMA foreign_keys = ON;`), and every fixed-value field (analyst role, dispute status, risk flag, reason code) is locked down with a `CHECK` constraint at the database level. `UNIQUE(transaction_id)` on disputes prevents two open cases on the same charge.
-
-**Seed data** covers the exact test cases every protocol concern depends on:
-
-| Seed ID | State | What it proves |
-|---|---|---|
-| `DISP-001` | $29.99, `duplicate_charge`, open | Auto-approve path — under threshold, no pause |
-| `DISP-002` | $899.00, `unauthorized_transaction`, investigating | Elicitation pause path — over threshold |
-| `DISP-003` | `refunded`, transaction `reversed` | Double-refund guard — second attempt rejected |
-| `CUST-003` | 4 resolved disputes in 12 months | Repeat pattern / notification trigger |
-| `ANL-001` | Role: `junior` | Authorization check — write tools fail |
-| `ANL-002` | Role: `senior` | Authorization check — write tools succeed |
-| `MERCH-003` | Risk score: 87 (`ShadyDeals.io`) | High-risk merchant feeding the sampling prompt |
-
-See `db/schema.sql`, `db/seed.sql`, and `db/ERD.md` for the full schema and diagram.
+The server connects to 7 normalized tables: `customers`, `analysts`, `merchants`, `accounts`, `transactions`, `disputes`, and `dispute_history`.
+- Foreign keys enabled (`PRAGMA foreign_keys = ON;`).
+- Constraints: `CHECK` constraints on role (`junior`/`senior`), status (`open`/`investigating`/`refunded`/`denied`/`escalated`), and risk flag (`normal`/`elevated`/`high`).
+- `UNIQUE(transaction_id)` prevents duplicate open disputes on the same transaction.
 
 ---
 
-## 🔧 Capability Negotiation
+## 🛠️ Exposed Tools Reference
 
-The server declares its capabilities honestly during the `initialize` exchange.
-Currently only `tools` (with `listChanged=True` on stdio) is declared —
-elicitation, sampling, resources, and prompts are not declared here because
-they are not implemented in this server session.
-
-A client must inspect `result.capabilities` before assuming support for any
-feature that hasn't been declared. See `evidence_capability_negotiation.txt`.
-
----
-
-## 🛠️ Tools
-
-| Tool | Type | Notes |
-|---|---|---|
-| `get_dispute_details` | Read-only | dispute_id (string, required) |
-| `get_transaction_history` | Read-only | account_id (string, required) |
-| `get_merchant_info` | Read-only | merchant_id (string, required) |
-| `summarize_dispute_evidence` | Read-only | Fetches raw evidence + calls sampling before elicitation |
-| `process_refund` | **Write** | 3-layer defense + elicitation pause above $500 |
-| `escalate_dispute` | **Write, conditional** | Only appears after an escalation trigger fires |
-
-### process_refund — Defensive Design & Elicitation
-
-1. **Schema:** `dispute_id`/`analyst_id` typed strings, required, `additionalProperties: false`
-2. **Business validation:** rejects if dispute status is not `open`/`investigating` (no double-refund)
-3. **Authorization:** rejects if analyst is `junior` and dispute amount exceeds $500
-
-**Elicitation threshold: $500.00** (bank policy limit).
-
-- Refunds **≤ $500.00** execute immediately — no pause, no prompt (e.g. `DISP-001` at $29.99).
-- Refunds **> $500.00** stop mid-call and return `elicitation_pause`, waiting for an explicit `confirmed` flag from the analyst.
-  - `confirmed=True` → refund proceeds, dispute status updates to `refunded`.
-  - `confirmed=False` → refund is blocked, database state remains **strictly unchanged**.
-
-Both outcomes are saved as separate evidence files. See `evidence/elicitation_approved.txt` (approved after pause) and `evidence/elicitation_declined.txt` (declined and blocked).
-
-**Implementation:** `mcp_server/elicitation_handler.py` — `mcp_server/test_elicitation.py` (4 tests, all passing).
-
-See `evidence_write_tool_refund.txt` for 4 real captured test cases.
+| Tool | Type | Elicitation? | Auth Check? | Description |
+|---|---|:---:|:---:|---|
+| `get_dispute_details` | Read-only | No | No | Look up details for a given `dispute_id` |
+| `get_transaction_history` | Read-only | No | No | Fetch recent transaction history for an `account_id` |
+| `get_merchant_info` | Read-only | No | No | Look up merchant details & risk score by `merchant_id` |
+| `summarize_dispute_evidence` | Read-only | No | No | Fetches evidence & triggers `sampling/createMessage` |
+| `scan_repeat_dispute_patterns` | Read-only | No | No | Scans transactions for pattern & emits progress notifications |
+| `process_refund` | **Write** | **Yes (> $500)** | **Yes (Senior required)** | 3-layer defense: schema → state → RBAC role validation |
+| `escalate_dispute` | **Write, Conditional** | No | **Yes (Senior required)** | Only appears in tool list after an escalation trigger fires |
 
 ---
 
-## 🧠 Sampling — Evidence Summarization Before Elicitation
+## 🛡️ Protocol Features & Handlers
 
-Before the elicitation pause fires, the server reaches back out to the model via `sampling/createMessage` and asks it to turn the raw `evidence_notes` and merchant `risk_score` into a 2-sentence plain-language summary. That summary — not a raw data dump — is what the analyst sees during the sign-off prompt.
+### 1. Capability Negotiation (`initialize`)
+Declared capabilities: `tools` (with `listChanged=True`), `resources`, `prompts`.
+The server advertises capabilities at session startup so clients can validate support before invoking gated features.
 
-This is the server borrowing the model's reasoning mid-task, not the agent having a conversation. The model generates the summary; the elicitation consumes it. Every piece is used by the next.
+### 2. Human Elicitation (`elicitation_handler.py`)
+Bank policy requires explicit human confirmation for high-value refunds:
+- **Refunds $\le \$500.00$:** Executed automatically.
+- **Refunds $> \$500.00$:** Paused mid-call. Server emits an elicitation request.
+  - `confirmed=True` → Refund commits, dispute status updated to `refunded`.
+  - `confirmed=False` → Refund cancelled, database state remains **strictly unchanged**.
 
-The exact exchange (what the server sent, what it got back) is saved separately in `evidence/evidence_sampling_exchange.txt`.
+### 3. LLM Sampling (`sampling_handler.py`)
+`summarize_dispute_evidence` constructs a structured prompt from raw dispute notes and merchant risk scores, sending it back to the client via `sampling/createMessage`. The client delegates reasoning to an external model (**OpenRouter / GPT-4o-mini**) and returns a concise summary.
 
-**Implementation:** `mcp_server/sampling_handler.py` — `mcp_server/test_sampling.py` (2 tests, all passing).
+### 4. Policy Resources (`resources.py`)
+Exposes dispute reason codes, compliance rules, and approval authority guidelines at `policy://disputes/reason-codes`.
 
----
+### 5. Prompt Templates (`prompts.py`)
+Provides `draft_denial_explanation`. Parameterized by `dispute_id`, it generates structured instructions for drafting compliant customer denial letters.
 
-## 🔔 Notifications
+### 6. Notifications & Dynamic Tool Unlocking
+When a refund request touches a dispute $> \$500$ or a customer with `risk_flag == 'high'`, `server.py` emits `await ctx.session.send_tool_list_changed()`. The `escalate_dispute` tool becomes dynamically available in the client's session without reconnecting.
 
-Escalation is a property of the **dispute itself** — independent of who's handling it:
-- `dispute.amount > $500`, OR
-- customer's `risk_flag == 'high'` (joined via disputes → transactions → accounts → customers)
-
-When triggered, the server sends a real `notifications/tools/list_changed` message,
-and `escalate_dispute` becomes visible in the **same session**, without reconnecting.
-
-See `evidence_notifications.txt` for a captured before/after tool list.
-
----
-
-## 🌐 Transport
-
-- **stdio** (default): single analyst, single machine — used for all local development
-- **Streamable HTTP** (`--http` flag): reachable over the network, so multiple analysts
-  across different branches can query the same live server simultaneously —
-  a setup tied to one local machine can't serve more than one analyst at a time
-
-See `evidence_transport_http.txt` for a captured client session over real HTTP.
+### 7. Real-Time Progress Notifications
+`scan_repeat_dispute_patterns` iterates over transaction records and emits `send_progress_notification(progress=i, total=total_txns)` for each transaction checked.
 
 ---
 
-## Running the server
+## 🧪 Test Suites in `mcp_server/`
 
 ```bash
-pip install mcp jsonschema starlette uvicorn
+# Run edge case & security vulnerability test suite (11 tests)
+python -m unittest mcp_server/test_edge_cases.py
 
-# Build the local SQLite database from schema + seed data first:
-python build_db.py
+# Run elicitation unit tests (4 tests)
+python -m unittest mcp_server/test_elicitation.py
 
-# Local development (stdio):
-python mcp_server/server.py
+# Run LLM sampling unit tests (2 tests)
+python -m unittest mcp_server/test_sampling.py
 
-# Production (Streamable HTTP):
-python mcp_server/server.py --http
+# Run live stdio server connection test
+python mcp_server/test_connection.py
+
+# Run dynamic notification test
+python mcp_server/test_notifications.py
+
+# Run process_refund write & auth test
+python mcp_server/test_process_refund.py
+
+# Run Streamable HTTP transport test
+python mcp_server/test_http_connection.py
 ```
-
----
-
-## Test files
-
-- `test_connection.py` — capability negotiation + read tools
-- `test_process_refund.py` — write tool, 3-layer defense (deterministic — resets db state before each run)
-- `test_notifications.py` — before/after tool list across an escalation trigger
-- `test_http_connection.py` — same tools/flow, verified over Streamable HTTP
-- `test_elicitation.py` — elicitation pause, approved path, declined & blocked path (4 tests)
-- `test_sampling.py` — sampling prompt construction and evidence summary generation (2 tests)

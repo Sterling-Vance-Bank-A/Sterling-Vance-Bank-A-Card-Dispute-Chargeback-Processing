@@ -1,0 +1,26 @@
+{
+  "evaluation_summary": {
+    "total_disputes": 501,
+    "total_checks": 1002,
+    "overall_accuracy_pct": 100.0,
+    "senior_accuracy_pct": 100.0,
+    "junior_accuracy_pct": 100.0,
+    "runtime_seconds": 6.67
+  },
+  "dispute_status_distribution": {
+    "refunded": 218,
+    "investigating": 90,
+    "denied": 72,
+    "escalated": 38,
+    "open": 83
+  },
+  "amount_distribution": {
+    "under_500": 133,
+    "over_500": 368
+  },
+  "decisions_breakdown": {
+    "elicitation_triggers": 211,
+    "routine_approved": 0,
+    "closed_rejected": 290
+  }
+}
