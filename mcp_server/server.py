@@ -32,6 +32,11 @@ class DisputeServer(Server):
 
 app = DisputeServer("sterling-vance-dispute-server")
 
+from resources import register_resources
+from prompts import register_prompts
+register_resources(app)
+register_prompts(app)
+
 DB_PATH = os.path.join(os.path.dirname(__file__), "..", "db", "sterling_vance.db")
 
 session_state = {"escalated": False}
