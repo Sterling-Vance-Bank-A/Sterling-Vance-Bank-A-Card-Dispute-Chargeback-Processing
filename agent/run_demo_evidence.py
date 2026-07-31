@@ -133,7 +133,7 @@ async def tc04_repeat_pattern_and_slow_scan():
     lines = []
     progress_log = []
 
-    def on_progress(progress, total, message):
+    async def on_progress(progress, total, message):        
         entry = f"[PROGRESS {progress}/{total}] {message}"
         progress_log.append(entry)
 

@@ -6,7 +6,7 @@ from mcp.client.streamable_http import streamable_http_client
 async def main():
     url = "http://127.0.0.1:8000/mcp"
 
-    async with streamable_http_client(url) as (read, write, _):
+    async with streamable_http_client(url) as (read, write):
         async with ClientSession(read, write) as session:
             result = await session.initialize()
             print("=== Connected over Streamable HTTP ===")

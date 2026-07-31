@@ -1,4 +1,39 @@
-Progress updates received: 0
+Progress updates received: 35
+[PROGRESS 1.0/35.0] None
+[PROGRESS 2.0/35.0] None
+[PROGRESS 3.0/35.0] None
+[PROGRESS 4.0/35.0] None
+[PROGRESS 5.0/35.0] None
+[PROGRESS 6.0/35.0] None
+[PROGRESS 7.0/35.0] None
+[PROGRESS 8.0/35.0] None
+[PROGRESS 9.0/35.0] None
+[PROGRESS 10.0/35.0] None
+[PROGRESS 11.0/35.0] None
+[PROGRESS 12.0/35.0] None
+[PROGRESS 13.0/35.0] None
+[PROGRESS 14.0/35.0] None
+[PROGRESS 15.0/35.0] None
+[PROGRESS 16.0/35.0] None
+[PROGRESS 17.0/35.0] None
+[PROGRESS 18.0/35.0] None
+[PROGRESS 19.0/35.0] None
+[PROGRESS 20.0/35.0] None
+[PROGRESS 21.0/35.0] None
+[PROGRESS 22.0/35.0] None
+[PROGRESS 23.0/35.0] None
+[PROGRESS 24.0/35.0] None
+[PROGRESS 25.0/35.0] None
+[PROGRESS 26.0/35.0] None
+[PROGRESS 27.0/35.0] None
+[PROGRESS 28.0/35.0] None
+[PROGRESS 29.0/35.0] None
+[PROGRESS 30.0/35.0] None
+[PROGRESS 31.0/35.0] None
+[PROGRESS 32.0/35.0] None
+[PROGRESS 33.0/35.0] None
+[PROGRESS 34.0/35.0] None
+[PROGRESS 35.0/35.0] None
 
 Final result:
 Scanned 35 transactions for customer CUST-073. Found 6 transaction(s) with merchant MERCH-006: ['TXN-849', 'TXN-850', 'TXN-844', 'TXN-843', 'TXN-866', 'TXN-869']. Repeat-dispute pattern detected: True.
