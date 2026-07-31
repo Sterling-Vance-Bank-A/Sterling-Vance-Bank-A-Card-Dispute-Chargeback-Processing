@@ -1,0 +1,9 @@
+Discovered prompts: ['draft_denial_explanation']
+Prompt description: Denial explanation template for DISP-003
+[user] Write a clear, professional, empathetic explanation to the customer for why dispute DISP-003 was denied.
+
+1. First call get_dispute_details for DISP-003 to get its reason_code, amount, and evidence_notes.
+2. Read the dispute reason-code policy resource (policy://disputes/reason-codes) to find the specific evidence requirement tied to that reason_code.
+3. Explain in plain, non-technical language: (a) what was reviewed, (b) the specific policy reason the dispute did not qualify, and (c) what the customer can do next (e.g. submit additional evidence, contact the merchant directly).
+
+Keep it under 150 words. Do not use accusatory language and do not imply the customer acted in bad faith.

@@ -1,0 +1,10 @@
+Discovered resources: [AnyUrl('policy://disputes/reason-codes')]
+--- policy://disputes/reason-codes (first 400 chars) ---
+================================================================================
+STERLING VANCE BANK — DISPUTE & CHARGEBACK REASON CODE POLICY
+Internal reference. Applies to all card-not-present and card-present disputes.
+================================================================================
+
+1. duplicate_charge
+   Definition: The same purchase was posted to the account more than once.
+ 

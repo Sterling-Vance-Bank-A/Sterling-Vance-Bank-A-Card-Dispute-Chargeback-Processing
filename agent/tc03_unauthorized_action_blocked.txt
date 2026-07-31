@@ -1,0 +1,3 @@
+escalate_dispute visible after trigger: True
+Junior analyst (ANL-001) attempts escalate_dispute (senior-only):
+REJECTED: Analyst ANL-001 is not a senior analyst and cannot escalate disputes.
