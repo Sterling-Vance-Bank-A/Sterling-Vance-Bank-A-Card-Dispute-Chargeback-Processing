@@ -14,6 +14,7 @@ Run: python run_demo_evidence.py
 import asyncio
 import os
 import sqlite3
+import sys
 
 from mcp import StdioServerParameters
 
@@ -47,7 +48,7 @@ def new_server_params() -> StdioServerParameters:
     # A fresh process per scenario => session_state (escalation flag) starts
     # clean every time, exactly like a brand-new analyst session would.
     return StdioServerParameters(
-        command=r"C:\Users\omari\AppData\Local\Programs\Python\Python312\python.exe",
+        command=sys.executable,
         args=["mcp_server/server.py"],
         cwd=REPO_ROOT
     )
