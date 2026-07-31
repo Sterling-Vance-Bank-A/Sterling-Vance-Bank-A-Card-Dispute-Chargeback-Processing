@@ -1,0 +1,7 @@
+Server capabilities: experimental={} logging=None prompts=PromptsCapability(list_changed=False) resources=ResourcesCapability(subscribe=False, list_changed=False) tools=ToolsCapability(list_changed=True) completions=None extensions=None tasks=None
+Discovered tools at connect: ['get_dispute_details', 'get_merchant_info', 'get_transaction_history', 'process_refund', 'scan_repeat_dispute_patterns', 'summarize_dispute_evidence']
+get_dispute_details(DISP-001):
+{'dispute_id': 'DISP-001', 'transaction_id': 'TXN-002', 'reason_code': 'duplicate_charge', 'status': 'open', 'amount': 29.99, 'evidence_notes': 'Customer reports being charged $29.99 twice on 2026-07-20 at Brew & Go Coffee. TXN-001 and TXN-002 share the same merchant, amount, and date. Customer provided order receipt for only one coffee. Merchant risk score: 5 (low). No prior disputes with this merchant.', 'opened_at': '2026-07-28 08:15:00', 'assigned_analyst_id': 'ANL-001', 'resolved_at': None}
+
+Routine small refund — junior analyst, $29.99 dispute:
+ROUTINE REFUND APPROVED: Dispute DISP-001 ($29.99) processed by analyst ANL-001.

@@ -1,0 +1,4 @@
+Progress updates received: 0
+
+Final result:
+Scanned 35 transactions for customer CUST-073. Found 6 transaction(s) with merchant MERCH-006: ['TXN-849', 'TXN-850', 'TXN-844', 'TXN-843', 'TXN-866', 'TXN-869']. Repeat-dispute pattern detected: True.
