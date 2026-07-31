@@ -34,6 +34,8 @@ app = DisputeServer("sterling-vance-dispute-server")
 
 from resources import register_resources
 from prompts import register_prompts
+from elicitation_handler import process_refund_with_elicitation, ELICITATION_THRESHOLD
+from sampling_handler import summarize_dispute_evidence
 register_resources(app)
 register_prompts(app)
 
@@ -245,29 +247,77 @@ async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
             conn.close()
             return [types.TextContent(type="text", text=f"REJECTED: No analyst found with ID {analyst_id}")]
 
-        REFUND_THRESHOLD = 500.0
-        if analyst["role"] == "junior" and dispute["amount"] > REFUND_THRESHOLD:
-            conn.close()
+        amount = dispute["amount"]
+        escalation_note = " This dispute is escalated — senior tools are now available." if should_escalate else ""
+        conn.close()  # from here on, the handler owns its own connection
+
+        # --- Routine path: at/under threshold, or a junior analyst who can
+        # never clear the threshold anyway. No pause needed — delegate
+        # straight to the real handler that owns this business logic. ---
+        if amount <= ELICITATION_THRESHOLD or analyst["role"] == "junior":
+            result = process_refund_with_elicitation(dispute_id, analyst_id)
+            return [types.TextContent(type="text", text=result["message"] + escalation_note)]
+
+        # --- Over threshold, senior analyst: real sampling, then real elicitation. ---
+
+        # 1) Sampling: ask the CLIENT's model (not a canned string) to turn the
+        # raw evidence into a short summary via a genuine sampling/createMessage call.
+        evidence = summarize_dispute_evidence(dispute_id)
+        if evidence["status"] != "success":
+            return [types.TextContent(type="text", text=evidence["message"])]
+
+        sampling_result = await app.request_context.session.create_message(
+            messages=[
+                types.SamplingMessage(
+                    role="user",
+                    content=types.TextContent(type="text", text=evidence["sampling_request_prompt"]),
+                )
+            ],
+            max_tokens=200,
+        )
+        model_text = (
+            sampling_result.content.text
+            if isinstance(sampling_result.content, types.TextContent)
+            else str(sampling_result.content)
+        )
+        # Re-run the handler with the real model output plugged in — this is
+        # the actual summary the analyst will see, not a hardcoded string.
+        evidence = summarize_dispute_evidence(dispute_id, mock_llm_response=model_text)
+
+        # 2) Elicitation: pause execution and wait for a real elicitation/create
+        # round trip with the analyst before touching the database at all.
+        elicit_result = await app.request_context.session.elicit(
+            message=(
+                f"Refund of ${amount:.2f} for dispute {dispute_id} exceeds the "
+                f"${ELICITATION_THRESHOLD:.2f} policy threshold.\n\n"
+                f"Evidence summary: {evidence['sampling_response_summary']}\n\n"
+                "Approve this refund?"
+            ),
+            requestedSchema={
+                "type": "object",
+                "properties": {
+                    "approved": {
+                        "type": "boolean",
+                        "title": "Approve refund",
+                        "description": "Senior sign-off on this refund",
+                    }
+                },
+            },
+        )
+
+        if elicit_result.action == "accept":
+            confirmed = True
+        elif elicit_result.action == "decline":
+            confirmed = False
+        else:  # "cancel" — analyst backed out without deciding either way
             return [types.TextContent(
                 type="text",
-                text=(
-                    f"REJECTED: Analyst {analyst_id} is junior and not authorized to "
-                    f"approve a refund of ${dispute['amount']} (over ${REFUND_THRESHOLD} "
-                    "threshold). Requires senior analyst."
-                    + (" This dispute is escalated — senior tools are now available." if should_escalate else "")
-                ),
+                text=f"CANCELLED: Elicitation was cancelled for dispute {dispute_id}. No changes made.",
             )]
 
-        cursor.execute(
-            "UPDATE disputes SET status = 'refunded', resolved_at = datetime('now') WHERE dispute_id = ?",
-            (dispute_id,),
-        )
-        conn.commit()
-        conn.close()
-        return [types.TextContent(
-            type="text",
-            text=f"APPROVED: Dispute {dispute_id} (${dispute['amount']}) refunded by analyst {analyst_id}.",
-        )]
+        # 3) Commit (or block) — the handler is the only place that writes to the DB.
+        result = process_refund_with_elicitation(dispute_id, analyst_id, confirmed=confirmed)
+        return [types.TextContent(type="text", text=result["message"] + escalation_note)]
 
     elif name == "escalate_dispute":
         dispute_id = arguments["dispute_id"]
