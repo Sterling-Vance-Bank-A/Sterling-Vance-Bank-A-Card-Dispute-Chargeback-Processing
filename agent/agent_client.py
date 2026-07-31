@@ -227,7 +227,15 @@ class DisputeAgentClient:
 async def _smoke_test():
     """What to prove for Part 1: connect, visible handshake, tool
     discovery, one normal read-only action, end to end."""
-    server_params = StdioServerParameters(command="python", args=["mcp_server/server.py"])
+    import os
+    import sys
+    agent_dir = os.path.dirname(os.path.abspath(__file__))
+    repo_root = os.path.dirname(agent_dir)
+    server_params = StdioServerParameters(
+        command=sys.executable,
+        args=["mcp_server/server.py"],
+        cwd=repo_root,
+    )
     async with DisputeAgentClient(server_params) as client:
         result = await client.call_tool_gated("get_dispute_details", {"dispute_id": "DISP-001"})
         for content in result.content:

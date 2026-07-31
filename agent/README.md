@@ -1,74 +1,62 @@
-*/# Person C — Agent/Client, Resources, Prompts, Progress, Demo Evidence
+# Agent & Client Layer (`agent/`)
 
-## What's here
+**Role:** Dispute Agent Client, Protocol Negotiation, LLM Sampling Integration, & Demo Evidence Suite.
 
-| File | Part |
+---
+
+## 🛠️ Overview & Key Components
+
+The `agent/` module contains the client-side implementation of the Sterling Vance Dispute Processing system:
+- **`agent_client.py` (`DisputeAgentClient`):** Asynchronous MCP client wrapping stdio and HTTP sessions. Performs protocol capability negotiation during `initialize`, maintains dynamic tool discovery (`tools/list_changed`), enforces client-side capability gating, and integrates OpenRouter sampling callbacks.
+- **`run_demo_evidence.py`:** Automated scenario runner executing 8 test cases (`tc01` – `tc08`) and populating the `agent/evidence/` directory with verified protocol traces.
+
+---
+
+## 📂 File Directory
+
+| File | Description |
 |---|---|
-| `agent_client.py` | Part 1 — the agent/client (handshake, live tool discovery, capability gate) |
-| `mcp_server/resources.py` | Part 2 — the dispute reason-code policy, as a fetchable resource |
-| `mcp_server/prompts.py` | Part 3 — the `draft_denial_explanation` prompt template |
-| `mcp_server/server.py` | Part 4 — `scan_repeat_dispute_patterns` (the slow tool), added into the existing dispatch; also now registers resources/prompts |
-| `run_demo_evidence.py` | Part 5 — runs all fixed test scenarios, saves each as a distinct file under `evidence/` |
+| `agent_client.py` | `DisputeAgentClient` class with capability negotiation, `call_tool_gated()`, resource/prompt methods, and OpenRouter sampling. |
+| `run_demo_evidence.py` | 8 automated evidence scenario runners that reset test DB rows and generate trace outputs. |
+| `evidence/` | Directory containing captured proof files (`tc01` through `tc08`) for all protocol concerns. |
 
-## Setup (from scratch, one time)
+---
+
+## 📄 Evidence File Reference (`agent/evidence/`)
+
+| File | Protocol Concern Proved | Description |
+|---|---|---|
+| `tc01_handshake_discovery_and_routine_refund.txt` | **Capability Negotiation & Elicitation** | Opening handshake, dynamic tool discovery, and auto-approved refund ($\le \$500.00$). |
+| `tc02_large_dispute_escalation_trigger.txt` | **Notifications & Elicitation Pause** | Refund $> \$500$ fires `tools/list_changed` notification unlocking `escalate_dispute` and triggering elicitation pause. |
+| `tc03_unauthorized_action_blocked.txt` | **Authorization & RBAC** | Junior analyst (`ANL-001`) attempted refund/escalation rejected server-side. |
+| `tc04_repeat_pattern_and_slow_scan.txt` | **Progress Tracking** | Long-running transaction scan (`CUST-073` / `MERCH-006`) sending 35 live progress updates. |
+| `tc05_missing_capability_blocked.txt` | **Capability Gating** | Client refuses client-side to call tool requiring unadvertised capabilities (`PermissionError`). |
+| `tc06_resource_read.txt` | **Resources** | Reading policy guidelines from `policy://disputes/reason-codes`. |
+| `tc07_prompt_template_used.txt` | **Prompts** | Fetching parameterized `draft_denial_explanation` prompt template for `DISP-003`. |
+| `tc08_real_llm_sampling.txt` | **Sampling (`sampling/createMessage`)** | `summarize_dispute_evidence` invoking client OpenRouter LLM (`openai/gpt-4o-mini`) for AI evidence summary. |
+
+---
+
+## 🛠️ Tool Capabilities & Policy Matrix
+
+| Tool Name | Type | Elicitation Threshold | Authorization Rule |
+|---|---|:---:|---|
+| `get_dispute_details` | Read-only | None | Safe for all analyst roles |
+| `get_transaction_history` | Read-only | None | Safe for all analyst roles |
+| `get_merchant_info` | Read-only | None | Safe for all analyst roles |
+| `summarize_dispute_evidence` | Read-only | None (Triggers Sampling) | Safe for all analyst roles |
+| `scan_repeat_dispute_patterns` | Read-only | None (Progress Tracked) | Safe for all analyst roles |
+| `process_refund` | **Write** | **Pause at $> \$500.00$** | **Senior Analyst Required** for $> \$500$ |
+| `escalate_dispute` | **Write** | None | **Senior Analyst Required** |
+
+---
+
+## 🚀 Execution Commands
 
 ```bash
-# from the repo root
-pip install mcp jsonschema starlette uvicorn
-python build_db.py          # builds db/sterling_vance.db from schema + seed
-python check_db.py          # sanity check — should print 5 disputes
+# Run agent smoke test (Handshake + tool discovery + DISP-001 lookup)
+python agent/agent_client.py
+
+# Run full demo evidence suite (Generates all 8 evidence files in agent/evidence/)
+python agent/run_demo_evidence.py
 ```
-
-## Run the agent smoke test (Part 1's "what to prove")
-
-```bash
-python agent_client.py
-```
-This connects, prints the handshake (server capabilities), discovers tools,
-and runs one read-only call (`get_dispute_details` on `DISP-001`) end to end.
-
-## Generate all demo evidence (Part 5)
-
-```bash
-python run_demo_evidence.py
-```
-This is re-runnable any time — it resets the DB rows each scenario depends
-on before running, so results are identical every time. It writes 7 files
-into `evidence/`, covering:
-
-- handshake + live discovery + a routine small-dispute refund
-- a large dispute that triggers escalation (`tools/list_changed` fires)
-- an unauthorized attempt (junior analyst tries the senior-only escalation tool)
-- a customer with a repeat-dispute pattern **and** the slow tool (same tool —
-  see note below)
-- a client refusing, client-side, to use a tool gated on a capability
-  (`elicitation`) the server never declared
-- a resource being read (the reason-code policy)
-- a prompt template being used (`draft_denial_explanation`)
-
-
-## Tool Comparison
-
-| Tool | Type | Requires Elicitation? | Notes |
-|---|---|---|---|
-| `get_dispute_details` | Read-only | No | Retrieves dispute information only. |
-| `get_merchant_info` | Read-only | No | Retrieves merchant information only. |
-| `get_transaction_history` | Read-only | No | Retrieves transaction history only. |
-| `scan_repeat_dispute_patterns` | Read-only | No | Performs analysis only; does not modify system state. |
-| `process_refund` | Write | Not currently implemented | Changes dispute state by approving a refund. The current server implementation does not perform an elicitation/confirmation step. |
-| `escalate_dispute` | Write | No | Escalates a dispute. Access is controlled by analyst role rather than elicitation. |
-
-## Capability Negotiation
-
-The client performs capability negotiation during the MCP `initialize` handshake.
-
-If a tool depends on a capability that the connected server does not advertise (for example, `elicitation`), the client refuses to invoke that tool locally before sending any request to the server. This behavior is demonstrated in `tc05_missing_capability_blocked.txt`.
-
-## Data used in the demo (for reference)
-
-- `CUST-073` has 35 transactions total, 6 of them with `MERCH-006` — the
-  repeat-pattern/slow-scan scenario.
-- `DISP-001` ($29.99, open) and `DISP-002` ($899, investigating) are the
-  small/large dispute pair used throughout — same ones Person B's own
-  tests already rely on.
-- `ANL-001` (Sarah Kim, junior) and `ANL-002` (James Okafor, senior).

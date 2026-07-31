@@ -294,7 +294,12 @@ async def handle_call_tool(ctx, params) -> types.CallToolResult:
                 matched_txns.append(txn["transaction_id"])
 
             meta = ctx.meta
-            progress_token = getattr(meta, "progressToken", None) if meta else None
+            progress_token = None
+            if meta:
+                if isinstance(meta, dict):
+                    progress_token = meta.get("progressToken") or meta.get("progress_token")
+                else:
+                    progress_token = getattr(meta, "progressToken", None) or getattr(meta, "progress_token", None)
 
             if progress_token is not None:
                 await ctx.session.send_progress_notification(
