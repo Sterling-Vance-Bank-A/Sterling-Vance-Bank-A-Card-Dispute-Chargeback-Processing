@@ -1,0 +1,34 @@
+=== STERLING VANCE BANK — SAMPLING PROTOCOL EVIDENCE (sampling/createMessage) ===
+
+Scenario: Server reaches out to the LLM mid-task to summarize raw database evidence prior to human elicitation approval pause.
+
+--- 1. OUTGOING SERVER-TO-MODEL SAMPLING REQUEST ---
+RPC Method: sampling/createMessage
+Target Model: host-attached-llm
+Request Payload:
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": {
+        "type": "text",
+        "text": "[SERVER-TO-MODEL SAMPLING REQUEST (sampling/createMessage)]\nDispute ID: DISP-002\nAmount: $899.00\nReason Code: unauthorized_transaction\nMerchant: TechGadgets Online (Risk Score: 45/100)\nRaw Evidence Notes: Customer denies purchasing from TechGadgets Online on 2026-07-25. Reports card was in possession at all times; no online shopping done that day. Merchant category: electronics. Merchant risk score: 45 (medium). No prior TechGadgets disputes on this account. IP of purchase origin not yet obtained from merchant.\n\nInstruction: Summarize this chargeback evidence in exactly 2 concise sentences for human elicitation approval."
+      }
+    }
+  ],
+  "max_tokens": 150
+}
+
+--- 2. INCOMING MODEL-TO-SERVER SAMPLING RESPONSE ---
+Response Payload:
+{
+  "role": "assistant",
+  "content": {
+    "type": "text",
+    "text": "Dispute DISP-002 involves an $899.00 unauthorized transaction claim at TechGadgets Online (Risk Score: 45/100). The customer asserts physical card possession and no online activity, but purchase IP verification remains pending from the merchant."
+  }
+}
+
+--- 3. CHAINED ELICITATION CONSUMPTION ---
+Summary Usage: The 2-sentence summary generated above is injected directly into the human elicitation sign-off prompt presented to Senior Analyst ANL-002.
+Verification: Proves server borrowed model's reasoning capabilities mid-call to construct plain-language evidence summaries.
