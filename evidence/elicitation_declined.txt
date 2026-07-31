@@ -1,0 +1,24 @@
+=== STERLING VANCE BANK — ELICITATION PROTOCOL EVIDENCE (DECLINED & BLOCKED PATH) ===
+
+Scenario: Senior Analyst (ANL-002) reviews DISP-002 ($899.00 > $500.00 threshold) and explicitly declines the refund.
+
+--- STEP 1: INITIAL REFUND ATTEMPT (No confirmation provided) ---
+Request: process_refund(dispute_id="DISP-002", analyst_id="ANL-002", confirmed=None)
+Response Status: elicitation_pause
+Elicitation Required: True
+Message: ELICITATION PAUSE: Dispute DISP-002 ($899.00) exceeds policy threshold ($500.00). Pausing execution for explicit human sign-off.
+
+--- STEP 2: HUMAN REVIEW & DECLINE DECISION ---
+Evidence Summary Reviewed: Dispute DISP-002 ($899.00) at ShadyDeals.io (Merchant Risk: 87/100). Analyst suspects customer collusion based on merchant delivery proof.
+Human Decision: Explicitly DECLINED (confirmed=False)
+
+--- STEP 3: EXPLICIT DECLINE SUBMISSION ---
+Request: process_refund(dispute_id="DISP-002", analyst_id="ANL-002", confirmed=False)
+Response Status: declined_blocked
+Message: DECLINED & BLOCKED: Elicitation approval was DECLINED for dispute DISP-002 ($899.00). Database state remains UNCHANGED (status: 'investigating').
+
+--- DATABASE ISOLATION VERIFICATION ---
+Dispute Status: investigating (UNTOUCHED)
+Transaction Status: settled (UNTOUCHED)
+Resolved At: NULL
+Result: Proves the system strictly blocks mutation on the 'No' path.
