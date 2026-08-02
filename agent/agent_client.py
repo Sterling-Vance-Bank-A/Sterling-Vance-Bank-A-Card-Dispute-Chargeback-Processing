@@ -19,7 +19,8 @@ import mcp.types as types
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+import sys
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s", stream=sys.stdout)
 log = logging.getLogger("dispute-agent")
 
 

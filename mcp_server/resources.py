@@ -10,6 +10,7 @@ Uses add_request_handler with the correct 3-argument signature:
 """
 
 import mcp.types as types
+from mcp.shared.exceptions import MCPError
 
 POLICY_URI = "policy://disputes/reason-codes"
 
@@ -68,15 +69,15 @@ def register_resources(app):
                     )
                 ]
             )
-        raise ValueError(f"Unknown resource URI: {uri}")
+        raise MCPError(types.INVALID_PARAMS, f"Unknown resource URI: {uri}")
 
-    app.add_request_handler(
-        "resources/list",
-        types.ListResourcesRequest,
-        handle_list_resources,
-    )
-    app.add_request_handler(
-        "resources/read",
-        types.ReadResourceRequestParams,
-        handle_read_resource,
-    )
+    def _register(method_name, req_type, handler):
+        if hasattr(app, "add_request_handler"):
+            app.add_request_handler(method_name, req_type, handler)
+        elif hasattr(app, "_request_handlers"):
+            app._request_handlers[req_type] = handler
+        elif hasattr(app, "request_handlers"):
+            app.request_handlers[req_type] = handler
+
+    _register("resources/list", types.ListResourcesRequest, handle_list_resources)
+    _register("resources/read", types.ReadResourceRequestParams, handle_read_resource)

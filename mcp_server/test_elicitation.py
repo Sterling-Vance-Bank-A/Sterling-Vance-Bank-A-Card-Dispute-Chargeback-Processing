@@ -1,6 +1,9 @@
 import os
 import sqlite3
+import sys
 import unittest
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from elicitation_handler import process_refund_with_elicitation, DB_PATH, ELICITATION_THRESHOLD
 

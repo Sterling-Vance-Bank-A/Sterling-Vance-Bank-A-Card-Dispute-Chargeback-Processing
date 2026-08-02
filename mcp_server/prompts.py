@@ -72,13 +72,13 @@ def register_prompts(app):
             ],
         )
 
-    app.add_request_handler(
-        "prompts/list",
-        types.ListPromptsRequest,
-        handle_list_prompts,
-    )
-    app.add_request_handler(
-        "prompts/get",
-        types.GetPromptRequestParams,
-        handle_get_prompt,
-    )
+    def _register(method_name, req_type, handler):
+        if hasattr(app, "add_request_handler"):
+            app.add_request_handler(method_name, req_type, handler)
+        elif hasattr(app, "_request_handlers"):
+            app._request_handlers[req_type] = handler
+        elif hasattr(app, "request_handlers"):
+            app.request_handlers[req_type] = handler
+
+    _register("prompts/list", types.ListPromptsRequest, handle_list_prompts)
+    _register("prompts/get", types.GetPromptRequestParams, handle_get_prompt)

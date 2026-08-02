@@ -1,6 +1,7 @@
+import os
 import sqlite3
-
-conn = sqlite3.connect("db/sterling_vance.db")
+DB_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "db", "sterling_vance.db")
+conn = sqlite3.connect(DB_PATH)
 cursor = conn.cursor()
 
 cursor.execute("SELECT COUNT(*) FROM customers")

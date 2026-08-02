@@ -380,11 +380,16 @@ async def handle_call_tool(ctx, params) -> types.CallToolResult:
     raise ValueError(f"Unknown tool: {name}")
 
 
-# Register tool handlers
-# For list methods: no separate *Params type exists, use the Request type directly
-# For call methods: use the *Params inner type so required fields validate correctly
-app.add_request_handler("tools/list", types.ListToolsRequest, handle_list_tools)
-app.add_request_handler("tools/call", types.CallToolRequestParams, handle_call_tool)
+def _register(method_name, req_type, handler):
+    if hasattr(app, "add_request_handler"):
+        app.add_request_handler(method_name, req_type, handler)
+    elif hasattr(app, "_request_handlers"):
+        app._request_handlers[req_type] = handler
+    elif hasattr(app, "request_handlers"):
+        app.request_handlers[req_type] = handler
+
+_register("tools/list", types.ListToolsRequest, handle_list_tools)
+_register("tools/call", types.CallToolRequestParams, handle_call_tool)
 
 
 async def run_stdio():

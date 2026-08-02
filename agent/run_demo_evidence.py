@@ -12,6 +12,7 @@ Run: python run_demo_evidence.py
 """
 
 import asyncio
+import logging
 import os
 import sqlite3
 import sys
@@ -19,6 +20,8 @@ import sys
 from mcp import StdioServerParameters
 
 from agent_client import DisputeAgentClient
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s", stream=sys.stdout)
 
 AGENT_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(AGENT_DIR)

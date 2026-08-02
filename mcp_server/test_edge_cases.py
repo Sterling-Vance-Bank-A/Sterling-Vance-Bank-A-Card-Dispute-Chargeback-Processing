@@ -24,9 +24,12 @@ DB_PATH = os.path.join(REPO_ROOT, "db", "sterling_vance.db")
 
 
 def server_params() -> StdioServerParameters:
+    server_py = os.path.join(os.path.dirname(os.path.abspath(__file__)), "server.py")
+    if not os.path.exists(server_py):
+        server_py = "mcp_server/server.py"
     return StdioServerParameters(
         command=sys.executable,
-        args=["mcp_server/server.py"],
+        args=[server_py],
         cwd=REPO_ROOT,
     )
 

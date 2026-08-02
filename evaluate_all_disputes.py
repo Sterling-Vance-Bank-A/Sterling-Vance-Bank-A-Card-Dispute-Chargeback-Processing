@@ -23,7 +23,7 @@ AGENT_DIR = os.path.join(REPO_ROOT, "agent")
 DB_PATH = os.path.join(REPO_ROOT, "db", "sterling_vance.db")
 sys.path.insert(0, AGENT_DIR)
 
-from agent_client import DisputeAgentClient
+from agent.agent_client import DisputeAgentClient
 from mcp import StdioServerParameters, types
 
 

@@ -60,12 +60,17 @@ def reset_db():
     conn.close()
 
 
+SERVER_PY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "server.py")
+if not os.path.exists(SERVER_PY):
+    SERVER_PY = "mcp_server/server.py"
+
+
 async def main():
     reset_db()  # Ensures repeatable results across multiple runs
 
     server_params = StdioServerParameters(
         command=sys.executable,
-        args=["mcp_server/server.py"],
+        args=[SERVER_PY],
     )
 
     async with stdio_client(server_params) as (read, write):
