@@ -1,0 +1,69 @@
+SECTION 1 - OVERVIEW
+Sterling Vance Bank Dispute & Chargeback Operations Manual v2.4
+Effective Date: January 1, 2026
+
+SECTION 2 - DEFINITIONS
+Define: Chargeback, Dispute, Reason Code, Refund Window, Escalation, Authorization, High-Risk Merchant
+Define 'unauthorized transaction' as: 'A transaction initiated without the explicit consent or authorization of the account holder, including transactions resulting from account compromise, card skimming, phishing, or identity theft.'
+
+SECTION 3 - ANALYST ROLES AND AUTHORIZATION
+3.1 Junior Analyst: May approve refunds up to $500.00. Cannot escalate to card network. Cannot override fraud flags.
+3.2 Senior Analyst: May approve refunds of any amount. Only role authorized to formally escalate disputes to card networks. Must countersign all refunds exceeding $1,000.00.
+3.3 Section 3 sign-off: Required for all refund denials affecting amounts over $1,000.00.
+3.4 Section 9 sign-off (Senior Supervisor): Required jointly with Section 3 for refund denials over $1,000.00. Both signatures required within 72 hours.
+
+SECTION 4 - REASON CODES
+4.1 General: Reason codes follow VISA and Mastercard international frameworks.
+4.2 Specific codes:
+- Code 4853: Services Not Rendered or Merchandise Not Received. Refund window: 120 days from transaction date. Customer must provide proof of expected delivery date.
+- Code 4855: Non-receipt of Merchandise. Refund window: 90 days. Tracking confirmation required.
+- Code 4863: Cardholder Does Not Recognize Transaction. Refund window: 60 days. Requires fraud investigation before refund.
+- Code 4837: No Cardholder Authorization. Refund window: 120 days. Triggers automatic fraud flag.
+4.3 Chargeback thresholds defined in Rule 4.2b: A merchant is placed on the Chargeback Monitoring Program when their chargeback ratio exceeds 1.0% of total monthly transactions OR when absolute chargeback count exceeds 100 per month, whichever occurs first.
+
+SECTION 5 - REFUND ELIGIBILITY WINDOWS
+5.1 Standard refund windows by dispute type:
+- Duplicate charge disputes: 90 days from original charge date. Customer must provide both transaction receipts.
+- Unauthorized transaction disputes: 120 days from statement date. Automatic if fraud score > 80.
+- Service quality disputes: 60 days from service date.
+- Subscription cancellation disputes: 30 days from last billing date.
+5.2 Expedited processing: Disputes involving amounts over $500 AND fraud risk score > 75 qualify for expedited 5-business-day processing.
+
+SECTION 6 - FRAUD RISK SCORING
+6.1 Sterling Vance uses a 0-100 fraud risk score updated by the risk engine.
+6.2 Score thresholds:
+- 0-39: Low risk. Routine processing.
+- 40-74: Medium risk. Enhanced verification required.
+- 75-100: High risk. Automatic escalation trigger. Senior analyst required.
+6.3 Impact on escalation routing: A dispute with fraud risk score >= 75 automatically routes to the escalation queue regardless of dispute amount. The escalation flag appears in the analyst dashboard and the MCP tool 'escalate_dispute' becomes available.
+6.4 Merchant fraud risk: Merchants with a risk_score >= 80 are classified as high-risk merchants. Disputes involving high-risk merchants require senior analyst review for any amount.
+
+SECTION 7 - ESCALATION PROCEDURES
+7.1 Escalation triggers: amount > $500 OR customer risk_flag = 'high' OR merchant risk_score >= 80.
+7.2 Escalation steps for $750 fraud disputes with high-risk merchants:
+7.2.1 Step 1: Senior analyst reviews all transaction evidence within 24 hours of escalation flag.
+7.2.2 Step 2: Fraud investigation report must be attached to the dispute record.
+7.2.3 Step 3: Merchant chargeback history retrieved and documented.
+7.2.4 Step 4: If merchant has >= 3 prior chargebacks in 90 days, submit to Chargeback Monitoring Program.
+7.2.5 Step 5: Card network formal notification submitted within 45 days of original transaction.
+7.3 Required documentation for escalated disputes: (a) Original transaction record, (b) Customer dispute form, (c) Fraud investigation report, (d) Merchant response if solicited within 10 days, (e) Senior analyst sign-off form.
+
+SECTION 8 - VISA AND MASTERCARD RULES
+8.1 VISA Rule 10.4: Applies to disputes where the cardholder claims non-receipt of cash from an ATM. Investigation must be completed within 30 days. Provisional credit issued within 5 business days.
+8.2 VISA Rule 10.5: Applies to disputes involving counterfeit card fraud at point-of-sale terminals. Chip liability shift applies: if merchant did not have EMV-capable terminal, liability shifts to merchant. Investigation window: 120 days.
+8.3 Mastercard Rule 4531: Duplicate processing disputes. Both original and duplicate transaction must be evidenced. Refund window: 45 days.
+
+SECTION 9 - MULTI-CONDITION DISPUTE HANDLING
+9.1 When a junior analyst flags a dispute AND the merchant has prior chargebacks AND the amount exceeds $500: The dispute is automatically escalated to senior analyst queue. Junior analyst cannot approve or deny. Must document initial findings in dispute notes field.
+9.2 Disputes involving both duplicate charge and merchant fraud (compound disputes): Senior analyst must complete the following sequence: (1) Verify duplicate charge independently, (2) Run merchant fraud history check, (3) Determine which policy applies (duplicate charge or fraud), applying the stricter standard, (4) If fraud confirmed: apply Code 4837 rules, (5) If duplicate only: apply Code 4853 or Mastercard 4531.
+9.3 Section 9 sign-off requirement: For any refund denial involving amounts over $1,000.00, Section 9 (Senior Supervisor) sign-off is required jointly with Section 3 authorization. This dual sign-off must be completed within 72 hours of denial decision.
+
+SECTION 10 - RECORD RETENTION
+10.1 All dispute records retained 7 years.
+10.2 Fraud investigation reports retained 10 years.
+10.3 Escalation records retained 5 years.
+
+SECTION 11 - COMPLIANCE
+11.1 All dispute decisions must comply with Regulation E (Electronic Fund Transfer Act).
+11.2 FCRA requirements for credit-related disputes.
+11.3 PCI-DSS for card data handling during investigations.
