@@ -15,3 +15,10 @@ anyio>=3.7.0
 
 # JSON Schema Validation & Utils
 jsonschema>=4.18.0
+
+# Memory & RAG Lab Dependencies
+chromadb>=0.6.0            # Vector store with HNSW index
+rank-bm25>=0.2.2           # BM25 keyword scorer for hybrid search
+tiktoken>=0.7.0            # Token counting for context eval
+sentence-transformers>=2.0.0  # Local embeddings (all-MiniLM-L6-v2)
+networkx>=3.0              # Graph RAG entity graph
