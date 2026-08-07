@@ -168,10 +168,12 @@ def _build_base_tools() -> list[types.Tool]:
                 "properties": {
                     "customer_id": {
                         "type": "string",
+                        "pattern": "^CUST-\\d{3,}$",
                         "description": "The customer ID to scan, e.g. 'CUST-073'",
                     },
                     "merchant_id": {
                         "type": "string",
+                        "pattern": "^MERCH-\\d{3,}$",
                         "description": "The merchant ID to check against, e.g. 'MERCH-006'",
                     },
                 },
@@ -187,7 +189,8 @@ def _build_base_tools() -> list[types.Tool]:
                 "properties": {
                     "dispute_id": {
                         "type": "string",
-                        "description": "The dispute ID to summarize",
+                        "pattern": "^DISP-\\d{3,}$",
+                        "description": "The dispute ID to summarize, e.g. 'DISP-001'",
                     }
                 },
                 "required": ["dispute_id"],
@@ -240,22 +243,95 @@ async def handle_list_tools(ctx, params) -> types.ListToolsResult:
 # call_tool handler
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# Server-side argument validation helpers
+# ---------------------------------------------------------------------------
+
+import re as _re
+
+_DISP_RE  = _re.compile(r"^DISP-\d{3,}$")
+_ANL_RE   = _re.compile(r"^ANL-\d{3,}$")
+_MERCH_RE = _re.compile(r"^MERCH-\d{3,}$")
+_ACC_RE   = _re.compile(r"^ACC-\d{3,}$")
+_CUST_RE  = _re.compile(r"^CUST-\d{3,}$")
+
+
+def _bad(msg: str) -> types.CallToolResult:
+    """Return a user-visible validation error without touching the database."""
+    return types.CallToolResult(
+        content=[types.TextContent(type="text", text=f"VALIDATION ERROR: {msg}")]
+    )
+
+
+def _validate_dispute_id(val) -> str | None:
+    if not isinstance(val, str) or not _DISP_RE.match(val):
+        return f"dispute_id '{val}' must match DISP-<3+ digits> (e.g. DISP-001)"
+    return None
+
+
+def _validate_analyst_id(val) -> str | None:
+    if not isinstance(val, str) or not _ANL_RE.match(val):
+        return f"analyst_id '{val}' must match ANL-<3+ digits> (e.g. ANL-001)"
+    return None
+
+
+def _validate_merchant_id(val) -> str | None:
+    if not isinstance(val, str) or not _MERCH_RE.match(val):
+        return f"merchant_id '{val}' must match MERCH-<3+ digits> (e.g. MERCH-001)"
+    return None
+
+
+def _validate_account_id(val) -> str | None:
+    if not isinstance(val, str) or not _ACC_RE.match(val):
+        return f"account_id '{val}' must match ACC-<3+ digits> (e.g. ACC-001)"
+    return None
+
+
+def _validate_customer_id(val) -> str | None:
+    if not isinstance(val, str) or not _CUST_RE.match(val):
+        return f"customer_id '{val}' must match CUST-<3+ digits> (e.g. CUST-001)"
+    return None
+
+
+# ---------------------------------------------------------------------------
+# call_tool handler  (explicit server-side validation before every DB action)
+# ---------------------------------------------------------------------------
+
 async def handle_call_tool(ctx, params) -> types.CallToolResult:
     name = params.name
     arguments = dict(params.arguments) if params.arguments else {}
 
-    conn = get_connection()
-    cursor = conn.cursor()
-
+    # ── get_dispute_details ──────────────────────────────────────────────────
     if name == "get_dispute_details":
+        # 1. Format validation
+        err = _validate_dispute_id(arguments.get("dispute_id"))
+        if err:
+            return _bad(err)
+
+        conn = get_connection()
+        cursor = conn.cursor()
         cursor.execute("SELECT * FROM disputes WHERE dispute_id = ?", (arguments["dispute_id"],))
         row = cursor.fetchone()
         conn.close()
+        # 2. Existence check
         if row is None:
             return types.CallToolResult(content=[types.TextContent(type="text", text=f"No dispute found with ID {arguments['dispute_id']}")])
         return types.CallToolResult(content=[types.TextContent(type="text", text=str(dict(row)))])
 
+    # ── get_transaction_history ──────────────────────────────────────────────
     elif name == "get_transaction_history":
+        # 1. Format validation
+        err = _validate_account_id(arguments.get("account_id"))
+        if err:
+            return _bad(err)
+
+        conn = get_connection()
+        cursor = conn.cursor()
+        # 2. Existence check — verify account exists
+        cursor.execute("SELECT account_id FROM accounts WHERE account_id = ?", (arguments["account_id"],))
+        if cursor.fetchone() is None:
+            conn.close()
+            return types.CallToolResult(content=[types.TextContent(type="text", text=f"No account found with ID {arguments['account_id']}")])
         cursor.execute("SELECT * FROM transactions WHERE account_id = ?", (arguments["account_id"],))
         rows = cursor.fetchall()
         conn.close()
@@ -263,17 +339,53 @@ async def handle_call_tool(ctx, params) -> types.CallToolResult:
             return types.CallToolResult(content=[types.TextContent(type="text", text=f"No transactions found for account {arguments['account_id']}")])
         return types.CallToolResult(content=[types.TextContent(type="text", text=str([dict(r) for r in rows]))])
 
+    # ── get_merchant_info ────────────────────────────────────────────────────
     elif name == "get_merchant_info":
+        # 1. Format validation
+        err = _validate_merchant_id(arguments.get("merchant_id"))
+        if err:
+            return _bad(err)
+
+        conn = get_connection()
+        cursor = conn.cursor()
         cursor.execute("SELECT * FROM merchants WHERE merchant_id = ?", (arguments["merchant_id"],))
         row = cursor.fetchone()
         conn.close()
+        # 2. Existence check
         if row is None:
             return types.CallToolResult(content=[types.TextContent(type="text", text=f"No merchant found with ID {arguments['merchant_id']}")])
         return types.CallToolResult(content=[types.TextContent(type="text", text=str(dict(row)))])
 
+    # ── scan_repeat_dispute_patterns ─────────────────────────────────────────
     elif name == "scan_repeat_dispute_patterns":
+        # 1. Format validation
+        err = _validate_customer_id(arguments.get("customer_id"))
+        if err:
+            return _bad(err)
+        err = _validate_merchant_id(arguments.get("merchant_id"))
+        if err:
+            return _bad(err)
+
         customer_id = arguments["customer_id"]
         merchant_id = arguments["merchant_id"]
+
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        # 2. Existence checks — customer and merchant must exist
+        cursor.execute(
+            "SELECT customer_id FROM customers WHERE customer_id = ?", (customer_id,)
+        )
+        if cursor.fetchone() is None:
+            conn.close()
+            return types.CallToolResult(content=[types.TextContent(type="text", text=f"No customer found with ID {customer_id}")])
+
+        cursor.execute(
+            "SELECT merchant_id FROM merchants WHERE merchant_id = ?", (merchant_id,)
+        )
+        if cursor.fetchone() is None:
+            conn.close()
+            return types.CallToolResult(content=[types.TextContent(type="text", text=f"No merchant found with ID {merchant_id}")])
 
         cursor.execute(
             """
@@ -320,8 +432,22 @@ async def handle_call_tool(ctx, params) -> types.CallToolResult:
         )
         return types.CallToolResult(content=[types.TextContent(type="text", text=result_str)])
 
+    # ── summarize_dispute_evidence ───────────────────────────────────────────
     elif name == "summarize_dispute_evidence":
+        # 1. Format validation
+        err = _validate_dispute_id(arguments.get("dispute_id"))
+        if err:
+            return _bad(err)
+
         dispute_id = arguments["dispute_id"]
+
+        # 2. Existence check — dispute must exist before sampling is invoked
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT dispute_id FROM disputes WHERE dispute_id = ?", (dispute_id,))
+        if cursor.fetchone() is None:
+            conn.close()
+            return types.CallToolResult(content=[types.TextContent(type="text", text=f"No dispute found with ID {dispute_id}")])
         conn.close()
 
         res = summarize_dispute_evidence(dispute_id)
@@ -330,11 +456,35 @@ async def handle_call_tool(ctx, params) -> types.CallToolResult:
 
         return types.CallToolResult(content=[types.TextContent(type="text", text=res["sampling_response_summary"])])
 
+    # ── process_refund ───────────────────────────────────────────────────────
     elif name == "process_refund":
+        # 1. Format validation
+        err = _validate_dispute_id(arguments.get("dispute_id"))
+        if err:
+            return _bad(err)
+        err = _validate_analyst_id(arguments.get("analyst_id"))
+        if err:
+            return _bad(err)
+
         dispute_id = arguments["dispute_id"]
         analyst_id = arguments["analyst_id"]
-        confirmed = arguments.get("confirmed")
+        confirmed  = arguments.get("confirmed")
 
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        # 2. Existence checks — both dispute and analyst must exist
+        cursor.execute("SELECT dispute_id FROM disputes WHERE dispute_id = ?", (dispute_id,))
+        if cursor.fetchone() is None:
+            conn.close()
+            return types.CallToolResult(content=[types.TextContent(type="text", text=f"No dispute found with ID {dispute_id}")])
+
+        cursor.execute("SELECT analyst_id FROM analysts WHERE analyst_id = ?", (analyst_id,))
+        if cursor.fetchone() is None:
+            conn.close()
+            return types.CallToolResult(content=[types.TextContent(type="text", text=f"No analyst found with ID {analyst_id}")])
+
+        # 3. Bounds / state check — fire escalation notification if needed
         cursor.execute("SELECT * FROM disputes WHERE dispute_id = ?", (dispute_id,))
         dispute = cursor.fetchone()
         if dispute:
@@ -348,17 +498,36 @@ async def handle_call_tool(ctx, params) -> types.CallToolResult:
         res = process_refund_with_elicitation(dispute_id, analyst_id, confirmed)
         return types.CallToolResult(content=[types.TextContent(type="text", text=res["message"])])
 
+    # ── escalate_dispute ─────────────────────────────────────────────────────
     elif name == "escalate_dispute":
+        # 1. Format validation
+        err = _validate_dispute_id(arguments.get("dispute_id"))
+        if err:
+            return _bad(err)
+        err = _validate_analyst_id(arguments.get("analyst_id"))
+        if err:
+            return _bad(err)
+
         dispute_id = arguments["dispute_id"]
         analyst_id = arguments["analyst_id"]
 
+        # 2. State check — escalation must have been triggered this session
         if not session_state["escalated"]:
-            conn.close()
             return types.CallToolResult(content=[types.TextContent(
                 type="text",
                 text="REJECTED: No escalation has been triggered in this session yet.",
             )])
 
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        # 3. Existence check — dispute must exist
+        cursor.execute("SELECT dispute_id FROM disputes WHERE dispute_id = ?", (dispute_id,))
+        if cursor.fetchone() is None:
+            conn.close()
+            return types.CallToolResult(content=[types.TextContent(type="text", text=f"No dispute found with ID {dispute_id}")])
+
+        # 4. Role check — analyst must exist and be senior
         cursor.execute("SELECT * FROM analysts WHERE analyst_id = ?", (analyst_id,))
         analyst = cursor.fetchone()
         if analyst is None or analyst["role"] != "senior":
@@ -366,6 +535,16 @@ async def handle_call_tool(ctx, params) -> types.CallToolResult:
             return types.CallToolResult(content=[types.TextContent(
                 type="text",
                 text=f"REJECTED: Analyst {analyst_id} is not a senior analyst and cannot escalate disputes.",
+            )])
+
+        # 5. Allowed-state check — dispute must be in an escalatable state
+        cursor.execute("SELECT status FROM disputes WHERE dispute_id = ?", (dispute_id,))
+        disp_row = cursor.fetchone()
+        if disp_row and disp_row["status"] in ("refunded", "escalated", "denied"):
+            conn.close()
+            return types.CallToolResult(content=[types.TextContent(
+                type="text",
+                text=f"REJECTED: Dispute {dispute_id} is already in terminal status '{disp_row['status']}' and cannot be escalated.",
             )])
 
         cursor.execute("UPDATE disputes SET status = 'escalated' WHERE dispute_id = ?", (dispute_id,))
@@ -376,7 +555,6 @@ async def handle_call_tool(ctx, params) -> types.CallToolResult:
             text=f"ESCALATED: Dispute {dispute_id} formally escalated to the card network by {analyst_id}.",
         )])
 
-    conn.close()
     raise ValueError(f"Unknown tool: {name}")
 
 

@@ -4,16 +4,16 @@
     "passed": 21,
     "failed": 0,
     "pass_rate_pct": 100,
-    "latency_min_ms": 1.3,
-    "latency_max_ms": 1451.1,
-    "latency_avg_ms": 223.2,
-    "latency_p95_ms": 1451.1
+    "latency_min_ms": 1.33,
+    "latency_max_ms": 1466.35,
+    "latency_avg_ms": 224.44,
+    "latency_p95_ms": 1466.35
   },
   "results": [
     {
       "name": "handshake_cold_start",
       "category": "Capability Negotiation",
-      "latency_ms": 1313.26,
+      "latency_ms": 1314.26,
       "passed": true,
       "actual": "tools_changed=True, resources=True, prompts=True",
       "notes": ""
@@ -21,7 +21,7 @@
     {
       "name": "tool_discovery_6_tools",
       "category": "Capability Negotiation",
-      "latency_ms": 1313.26,
+      "latency_ms": 1314.26,
       "passed": true,
       "actual": "6 tools: ['get_dispute_details', 'get_transaction_history', 'get_merchant_info', 'process_refund', 'scan_repeat_dispute_patterns', 'summarize_dispute_evidence']",
       "notes": ""
@@ -29,7 +29,7 @@
     {
       "name": "get_dispute_details_DISP001",
       "category": "Read Tools",
-      "latency_ms": 3.48,
+      "latency_ms": 3.86,
       "passed": true,
       "actual": "{'dispute_id': 'DISP-001', 'transaction_id': 'TXN-002', 'reason_code': 'duplicate_charge', 'status':",
       "notes": ""
@@ -37,7 +37,7 @@
     {
       "name": "get_dispute_details_not_found",
       "category": "Read Tools",
-      "latency_ms": 2.44,
+      "latency_ms": 2.88,
       "passed": true,
       "actual": "No dispute found with ID DISP-999",
       "notes": ""
@@ -45,7 +45,7 @@
     {
       "name": "get_transaction_history_ACC001",
       "category": "Read Tools",
-      "latency_ms": 2.58,
+      "latency_ms": 2.77,
       "passed": true,
       "actual": "[{'transaction_id': 'TXN-001', 'account_id': 'ACC-001', 'merchant_id': 'MERCH-001', 'amount': 29.99,",
       "notes": ""
@@ -53,7 +53,7 @@
     {
       "name": "get_merchant_info_MERCH001",
       "category": "Read Tools",
-      "latency_ms": 2.66,
+      "latency_ms": 2.76,
       "passed": true,
       "actual": "{'merchant_id': 'MERCH-001', 'name': 'Brew & Go Coffee', 'category': 'food_beverage', 'risk_score': ",
       "notes": ""
@@ -61,7 +61,7 @@
     {
       "name": "get_merchant_info_not_found",
       "category": "Read Tools",
-      "latency_ms": 2.42,
+      "latency_ms": 2.58,
       "passed": true,
       "actual": "No merchant found with ID MERCH-999",
       "notes": ""
@@ -69,7 +69,7 @@
     {
       "name": "notification_tools_list_changed",
       "category": "Notifications",
-      "latency_ms": 309.51,
+      "latency_ms": 313.7,
       "passed": true,
       "actual": "before=6 tools, after=7 tools, escalate_appeared=True",
       "notes": ""
@@ -77,7 +77,7 @@
     {
       "name": "auth_junior_blocked_large_refund",
       "category": "Authorization",
-      "latency_ms": 4.66,
+      "latency_ms": 4.76,
       "passed": true,
       "actual": "REJECTED: Junior analyst ANL-001 cannot approve refunds > $500.00.",
       "notes": ""
@@ -85,7 +85,7 @@
     {
       "name": "auth_junior_blocked_from_escalate",
       "category": "Authorization",
-      "latency_ms": 2.71,
+      "latency_ms": 2.61,
       "passed": true,
       "actual": "REJECTED: Analyst ANL-001 is not a senior analyst and cannot escalate disputes.",
       "notes": ""
@@ -93,7 +93,7 @@
     {
       "name": "elicitation_routine_auto_approved",
       "category": "Elicitation",
-      "latency_ms": 19.41,
+      "latency_ms": 18.13,
       "passed": true,
       "actual": "ROUTINE REFUND APPROVED: Dispute DISP-001 ($100.00) processed by analyst ANL-001.",
       "notes": ""
@@ -101,7 +101,7 @@
     {
       "name": "elicitation_pause_over_threshold",
       "category": "Elicitation",
-      "latency_ms": 3.87,
+      "latency_ms": 5.39,
       "passed": true,
       "actual": "ELICITATION PAUSE: Dispute DISP-002 ($899.00) exceeds policy threshold ($500.00). Pausing execution for explicit human sign-off.",
       "notes": ""
@@ -109,7 +109,7 @@
     {
       "name": "resource_list",
       "category": "Resources & Prompts",
-      "latency_ms": 1.54,
+      "latency_ms": 1.5,
       "passed": true,
       "actual": "['policy://disputes/reason-codes']",
       "notes": ""
@@ -117,7 +117,7 @@
     {
       "name": "resource_read_policy",
       "category": "Resources & Prompts",
-      "latency_ms": 2.22,
+      "latency_ms": 2.69,
       "passed": true,
       "actual": "================================================================================\nSTERLING VANCE BANK \u2014 DISPUTE & CHARGEB",
       "notes": ""
@@ -125,7 +125,7 @@
     {
       "name": "prompt_list",
       "category": "Resources & Prompts",
-      "latency_ms": 1.3,
+      "latency_ms": 1.33,
       "passed": true,
       "actual": "['draft_denial_explanation']",
       "notes": ""
@@ -133,7 +133,7 @@
     {
       "name": "prompt_get_denial_template",
       "category": "Resources & Prompts",
-      "latency_ms": 2.04,
+      "latency_ms": 2.31,
       "passed": true,
       "actual": "Write a clear, professional, empathetic explanation to the customer for why dispute DISP-003 was denied.\n\n1. First call ",
       "notes": ""
@@ -141,7 +141,7 @@
     {
       "name": "progress_scan_repeat_patterns",
       "category": "Progress Tracking",
-      "latency_ms": 19.42,
+      "latency_ms": 20.21,
       "passed": true,
       "actual": "Scanned 35 transactions for customer CUST-073. Found 6 transaction(s) with merchant MERCH-006: ['TXN-849', 'TXN-850', 'TXN-844', 'TXN-843', 'TXN-866', 'TXN-869']. Repeat-dispute pattern detected: True.",
       "notes": "progress_updates_received=35"
@@ -149,10 +149,10 @@
     {
       "name": "throughput_10_sequential_reads",
       "category": "Throughput",
-      "latency_ms": 2.48,
+      "latency_ms": 2.58,
       "passed": true,
-      "actual": "avg=2.48ms total=24.77ms tps=403.71",
-      "notes": "403.71 calls/sec"
+      "actual": "avg=2.58ms total=25.77ms tps=388.05",
+      "notes": "388.05 calls/sec"
     },
     {
       "name": "capability_elicitation_not_declared_by_server",
@@ -165,7 +165,7 @@
     {
       "name": "llm_sampling_call_latency",
       "category": "End-to-End Workflow",
-      "latency_ms": 3.69,
+      "latency_ms": 3.79,
       "passed": true,
       "actual": "Dispute DISP-002 ($ 899.00) at TechGadgets Online carries a elevated risk score of 45/100. Evidence ",
       "notes": "LLM evidence summarization call"
@@ -173,10 +173,10 @@
     {
       "name": "start_to_finish_full_workflow_latency",
       "category": "End-to-End Workflow",
-      "latency_ms": 1451.1,
+      "latency_ms": 1466.35,
       "passed": true,
-      "actual": "total_end_to_end=1451.1ms",
-      "notes": "Includes cold start (1451.12ms), handshake, LLM sampling, and elicitation refund"
+      "actual": "total_end_to_end=1466.35ms",
+      "notes": "Includes cold start (1466.37ms), handshake, LLM sampling, and elicitation refund"
     }
   ]
 }
