@@ -18,6 +18,12 @@ import sqlite3
 import sys
 import time
 
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    except Exception:
+        pass
+
 REPO_ROOT = os.path.dirname(os.path.abspath(__file__))
 AGENT_DIR = os.path.join(REPO_ROOT, "agent")
 DB_PATH = os.path.join(REPO_ROOT, "db", "sterling_vance.db")

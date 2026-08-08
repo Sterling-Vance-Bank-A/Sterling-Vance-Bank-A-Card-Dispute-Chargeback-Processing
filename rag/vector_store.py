@@ -10,7 +10,10 @@ class PolicyVectorStore:
     """ChromaDB-backed vector store with HNSW index, metadata payload, and metadata filtering."""
     def __init__(self, persist_dir=PERSIST_DIR, embedding_model='all-MiniLM-L6-v2'):
         self.client = chromadb.PersistentClient(path=persist_dir)
-        self.ef = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=embedding_model)
+        try:
+            self.ef = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=embedding_model)
+        except Exception:
+            self.ef = embedding_functions.DefaultEmbeddingFunction()
         self.collection = self.client.get_or_create_collection(
             name=COLLECTION_NAME,
             embedding_function=self.ef,
