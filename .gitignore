@@ -8,7 +8,7 @@ __pycache__/
 dist/
 build/
 .eggs/
-
+venv/
 # Environment & secrets — NEVER commit these
 .env
 .env.*
