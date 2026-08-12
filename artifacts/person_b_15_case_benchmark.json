@@ -1,0 +1,4970 @@
+{
+  "benchmark": "Person B Planning & Search",
+  "cases": [
+    {
+      "id": "PB01",
+      "family": "linear",
+      "type": "evidence_aggregation",
+      "description": "Summarize evidence for DISP-001 and compute dispute exposure.",
+      "context": "DISP-001 amount=$29.99 reason=duplicate_charge",
+      "expected": "PLAN and SOLUTION"
+    },
+    {
+      "id": "PB02",
+      "family": "linear",
+      "type": "timeline_generation",
+      "description": "Build a concise dispute timeline for DISP-002.",
+      "context": "DISP-002 status=investigating amount=$899",
+      "expected": "PLAN and SOLUTION"
+    },
+    {
+      "id": "PB03",
+      "family": "linear",
+      "type": "fee_calculation",
+      "description": "Calculate the monetary exposure for DISP-006.",
+      "context": "DISP-006 amount=$320 reason=fraud",
+      "expected": "PLAN and SOLUTION"
+    },
+    {
+      "id": "PB04",
+      "family": "linear",
+      "type": "notification_draft",
+      "description": "Draft a customer notification for DISP-009.",
+      "context": "DISP-009 amount=$793.78 status=investigating",
+      "expected": "PLAN and SOLUTION"
+    },
+    {
+      "id": "PB05",
+      "family": "linear",
+      "type": "evidence_aggregation",
+      "description": "Summarize evidence and constraints for DISP-013.",
+      "context": "DISP-013 amount=$1337.92 reason=duplicate_charge",
+      "expected": "PLAN and SOLUTION"
+    },
+    {
+      "id": "PB06",
+      "family": "ranking",
+      "type": "rank_recovery",
+      "description": "Rank these dispute priorities by filing deadline, merchant risk, and recoverability. PB06",
+      "context": "M-A deadline=2d risk=60 recovery=.70; M-B deadline=5d risk=90 recovery=.60; M-C deadline=1d risk=30 recovery=.80",
+      "expected": "M-C -> M-A -> M-B"
+    },
+    {
+      "id": "PB07",
+      "family": "ranking",
+      "type": "sort_priority",
+      "description": "Sort five disputes by urgency while balancing deadline and amount. PB07",
+      "context": "D1 deadline=1d amount=120; D2 deadline=3d amount=900; D3 deadline=2d amount=450; D4 deadline=1d amount=700; D5 deadline=7d amount=150",
+      "expected": "D1 -> D4 -> D3 -> D2 -> D5"
+    },
+    {
+      "id": "PB08",
+      "family": "ranking",
+      "type": "rank_risk",
+      "description": "Rank multi-merchant chargeback risk from highest to lowest. PB08",
+      "context": "MERCH-A risk=88 history=12; MERCH-B risk=41 history=4; MERCH-C risk=72 history=9; MERCH-D risk=15 history=1",
+      "expected": "MERCH-A -> MERCH-C -> MERCH-B -> MERCH-D"
+    },
+    {
+      "id": "PB09",
+      "family": "ranking",
+      "type": "rank_recovery",
+      "description": "Choose the best recovery-first ordering across three transactions. PB09",
+      "context": "TX-A recovery=.82 deadline=4d; TX-B recovery=.61 deadline=1d; TX-C recovery=.76 deadline=2d",
+      "expected": "TX-A -> TX-C -> TX-B"
+    },
+    {
+      "id": "PB10",
+      "family": "ranking",
+      "type": "sort_priority",
+      "description": "Prioritize a mixed portfolio of high-risk and time-sensitive disputes. PB10",
+      "context": "P1 risk=95 deadline=5d; P2 risk=40 deadline=1d; P3 risk=70 deadline=2d; P4 risk=50 deadline=3d",
+      "expected": "P1 -> P3 -> P4 -> P2"
+    },
+    {
+      "id": "PB11",
+      "family": "high_stakes",
+      "type": "process_refund",
+      "description": "Evaluate a refund candidate for DISP-001 using analyst ANL-001. PB11",
+      "context": "DISP-001 amount=29.99 status=open analyst=ANL-001",
+      "expected": true
+    },
+    {
+      "id": "PB12",
+      "family": "high_stakes",
+      "type": "process_refund",
+      "description": "Evaluate a high-value refund for DISP-002 using junior analyst ANL-001. PB12",
+      "context": "DISP-002 amount=899 status=investigating junior analyst=ANL-001",
+      "expected": false
+    },
+    {
+      "id": "PB13",
+      "family": "high_stakes",
+      "type": "process_refund",
+      "description": "Evaluate a refund for DISP-003, which is already refunded. PB13",
+      "context": "DISP-003 amount=150 status=refunded analyst=ANL-002",
+      "expected": false
+    },
+    {
+      "id": "PB14",
+      "family": "high_stakes",
+      "type": "escalate_dispute",
+      "description": "Evaluate escalation of DISP-014; it is already escalated. PB14",
+      "context": "DISP-014 amount=370.78 status=escalated analyst=ANL-002",
+      "expected": false
+    },
+    {
+      "id": "PB15",
+      "family": "high_stakes",
+      "type": "process_refund",
+      "description": "Evaluate a high-value refund for DISP-013 using senior analyst ANL-008. PB15",
+      "context": "DISP-013 amount=1337.92 status=investigating senior analyst=ANL-008",
+      "expected": true
+    }
+  ],
+  "strategies": [
+    "plan_and_solve",
+    "tree_of_thoughts",
+    "lats_ungrounded",
+    "lats_grounded"
+  ],
+  "model": "deterministic MockLLMClient",
+  "grounded_source": "db/sterling_vance.db (read-only)",
+  "note": "This local run verifies control flow and reproducibility. Replace MockLLMClient with the team's live model adapter for final quality measurements.",
+  "summary": [
+    {
+      "strategy": "plan_and_solve",
+      "applicable_cases": 5,
+      "successes": 5,
+      "success_rate": 1.0,
+      "avg_llm_calls": 1,
+      "avg_tokens": 20,
+      "avg_latency_seconds": 2e-05,
+      "avg_cost_usd": 0.0002
+    },
+    {
+      "strategy": "tree_of_thoughts",
+      "applicable_cases": 5,
+      "successes": 5,
+      "success_rate": 1.0,
+      "avg_llm_calls": 16,
+      "avg_tokens": 151.2,
+      "avg_latency_seconds": 7.7e-05,
+      "avg_cost_usd": 0.001512
+    },
+    {
+      "strategy": "lats_ungrounded",
+      "applicable_cases": 5,
+      "successes": 2,
+      "success_rate": 0.4,
+      "avg_llm_calls": 2,
+      "avg_tokens": 13,
+      "avg_latency_seconds": 5.4e-05,
+      "avg_cost_usd": 0.00013
+    },
+    {
+      "strategy": "lats_grounded",
+      "applicable_cases": 5,
+      "successes": 5,
+      "success_rate": 1.0,
+      "avg_llm_calls": 9.2,
+      "avg_tokens": 80.8,
+      "avg_latency_seconds": 0.000808,
+      "avg_cost_usd": 0.000808
+    }
+  ],
+  "runs": [
+    {
+      "case_id": "PB01",
+      "family": "linear",
+      "strategy": "plan_and_solve",
+      "applicable": true,
+      "success": true,
+      "success_basis": "explicit PLAN/SOLUTION output",
+      "llm_calls": 1,
+      "tokens": 20,
+      "latency_seconds": 6.4e-05,
+      "estimated_cost_usd": 0.0002,
+      "result": {
+        "status": "success",
+        "final_result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked.",
+        "execution_trace": [
+          {
+            "phase": "plan",
+            "result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked."
+          }
+        ],
+        "metrics": {
+          "llm_calls": 1,
+          "tokens": 20
+        }
+      }
+    },
+    {
+      "case_id": "PB01",
+      "family": "linear",
+      "strategy": "tree_of_thoughts",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 16,
+      "tokens": 96,
+      "latency_seconds": 9.8e-05,
+      "estimated_cost_usd": 0.00096,
+      "result": {
+        "status": "success",
+        "best_path": {
+          "state": "Candidate A",
+          "score": 0.35,
+          "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+        },
+        "search": {
+          "method": "BFS/beam",
+          "beam_width": 3,
+          "max_depth": 2,
+          "pruned": 0,
+          "levels": [
+            [
+              {
+                "parent": "Start | DISP-001 amount=$29.99 reason=duplicate_charge",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | DISP-001 amount=$29.99 reason=duplicate_charge",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | DISP-001 amount=$29.99 reason=duplicate_charge",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ],
+            [
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ]
+          ]
+        },
+        "metrics": {
+          "llm_calls": 16,
+          "tokens": 96
+        }
+      }
+    },
+    {
+      "case_id": "PB01",
+      "family": "linear",
+      "strategy": "lats_ungrounded",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 0.000112,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-001 using ANL-002",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Candidate self-approved; no external bank validator was consulted.",
+          "source": "ungrounded_model_score"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "DISP-001 amount=$29.99 reason=duplicate_charge",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Candidate self-approved; no external bank validator was consulted.",
+              "source": "ungrounded_model_score"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB01",
+      "family": "linear",
+      "strategy": "lats_grounded",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 0.000466,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-001 using ANL-002",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Refund candidate passes current DB constraints.",
+          "source": "sterling_vance.db"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "DISP-001 amount=$29.99 reason=duplicate_charge",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Refund candidate passes current DB constraints.",
+              "source": "sterling_vance.db"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB02",
+      "family": "linear",
+      "strategy": "plan_and_solve",
+      "applicable": true,
+      "success": true,
+      "success_basis": "explicit PLAN/SOLUTION output",
+      "llm_calls": 1,
+      "tokens": 20,
+      "latency_seconds": 1.2e-05,
+      "estimated_cost_usd": 0.0002,
+      "result": {
+        "status": "success",
+        "final_result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked.",
+        "execution_trace": [
+          {
+            "phase": "plan",
+            "result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked."
+          }
+        ],
+        "metrics": {
+          "llm_calls": 1,
+          "tokens": 20
+        }
+      }
+    },
+    {
+      "case_id": "PB02",
+      "family": "linear",
+      "strategy": "tree_of_thoughts",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 16,
+      "tokens": 96,
+      "latency_seconds": 7.9e-05,
+      "estimated_cost_usd": 0.00096,
+      "result": {
+        "status": "success",
+        "best_path": {
+          "state": "Candidate A",
+          "score": 0.35,
+          "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+        },
+        "search": {
+          "method": "BFS/beam",
+          "beam_width": 3,
+          "max_depth": 2,
+          "pruned": 0,
+          "levels": [
+            [
+              {
+                "parent": "Start | DISP-002 status=investigating amount=$899",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | DISP-002 status=investigating amount=$899",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | DISP-002 status=investigating amount=$899",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ],
+            [
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ]
+          ]
+        },
+        "metrics": {
+          "llm_calls": 16,
+          "tokens": 96
+        }
+      }
+    },
+    {
+      "case_id": "PB02",
+      "family": "linear",
+      "strategy": "lats_ungrounded",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 3.4e-05,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-002 using ANL-002",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Candidate self-approved; no external bank validator was consulted.",
+          "source": "ungrounded_model_score"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "DISP-002 status=investigating amount=$899",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-002 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Candidate self-approved; no external bank validator was consulted.",
+              "source": "ungrounded_model_score"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-002 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-002 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB02",
+      "family": "linear",
+      "strategy": "lats_grounded",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 0.00028,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-002 using ANL-002",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Refund candidate passes current DB constraints.",
+          "source": "sterling_vance.db"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "DISP-002 status=investigating amount=$899",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-002 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Refund candidate passes current DB constraints.",
+              "source": "sterling_vance.db"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-002 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-002 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB03",
+      "family": "linear",
+      "strategy": "plan_and_solve",
+      "applicable": true,
+      "success": true,
+      "success_basis": "explicit PLAN/SOLUTION output",
+      "llm_calls": 1,
+      "tokens": 20,
+      "latency_seconds": 1e-05,
+      "estimated_cost_usd": 0.0002,
+      "result": {
+        "status": "success",
+        "final_result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked.",
+        "execution_trace": [
+          {
+            "phase": "plan",
+            "result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked."
+          }
+        ],
+        "metrics": {
+          "llm_calls": 1,
+          "tokens": 20
+        }
+      }
+    },
+    {
+      "case_id": "PB03",
+      "family": "linear",
+      "strategy": "tree_of_thoughts",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 16,
+      "tokens": 96,
+      "latency_seconds": 7.1e-05,
+      "estimated_cost_usd": 0.00096,
+      "result": {
+        "status": "success",
+        "best_path": {
+          "state": "Candidate A",
+          "score": 0.35,
+          "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+        },
+        "search": {
+          "method": "BFS/beam",
+          "beam_width": 3,
+          "max_depth": 2,
+          "pruned": 0,
+          "levels": [
+            [
+              {
+                "parent": "Start | DISP-006 amount=$320 reason=fraud",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | DISP-006 amount=$320 reason=fraud",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | DISP-006 amount=$320 reason=fraud",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ],
+            [
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ]
+          ]
+        },
+        "metrics": {
+          "llm_calls": 16,
+          "tokens": 96
+        }
+      }
+    },
+    {
+      "case_id": "PB03",
+      "family": "linear",
+      "strategy": "lats_ungrounded",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 3.2e-05,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-006 using ANL-002",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Candidate self-approved; no external bank validator was consulted.",
+          "source": "ungrounded_model_score"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "DISP-006 amount=$320 reason=fraud",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-006 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Candidate self-approved; no external bank validator was consulted.",
+              "source": "ungrounded_model_score"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-006 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-006 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB03",
+      "family": "linear",
+      "strategy": "lats_grounded",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 14,
+      "tokens": 126,
+      "latency_seconds": 0.001355,
+      "estimated_cost_usd": 0.00126,
+      "result": {
+        "status": "failed",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-006 using ANL-002",
+        "environment_feedback": {
+          "success": false,
+          "score": 0.0,
+          "details": "Refund blocked: dispute already terminal (refunded).",
+          "source": "sterling_vance.db"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "DISP-006 amount=$320 reason=fraud",
+            "visits": 6,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-006 using ANL-002",
+            "visits": 4,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": false,
+              "score": 0.0,
+              "details": "Refund blocked: dispute already terminal (refunded).",
+              "source": "sterling_vance.db"
+            },
+            "reflections": [
+              "Validator rejected this branch; the next expansion should avoid the same policy violation or terminal-state conflict."
+            ]
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-006 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": false,
+              "score": 0.0,
+              "details": "Refund blocked: dispute already terminal (refunded).",
+              "source": "sterling_vance.db"
+            },
+            "reflections": [
+              "Validator rejected this branch; the next expansion should avoid the same policy violation or terminal-state conflict."
+            ]
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-006 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": false,
+              "score": 0.0,
+              "details": "Refund blocked: dispute already terminal (refunded).",
+              "source": "sterling_vance.db"
+            },
+            "reflections": [
+              "Validator rejected this branch; the next expansion should avoid the same policy violation or terminal-state conflict."
+            ]
+          },
+          {
+            "id": "n4",
+            "parent_id": "n1",
+            "action": "process_refund",
+            "state": "Refund DISP-006 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": false,
+              "score": 0.0,
+              "details": "Refund blocked: dispute already terminal (refunded).",
+              "source": "sterling_vance.db"
+            },
+            "reflections": [
+              "Validator rejected this branch; the next expansion should avoid the same policy violation or terminal-state conflict."
+            ]
+          },
+          {
+            "id": "n5",
+            "parent_id": "n1",
+            "action": "process_refund",
+            "state": "Refund DISP-006 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": false,
+              "score": 0.0,
+              "details": "Refund blocked: dispute already terminal (refunded).",
+              "source": "sterling_vance.db"
+            },
+            "reflections": [
+              "Validator rejected this branch; the next expansion should avoid the same policy violation or terminal-state conflict."
+            ]
+          },
+          {
+            "id": "n6",
+            "parent_id": "n1",
+            "action": "process_refund",
+            "state": "Refund DISP-006 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": false,
+              "score": 0.0,
+              "details": "Refund blocked: dispute already terminal (refunded).",
+              "source": "sterling_vance.db"
+            },
+            "reflections": [
+              "Validator rejected this branch; the next expansion should avoid the same policy violation or terminal-state conflict."
+            ]
+          }
+        ],
+        "iterations": 2,
+        "metrics": {
+          "llm_calls": 14,
+          "tokens": 126
+        }
+      }
+    },
+    {
+      "case_id": "PB04",
+      "family": "linear",
+      "strategy": "plan_and_solve",
+      "applicable": true,
+      "success": true,
+      "success_basis": "explicit PLAN/SOLUTION output",
+      "llm_calls": 1,
+      "tokens": 20,
+      "latency_seconds": 8e-06,
+      "estimated_cost_usd": 0.0002,
+      "result": {
+        "status": "success",
+        "final_result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked.",
+        "execution_trace": [
+          {
+            "phase": "plan",
+            "result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked."
+          }
+        ],
+        "metrics": {
+          "llm_calls": 1,
+          "tokens": 20
+        }
+      }
+    },
+    {
+      "case_id": "PB04",
+      "family": "linear",
+      "strategy": "tree_of_thoughts",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 16,
+      "tokens": 96,
+      "latency_seconds": 7.1e-05,
+      "estimated_cost_usd": 0.00096,
+      "result": {
+        "status": "success",
+        "best_path": {
+          "state": "Candidate A",
+          "score": 0.35,
+          "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+        },
+        "search": {
+          "method": "BFS/beam",
+          "beam_width": 3,
+          "max_depth": 2,
+          "pruned": 0,
+          "levels": [
+            [
+              {
+                "parent": "Start | DISP-009 amount=$793.78 status=investigating",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | DISP-009 amount=$793.78 status=investigating",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | DISP-009 amount=$793.78 status=investigating",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ],
+            [
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ]
+          ]
+        },
+        "metrics": {
+          "llm_calls": 16,
+          "tokens": 96
+        }
+      }
+    },
+    {
+      "case_id": "PB04",
+      "family": "linear",
+      "strategy": "lats_ungrounded",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 3.1e-05,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-009 using ANL-002",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Candidate self-approved; no external bank validator was consulted.",
+          "source": "ungrounded_model_score"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "DISP-009 amount=$793.78 status=investigating",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-009 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Candidate self-approved; no external bank validator was consulted.",
+              "source": "ungrounded_model_score"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-009 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-009 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB04",
+      "family": "linear",
+      "strategy": "lats_grounded",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 0.000267,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-009 using ANL-002",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Refund candidate passes current DB constraints.",
+          "source": "sterling_vance.db"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "DISP-009 amount=$793.78 status=investigating",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-009 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Refund candidate passes current DB constraints.",
+              "source": "sterling_vance.db"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-009 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-009 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB05",
+      "family": "linear",
+      "strategy": "plan_and_solve",
+      "applicable": true,
+      "success": true,
+      "success_basis": "explicit PLAN/SOLUTION output",
+      "llm_calls": 1,
+      "tokens": 20,
+      "latency_seconds": 7e-06,
+      "estimated_cost_usd": 0.0002,
+      "result": {
+        "status": "success",
+        "final_result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked.",
+        "execution_trace": [
+          {
+            "phase": "plan",
+            "result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked."
+          }
+        ],
+        "metrics": {
+          "llm_calls": 1,
+          "tokens": 20
+        }
+      }
+    },
+    {
+      "case_id": "PB05",
+      "family": "linear",
+      "strategy": "tree_of_thoughts",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 16,
+      "tokens": 96,
+      "latency_seconds": 6.8e-05,
+      "estimated_cost_usd": 0.00096,
+      "result": {
+        "status": "success",
+        "best_path": {
+          "state": "Candidate A",
+          "score": 0.35,
+          "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+        },
+        "search": {
+          "method": "BFS/beam",
+          "beam_width": 3,
+          "max_depth": 2,
+          "pruned": 0,
+          "levels": [
+            [
+              {
+                "parent": "Start | DISP-013 amount=$1337.92 reason=duplicate_charge",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | DISP-013 amount=$1337.92 reason=duplicate_charge",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | DISP-013 amount=$1337.92 reason=duplicate_charge",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ],
+            [
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ]
+          ]
+        },
+        "metrics": {
+          "llm_calls": 16,
+          "tokens": 96
+        }
+      }
+    },
+    {
+      "case_id": "PB05",
+      "family": "linear",
+      "strategy": "lats_ungrounded",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 3.1e-05,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-013 using ANL-002",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Candidate self-approved; no external bank validator was consulted.",
+          "source": "ungrounded_model_score"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "DISP-013 amount=$1337.92 reason=duplicate_charge",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-013 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Candidate self-approved; no external bank validator was consulted.",
+              "source": "ungrounded_model_score"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-013 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-013 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB05",
+      "family": "linear",
+      "strategy": "lats_grounded",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 0.000387,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-013 using ANL-002",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Refund candidate passes current DB constraints.",
+          "source": "sterling_vance.db"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "DISP-013 amount=$1337.92 reason=duplicate_charge",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-013 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Refund candidate passes current DB constraints.",
+              "source": "sterling_vance.db"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-013 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-013 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB06",
+      "family": "ranking",
+      "strategy": "plan_and_solve",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 1,
+      "tokens": 20,
+      "latency_seconds": 8e-06,
+      "estimated_cost_usd": 0.0002,
+      "result": {
+        "status": "success",
+        "final_result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked.",
+        "execution_trace": [
+          {
+            "phase": "plan",
+            "result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked."
+          }
+        ],
+        "metrics": {
+          "llm_calls": 1,
+          "tokens": 20
+        }
+      }
+    },
+    {
+      "case_id": "PB06",
+      "family": "ranking",
+      "strategy": "tree_of_thoughts",
+      "applicable": true,
+      "success": true,
+      "success_basis": "expected priority ordering present in best beam",
+      "llm_calls": 16,
+      "tokens": 132,
+      "latency_seconds": 8e-05,
+      "estimated_cost_usd": 0.00132,
+      "result": {
+        "status": "success",
+        "best_path": {
+          "state": "M-C -> M-A -> M-B",
+          "score": 0.95,
+          "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+        },
+        "search": {
+          "method": "BFS/beam",
+          "beam_width": 3,
+          "max_depth": 2,
+          "pruned": 0,
+          "levels": [
+            [
+              {
+                "parent": "Start | M-A deadline=2d risk=60 recovery=.70; M-B deadline=5d risk=90 recovery=.60; M-C deadline=1d risk=30 recovery=.80",
+                "candidate": "M-C -> M-A -> M-B",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "Start | M-A deadline=2d risk=60 recovery=.70; M-B deadline=5d risk=90 recovery=.60; M-C deadline=1d risk=30 recovery=.80",
+                "candidate": "M-A -> M-C -> M-B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | M-A deadline=2d risk=60 recovery=.70; M-B deadline=5d risk=90 recovery=.60; M-C deadline=1d risk=30 recovery=.80",
+                "candidate": "M-B -> M-A -> M-C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ],
+            [
+              {
+                "parent": "M-C -> M-A -> M-B",
+                "candidate": "M-C -> M-A -> M-B",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "M-C -> M-A -> M-B",
+                "candidate": "M-A -> M-C -> M-B",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "M-C -> M-A -> M-B",
+                "candidate": "M-B -> M-A -> M-C",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "M-A -> M-C -> M-B",
+                "candidate": "M-C -> M-A -> M-B",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "M-A -> M-C -> M-B",
+                "candidate": "M-A -> M-C -> M-B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "M-A -> M-C -> M-B",
+                "candidate": "M-B -> M-A -> M-C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "M-B -> M-A -> M-C",
+                "candidate": "M-C -> M-A -> M-B",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "M-B -> M-A -> M-C",
+                "candidate": "M-A -> M-C -> M-B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "M-B -> M-A -> M-C",
+                "candidate": "M-B -> M-A -> M-C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ]
+          ]
+        },
+        "metrics": {
+          "llm_calls": 16,
+          "tokens": 132
+        }
+      }
+    },
+    {
+      "case_id": "PB06",
+      "family": "ranking",
+      "strategy": "lats_ungrounded",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 3.3e-05,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-001 using ANL-002",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Candidate self-approved; no external bank validator was consulted.",
+          "source": "ungrounded_model_score"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "M-A deadline=2d risk=60 recovery=.70; M-B deadline=5d risk=90 recovery=.60; M-C deadline=1d risk=30 recovery=.80",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Candidate self-approved; no external bank validator was consulted.",
+              "source": "ungrounded_model_score"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB06",
+      "family": "ranking",
+      "strategy": "lats_grounded",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 0.000315,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-001 using ANL-002",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Refund candidate passes current DB constraints.",
+          "source": "sterling_vance.db"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "M-A deadline=2d risk=60 recovery=.70; M-B deadline=5d risk=90 recovery=.60; M-C deadline=1d risk=30 recovery=.80",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Refund candidate passes current DB constraints.",
+              "source": "sterling_vance.db"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB07",
+      "family": "ranking",
+      "strategy": "plan_and_solve",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 1,
+      "tokens": 20,
+      "latency_seconds": 7e-06,
+      "estimated_cost_usd": 0.0002,
+      "result": {
+        "status": "success",
+        "final_result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked.",
+        "execution_trace": [
+          {
+            "phase": "plan",
+            "result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked."
+          }
+        ],
+        "metrics": {
+          "llm_calls": 1,
+          "tokens": 20
+        }
+      }
+    },
+    {
+      "case_id": "PB07",
+      "family": "ranking",
+      "strategy": "tree_of_thoughts",
+      "applicable": true,
+      "success": true,
+      "success_basis": "expected priority ordering present in best beam",
+      "llm_calls": 16,
+      "tokens": 180,
+      "latency_seconds": 7.7e-05,
+      "estimated_cost_usd": 0.0018,
+      "result": {
+        "status": "success",
+        "best_path": {
+          "state": "D1 -> D4 -> D3 -> D2 -> D5",
+          "score": 0.95,
+          "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+        },
+        "search": {
+          "method": "BFS/beam",
+          "beam_width": 3,
+          "max_depth": 2,
+          "pruned": 0,
+          "levels": [
+            [
+              {
+                "parent": "Start | D1 deadline=1d amount=120; D2 deadline=3d amount=900; D3 deadline=2d amount=450; D4 deadline=1d amount=700; D5 deadline=7d amount=150",
+                "candidate": "D1 -> D4 -> D3 -> D2 -> D5",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "Start | D1 deadline=1d amount=120; D2 deadline=3d amount=900; D3 deadline=2d amount=450; D4 deadline=1d amount=700; D5 deadline=7d amount=150",
+                "candidate": "D4 -> D1 -> D3 -> D2 -> D5",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | D1 deadline=1d amount=120; D2 deadline=3d amount=900; D3 deadline=2d amount=450; D4 deadline=1d amount=700; D5 deadline=7d amount=150",
+                "candidate": "D2 -> D3 -> D1 -> D4 -> D5",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ],
+            [
+              {
+                "parent": "D1 -> D4 -> D3 -> D2 -> D5",
+                "candidate": "D1 -> D4 -> D3 -> D2 -> D5",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "D1 -> D4 -> D3 -> D2 -> D5",
+                "candidate": "D4 -> D1 -> D3 -> D2 -> D5",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "D1 -> D4 -> D3 -> D2 -> D5",
+                "candidate": "D2 -> D3 -> D1 -> D4 -> D5",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "D4 -> D1 -> D3 -> D2 -> D5",
+                "candidate": "D1 -> D4 -> D3 -> D2 -> D5",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "D4 -> D1 -> D3 -> D2 -> D5",
+                "candidate": "D4 -> D1 -> D3 -> D2 -> D5",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "D4 -> D1 -> D3 -> D2 -> D5",
+                "candidate": "D2 -> D3 -> D1 -> D4 -> D5",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "D2 -> D3 -> D1 -> D4 -> D5",
+                "candidate": "D1 -> D4 -> D3 -> D2 -> D5",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "D2 -> D3 -> D1 -> D4 -> D5",
+                "candidate": "D4 -> D1 -> D3 -> D2 -> D5",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "D2 -> D3 -> D1 -> D4 -> D5",
+                "candidate": "D2 -> D3 -> D1 -> D4 -> D5",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ]
+          ]
+        },
+        "metrics": {
+          "llm_calls": 16,
+          "tokens": 180
+        }
+      }
+    },
+    {
+      "case_id": "PB07",
+      "family": "ranking",
+      "strategy": "lats_ungrounded",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 3.1e-05,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-001 using ANL-002",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Candidate self-approved; no external bank validator was consulted.",
+          "source": "ungrounded_model_score"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "D1 deadline=1d amount=120; D2 deadline=3d amount=900; D3 deadline=2d amount=450; D4 deadline=1d amount=700; D5 deadline=7d amount=150",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Candidate self-approved; no external bank validator was consulted.",
+              "source": "ungrounded_model_score"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB07",
+      "family": "ranking",
+      "strategy": "lats_grounded",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 0.00022,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-001 using ANL-002",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Refund candidate passes current DB constraints.",
+          "source": "sterling_vance.db"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "D1 deadline=1d amount=120; D2 deadline=3d amount=900; D3 deadline=2d amount=450; D4 deadline=1d amount=700; D5 deadline=7d amount=150",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Refund candidate passes current DB constraints.",
+              "source": "sterling_vance.db"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB08",
+      "family": "ranking",
+      "strategy": "plan_and_solve",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 1,
+      "tokens": 20,
+      "latency_seconds": 7e-06,
+      "estimated_cost_usd": 0.0002,
+      "result": {
+        "status": "success",
+        "final_result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked.",
+        "execution_trace": [
+          {
+            "phase": "plan",
+            "result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked."
+          }
+        ],
+        "metrics": {
+          "llm_calls": 1,
+          "tokens": 20
+        }
+      }
+    },
+    {
+      "case_id": "PB08",
+      "family": "ranking",
+      "strategy": "tree_of_thoughts",
+      "applicable": true,
+      "success": true,
+      "success_basis": "expected priority ordering present in best beam",
+      "llm_calls": 16,
+      "tokens": 156,
+      "latency_seconds": 7.6e-05,
+      "estimated_cost_usd": 0.00156,
+      "result": {
+        "status": "success",
+        "best_path": {
+          "state": "MERCH-A -> MERCH-C -> MERCH-B -> MERCH-D",
+          "score": 0.95,
+          "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+        },
+        "search": {
+          "method": "BFS/beam",
+          "beam_width": 3,
+          "max_depth": 2,
+          "pruned": 0,
+          "levels": [
+            [
+              {
+                "parent": "Start | MERCH-A risk=88 history=12; MERCH-B risk=41 history=4; MERCH-C risk=72 history=9; MERCH-D risk=15 history=1",
+                "candidate": "MERCH-A -> MERCH-C -> MERCH-B -> MERCH-D",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "Start | MERCH-A risk=88 history=12; MERCH-B risk=41 history=4; MERCH-C risk=72 history=9; MERCH-D risk=15 history=1",
+                "candidate": "MERCH-C -> MERCH-A -> MERCH-B -> MERCH-D",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | MERCH-A risk=88 history=12; MERCH-B risk=41 history=4; MERCH-C risk=72 history=9; MERCH-D risk=15 history=1",
+                "candidate": "MERCH-B -> MERCH-A -> MERCH-C -> MERCH-D",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ],
+            [
+              {
+                "parent": "MERCH-A -> MERCH-C -> MERCH-B -> MERCH-D",
+                "candidate": "MERCH-A -> MERCH-C -> MERCH-B -> MERCH-D",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "MERCH-A -> MERCH-C -> MERCH-B -> MERCH-D",
+                "candidate": "MERCH-C -> MERCH-A -> MERCH-B -> MERCH-D",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "MERCH-A -> MERCH-C -> MERCH-B -> MERCH-D",
+                "candidate": "MERCH-B -> MERCH-A -> MERCH-C -> MERCH-D",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "MERCH-C -> MERCH-A -> MERCH-B -> MERCH-D",
+                "candidate": "MERCH-A -> MERCH-C -> MERCH-B -> MERCH-D",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "MERCH-C -> MERCH-A -> MERCH-B -> MERCH-D",
+                "candidate": "MERCH-C -> MERCH-A -> MERCH-B -> MERCH-D",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "MERCH-C -> MERCH-A -> MERCH-B -> MERCH-D",
+                "candidate": "MERCH-B -> MERCH-A -> MERCH-C -> MERCH-D",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "MERCH-B -> MERCH-A -> MERCH-C -> MERCH-D",
+                "candidate": "MERCH-A -> MERCH-C -> MERCH-B -> MERCH-D",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "MERCH-B -> MERCH-A -> MERCH-C -> MERCH-D",
+                "candidate": "MERCH-C -> MERCH-A -> MERCH-B -> MERCH-D",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "MERCH-B -> MERCH-A -> MERCH-C -> MERCH-D",
+                "candidate": "MERCH-B -> MERCH-A -> MERCH-C -> MERCH-D",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ]
+          ]
+        },
+        "metrics": {
+          "llm_calls": 16,
+          "tokens": 156
+        }
+      }
+    },
+    {
+      "case_id": "PB08",
+      "family": "ranking",
+      "strategy": "lats_ungrounded",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 2.9e-05,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-001 using ANL-002",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Candidate self-approved; no external bank validator was consulted.",
+          "source": "ungrounded_model_score"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "MERCH-A risk=88 history=12; MERCH-B risk=41 history=4; MERCH-C risk=72 history=9; MERCH-D risk=15 history=1",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Candidate self-approved; no external bank validator was consulted.",
+              "source": "ungrounded_model_score"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB08",
+      "family": "ranking",
+      "strategy": "lats_grounded",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 0.000228,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-001 using ANL-002",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Refund candidate passes current DB constraints.",
+          "source": "sterling_vance.db"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "MERCH-A risk=88 history=12; MERCH-B risk=41 history=4; MERCH-C risk=72 history=9; MERCH-D risk=15 history=1",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Refund candidate passes current DB constraints.",
+              "source": "sterling_vance.db"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB09",
+      "family": "ranking",
+      "strategy": "plan_and_solve",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 1,
+      "tokens": 20,
+      "latency_seconds": 7e-06,
+      "estimated_cost_usd": 0.0002,
+      "result": {
+        "status": "success",
+        "final_result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked.",
+        "execution_trace": [
+          {
+            "phase": "plan",
+            "result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked."
+          }
+        ],
+        "metrics": {
+          "llm_calls": 1,
+          "tokens": 20
+        }
+      }
+    },
+    {
+      "case_id": "PB09",
+      "family": "ranking",
+      "strategy": "tree_of_thoughts",
+      "applicable": true,
+      "success": true,
+      "success_basis": "expected priority ordering present in best beam",
+      "llm_calls": 16,
+      "tokens": 132,
+      "latency_seconds": 7.1e-05,
+      "estimated_cost_usd": 0.00132,
+      "result": {
+        "status": "success",
+        "best_path": {
+          "state": "TX-A -> TX-C -> TX-B",
+          "score": 0.95,
+          "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+        },
+        "search": {
+          "method": "BFS/beam",
+          "beam_width": 3,
+          "max_depth": 2,
+          "pruned": 0,
+          "levels": [
+            [
+              {
+                "parent": "Start | TX-A recovery=.82 deadline=4d; TX-B recovery=.61 deadline=1d; TX-C recovery=.76 deadline=2d",
+                "candidate": "TX-A -> TX-C -> TX-B",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "Start | TX-A recovery=.82 deadline=4d; TX-B recovery=.61 deadline=1d; TX-C recovery=.76 deadline=2d",
+                "candidate": "TX-C -> TX-A -> TX-B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | TX-A recovery=.82 deadline=4d; TX-B recovery=.61 deadline=1d; TX-C recovery=.76 deadline=2d",
+                "candidate": "TX-B -> TX-C -> TX-A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ],
+            [
+              {
+                "parent": "TX-A -> TX-C -> TX-B",
+                "candidate": "TX-A -> TX-C -> TX-B",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "TX-A -> TX-C -> TX-B",
+                "candidate": "TX-C -> TX-A -> TX-B",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "TX-A -> TX-C -> TX-B",
+                "candidate": "TX-B -> TX-C -> TX-A",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "TX-C -> TX-A -> TX-B",
+                "candidate": "TX-A -> TX-C -> TX-B",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "TX-C -> TX-A -> TX-B",
+                "candidate": "TX-C -> TX-A -> TX-B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "TX-C -> TX-A -> TX-B",
+                "candidate": "TX-B -> TX-C -> TX-A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "TX-B -> TX-C -> TX-A",
+                "candidate": "TX-A -> TX-C -> TX-B",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "TX-B -> TX-C -> TX-A",
+                "candidate": "TX-C -> TX-A -> TX-B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "TX-B -> TX-C -> TX-A",
+                "candidate": "TX-B -> TX-C -> TX-A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ]
+          ]
+        },
+        "metrics": {
+          "llm_calls": 16,
+          "tokens": 132
+        }
+      }
+    },
+    {
+      "case_id": "PB09",
+      "family": "ranking",
+      "strategy": "lats_ungrounded",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 2.7e-05,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-001 using ANL-002",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Candidate self-approved; no external bank validator was consulted.",
+          "source": "ungrounded_model_score"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "TX-A recovery=.82 deadline=4d; TX-B recovery=.61 deadline=1d; TX-C recovery=.76 deadline=2d",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Candidate self-approved; no external bank validator was consulted.",
+              "source": "ungrounded_model_score"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB09",
+      "family": "ranking",
+      "strategy": "lats_grounded",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 0.000291,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-001 using ANL-002",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Refund candidate passes current DB constraints.",
+          "source": "sterling_vance.db"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "TX-A recovery=.82 deadline=4d; TX-B recovery=.61 deadline=1d; TX-C recovery=.76 deadline=2d",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Refund candidate passes current DB constraints.",
+              "source": "sterling_vance.db"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB10",
+      "family": "ranking",
+      "strategy": "plan_and_solve",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 1,
+      "tokens": 20,
+      "latency_seconds": 7e-06,
+      "estimated_cost_usd": 0.0002,
+      "result": {
+        "status": "success",
+        "final_result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked.",
+        "execution_trace": [
+          {
+            "phase": "plan",
+            "result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked."
+          }
+        ],
+        "metrics": {
+          "llm_calls": 1,
+          "tokens": 20
+        }
+      }
+    },
+    {
+      "case_id": "PB10",
+      "family": "ranking",
+      "strategy": "tree_of_thoughts",
+      "applicable": true,
+      "success": true,
+      "success_basis": "expected priority ordering present in best beam",
+      "llm_calls": 16,
+      "tokens": 156,
+      "latency_seconds": 8.3e-05,
+      "estimated_cost_usd": 0.00156,
+      "result": {
+        "status": "success",
+        "best_path": {
+          "state": "P1 -> P3 -> P4 -> P2",
+          "score": 0.95,
+          "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+        },
+        "search": {
+          "method": "BFS/beam",
+          "beam_width": 3,
+          "max_depth": 2,
+          "pruned": 0,
+          "levels": [
+            [
+              {
+                "parent": "Start | P1 risk=95 deadline=5d; P2 risk=40 deadline=1d; P3 risk=70 deadline=2d; P4 risk=50 deadline=3d",
+                "candidate": "P1 -> P3 -> P4 -> P2",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "Start | P1 risk=95 deadline=5d; P2 risk=40 deadline=1d; P3 risk=70 deadline=2d; P4 risk=50 deadline=3d",
+                "candidate": "P3 -> P1 -> P4 -> P2",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | P1 risk=95 deadline=5d; P2 risk=40 deadline=1d; P3 risk=70 deadline=2d; P4 risk=50 deadline=3d",
+                "candidate": "P2 -> P3 -> P1 -> P4",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ],
+            [
+              {
+                "parent": "P1 -> P3 -> P4 -> P2",
+                "candidate": "P1 -> P3 -> P4 -> P2",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "P1 -> P3 -> P4 -> P2",
+                "candidate": "P3 -> P1 -> P4 -> P2",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "P1 -> P3 -> P4 -> P2",
+                "candidate": "P2 -> P3 -> P1 -> P4",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "P3 -> P1 -> P4 -> P2",
+                "candidate": "P1 -> P3 -> P4 -> P2",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "P3 -> P1 -> P4 -> P2",
+                "candidate": "P3 -> P1 -> P4 -> P2",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "P3 -> P1 -> P4 -> P2",
+                "candidate": "P2 -> P3 -> P1 -> P4",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "P2 -> P3 -> P1 -> P4",
+                "candidate": "P1 -> P3 -> P4 -> P2",
+                "score": 0.95,
+                "rationale": "SCORE 0.95 | RATIONALE preferred ordering"
+              },
+              {
+                "parent": "P2 -> P3 -> P1 -> P4",
+                "candidate": "P3 -> P1 -> P4 -> P2",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "P2 -> P3 -> P1 -> P4",
+                "candidate": "P2 -> P3 -> P1 -> P4",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ]
+          ]
+        },
+        "metrics": {
+          "llm_calls": 16,
+          "tokens": 156
+        }
+      }
+    },
+    {
+      "case_id": "PB10",
+      "family": "ranking",
+      "strategy": "lats_ungrounded",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 3e-05,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-001 using ANL-002",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Candidate self-approved; no external bank validator was consulted.",
+          "source": "ungrounded_model_score"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "P1 risk=95 deadline=5d; P2 risk=40 deadline=1d; P3 risk=70 deadline=2d; P4 risk=50 deadline=3d",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Candidate self-approved; no external bank validator was consulted.",
+              "source": "ungrounded_model_score"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB10",
+      "family": "ranking",
+      "strategy": "lats_grounded",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not the production method for this sub-task shape",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 0.000217,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-001 using ANL-002",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Refund candidate passes current DB constraints.",
+          "source": "sterling_vance.db"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "P1 risk=95 deadline=5d; P2 risk=40 deadline=1d; P3 risk=70 deadline=2d; P4 risk=50 deadline=3d",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Refund candidate passes current DB constraints.",
+              "source": "sterling_vance.db"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB11",
+      "family": "high_stakes",
+      "strategy": "plan_and_solve",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not a search method for high-stakes commits",
+      "llm_calls": 1,
+      "tokens": 20,
+      "latency_seconds": 6e-06,
+      "estimated_cost_usd": 0.0002,
+      "result": {
+        "status": "success",
+        "final_result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked.",
+        "execution_trace": [
+          {
+            "phase": "plan",
+            "result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked."
+          }
+        ],
+        "metrics": {
+          "llm_calls": 1,
+          "tokens": 20
+        }
+      }
+    },
+    {
+      "case_id": "PB11",
+      "family": "high_stakes",
+      "strategy": "tree_of_thoughts",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not a search method for high-stakes commits",
+      "llm_calls": 16,
+      "tokens": 96,
+      "latency_seconds": 7.1e-05,
+      "estimated_cost_usd": 0.00096,
+      "result": {
+        "status": "success",
+        "best_path": {
+          "state": "Candidate A",
+          "score": 0.35,
+          "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+        },
+        "search": {
+          "method": "BFS/beam",
+          "beam_width": 3,
+          "max_depth": 2,
+          "pruned": 0,
+          "levels": [
+            [
+              {
+                "parent": "Start | DISP-001 amount=29.99 status=open analyst=ANL-001",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | DISP-001 amount=29.99 status=open analyst=ANL-001",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | DISP-001 amount=29.99 status=open analyst=ANL-001",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ],
+            [
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ]
+          ]
+        },
+        "metrics": {
+          "llm_calls": 16,
+          "tokens": 96
+        }
+      }
+    },
+    {
+      "case_id": "PB11",
+      "family": "high_stakes",
+      "strategy": "lats_ungrounded",
+      "applicable": true,
+      "success": true,
+      "success_basis": "decision matches expected grounded policy outcome",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 3.6e-05,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-001 using ANL-001",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Candidate self-approved; no external bank validator was consulted.",
+          "source": "ungrounded_model_score"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "DISP-001 amount=29.99 status=open analyst=ANL-001",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-001",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Candidate self-approved; no external bank validator was consulted.",
+              "source": "ungrounded_model_score"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-001",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-001",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB11",
+      "family": "high_stakes",
+      "strategy": "lats_grounded",
+      "applicable": true,
+      "success": true,
+      "success_basis": "decision matches expected grounded policy outcome",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 0.000209,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-001 using ANL-001",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Refund candidate passes current DB constraints.",
+          "source": "sterling_vance.db"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "DISP-001 amount=29.99 status=open analyst=ANL-001",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-001",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Refund candidate passes current DB constraints.",
+              "source": "sterling_vance.db"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-001",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-001 using ANL-001",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB12",
+      "family": "high_stakes",
+      "strategy": "plan_and_solve",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not a search method for high-stakes commits",
+      "llm_calls": 1,
+      "tokens": 20,
+      "latency_seconds": 6e-06,
+      "estimated_cost_usd": 0.0002,
+      "result": {
+        "status": "success",
+        "final_result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked.",
+        "execution_trace": [
+          {
+            "phase": "plan",
+            "result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked."
+          }
+        ],
+        "metrics": {
+          "llm_calls": 1,
+          "tokens": 20
+        }
+      }
+    },
+    {
+      "case_id": "PB12",
+      "family": "high_stakes",
+      "strategy": "tree_of_thoughts",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not a search method for high-stakes commits",
+      "llm_calls": 16,
+      "tokens": 96,
+      "latency_seconds": 7.5e-05,
+      "estimated_cost_usd": 0.00096,
+      "result": {
+        "status": "success",
+        "best_path": {
+          "state": "Candidate A",
+          "score": 0.35,
+          "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+        },
+        "search": {
+          "method": "BFS/beam",
+          "beam_width": 3,
+          "max_depth": 2,
+          "pruned": 0,
+          "levels": [
+            [
+              {
+                "parent": "Start | DISP-002 amount=899 status=investigating junior analyst=ANL-001",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | DISP-002 amount=899 status=investigating junior analyst=ANL-001",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | DISP-002 amount=899 status=investigating junior analyst=ANL-001",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ],
+            [
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ]
+          ]
+        },
+        "metrics": {
+          "llm_calls": 16,
+          "tokens": 96
+        }
+      }
+    },
+    {
+      "case_id": "PB12",
+      "family": "high_stakes",
+      "strategy": "lats_ungrounded",
+      "applicable": true,
+      "success": false,
+      "success_basis": "decision matches expected grounded policy outcome",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 2.9e-05,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-002 using ANL-001",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Candidate self-approved; no external bank validator was consulted.",
+          "source": "ungrounded_model_score"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "DISP-002 amount=899 status=investigating junior analyst=ANL-001",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-002 using ANL-001",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Candidate self-approved; no external bank validator was consulted.",
+              "source": "ungrounded_model_score"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-002 using ANL-001",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-002 using ANL-001",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB12",
+      "family": "high_stakes",
+      "strategy": "lats_grounded",
+      "applicable": true,
+      "success": true,
+      "success_basis": "decision matches expected grounded policy outcome",
+      "llm_calls": 14,
+      "tokens": 126,
+      "latency_seconds": 0.000998,
+      "estimated_cost_usd": 0.00126,
+      "result": {
+        "status": "failed",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-002 using ANL-001",
+        "environment_feedback": {
+          "success": false,
+          "score": 0.0,
+          "details": "Refund blocked: amount above $500 requires a senior analyst.",
+          "source": "sterling_vance.db"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "DISP-002 amount=899 status=investigating junior analyst=ANL-001",
+            "visits": 6,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-002 using ANL-001",
+            "visits": 4,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": false,
+              "score": 0.0,
+              "details": "Refund blocked: amount above $500 requires a senior analyst.",
+              "source": "sterling_vance.db"
+            },
+            "reflections": [
+              "Validator rejected this branch; the next expansion should avoid the same policy violation or terminal-state conflict."
+            ]
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-002 using ANL-001",
+            "visits": 1,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": false,
+              "score": 0.0,
+              "details": "Refund blocked: amount above $500 requires a senior analyst.",
+              "source": "sterling_vance.db"
+            },
+            "reflections": [
+              "Validator rejected this branch; the next expansion should avoid the same policy violation or terminal-state conflict."
+            ]
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-002 using ANL-001",
+            "visits": 1,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": false,
+              "score": 0.0,
+              "details": "Refund blocked: amount above $500 requires a senior analyst.",
+              "source": "sterling_vance.db"
+            },
+            "reflections": [
+              "Validator rejected this branch; the next expansion should avoid the same policy violation or terminal-state conflict."
+            ]
+          },
+          {
+            "id": "n4",
+            "parent_id": "n1",
+            "action": "process_refund",
+            "state": "Refund DISP-002 using ANL-001",
+            "visits": 1,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": false,
+              "score": 0.0,
+              "details": "Refund blocked: amount above $500 requires a senior analyst.",
+              "source": "sterling_vance.db"
+            },
+            "reflections": [
+              "Validator rejected this branch; the next expansion should avoid the same policy violation or terminal-state conflict."
+            ]
+          },
+          {
+            "id": "n5",
+            "parent_id": "n1",
+            "action": "process_refund",
+            "state": "Refund DISP-002 using ANL-001",
+            "visits": 1,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": false,
+              "score": 0.0,
+              "details": "Refund blocked: amount above $500 requires a senior analyst.",
+              "source": "sterling_vance.db"
+            },
+            "reflections": [
+              "Validator rejected this branch; the next expansion should avoid the same policy violation or terminal-state conflict."
+            ]
+          },
+          {
+            "id": "n6",
+            "parent_id": "n1",
+            "action": "process_refund",
+            "state": "Refund DISP-002 using ANL-001",
+            "visits": 1,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": false,
+              "score": 0.0,
+              "details": "Refund blocked: amount above $500 requires a senior analyst.",
+              "source": "sterling_vance.db"
+            },
+            "reflections": [
+              "Validator rejected this branch; the next expansion should avoid the same policy violation or terminal-state conflict."
+            ]
+          }
+        ],
+        "iterations": 2,
+        "metrics": {
+          "llm_calls": 14,
+          "tokens": 126
+        }
+      }
+    },
+    {
+      "case_id": "PB13",
+      "family": "high_stakes",
+      "strategy": "plan_and_solve",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not a search method for high-stakes commits",
+      "llm_calls": 1,
+      "tokens": 20,
+      "latency_seconds": 7e-06,
+      "estimated_cost_usd": 0.0002,
+      "result": {
+        "status": "success",
+        "final_result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked.",
+        "execution_trace": [
+          {
+            "phase": "plan",
+            "result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked."
+          }
+        ],
+        "metrics": {
+          "llm_calls": 1,
+          "tokens": 20
+        }
+      }
+    },
+    {
+      "case_id": "PB13",
+      "family": "high_stakes",
+      "strategy": "tree_of_thoughts",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not a search method for high-stakes commits",
+      "llm_calls": 16,
+      "tokens": 96,
+      "latency_seconds": 8e-05,
+      "estimated_cost_usd": 0.00096,
+      "result": {
+        "status": "success",
+        "best_path": {
+          "state": "Candidate A",
+          "score": 0.35,
+          "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+        },
+        "search": {
+          "method": "BFS/beam",
+          "beam_width": 3,
+          "max_depth": 2,
+          "pruned": 0,
+          "levels": [
+            [
+              {
+                "parent": "Start | DISP-003 amount=150 status=refunded analyst=ANL-002",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | DISP-003 amount=150 status=refunded analyst=ANL-002",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | DISP-003 amount=150 status=refunded analyst=ANL-002",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ],
+            [
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ]
+          ]
+        },
+        "metrics": {
+          "llm_calls": 16,
+          "tokens": 96
+        }
+      }
+    },
+    {
+      "case_id": "PB13",
+      "family": "high_stakes",
+      "strategy": "lats_ungrounded",
+      "applicable": true,
+      "success": false,
+      "success_basis": "decision matches expected grounded policy outcome",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 0.000136,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-003 using ANL-002",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Candidate self-approved; no external bank validator was consulted.",
+          "source": "ungrounded_model_score"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "DISP-003 amount=150 status=refunded analyst=ANL-002",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-003 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Candidate self-approved; no external bank validator was consulted.",
+              "source": "ungrounded_model_score"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-003 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-003 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB13",
+      "family": "high_stakes",
+      "strategy": "lats_grounded",
+      "applicable": true,
+      "success": true,
+      "success_basis": "decision matches expected grounded policy outcome",
+      "llm_calls": 14,
+      "tokens": 126,
+      "latency_seconds": 0.001377,
+      "estimated_cost_usd": 0.00126,
+      "result": {
+        "status": "failed",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-003 using ANL-002",
+        "environment_feedback": {
+          "success": false,
+          "score": 0.0,
+          "details": "Refund blocked: dispute already terminal (refunded).",
+          "source": "sterling_vance.db"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "DISP-003 amount=150 status=refunded analyst=ANL-002",
+            "visits": 6,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-003 using ANL-002",
+            "visits": 4,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": false,
+              "score": 0.0,
+              "details": "Refund blocked: dispute already terminal (refunded).",
+              "source": "sterling_vance.db"
+            },
+            "reflections": [
+              "Validator rejected this branch; the next expansion should avoid the same policy violation or terminal-state conflict."
+            ]
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-003 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": false,
+              "score": 0.0,
+              "details": "Refund blocked: dispute already terminal (refunded).",
+              "source": "sterling_vance.db"
+            },
+            "reflections": [
+              "Validator rejected this branch; the next expansion should avoid the same policy violation or terminal-state conflict."
+            ]
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-003 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": false,
+              "score": 0.0,
+              "details": "Refund blocked: dispute already terminal (refunded).",
+              "source": "sterling_vance.db"
+            },
+            "reflections": [
+              "Validator rejected this branch; the next expansion should avoid the same policy violation or terminal-state conflict."
+            ]
+          },
+          {
+            "id": "n4",
+            "parent_id": "n1",
+            "action": "process_refund",
+            "state": "Refund DISP-003 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": false,
+              "score": 0.0,
+              "details": "Refund blocked: dispute already terminal (refunded).",
+              "source": "sterling_vance.db"
+            },
+            "reflections": [
+              "Validator rejected this branch; the next expansion should avoid the same policy violation or terminal-state conflict."
+            ]
+          },
+          {
+            "id": "n5",
+            "parent_id": "n1",
+            "action": "process_refund",
+            "state": "Refund DISP-003 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": false,
+              "score": 0.0,
+              "details": "Refund blocked: dispute already terminal (refunded).",
+              "source": "sterling_vance.db"
+            },
+            "reflections": [
+              "Validator rejected this branch; the next expansion should avoid the same policy violation or terminal-state conflict."
+            ]
+          },
+          {
+            "id": "n6",
+            "parent_id": "n1",
+            "action": "process_refund",
+            "state": "Refund DISP-003 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": false,
+              "score": 0.0,
+              "details": "Refund blocked: dispute already terminal (refunded).",
+              "source": "sterling_vance.db"
+            },
+            "reflections": [
+              "Validator rejected this branch; the next expansion should avoid the same policy violation or terminal-state conflict."
+            ]
+          }
+        ],
+        "iterations": 2,
+        "metrics": {
+          "llm_calls": 14,
+          "tokens": 126
+        }
+      }
+    },
+    {
+      "case_id": "PB14",
+      "family": "high_stakes",
+      "strategy": "plan_and_solve",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not a search method for high-stakes commits",
+      "llm_calls": 1,
+      "tokens": 20,
+      "latency_seconds": 7e-06,
+      "estimated_cost_usd": 0.0002,
+      "result": {
+        "status": "success",
+        "final_result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked.",
+        "execution_trace": [
+          {
+            "phase": "plan",
+            "result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked."
+          }
+        ],
+        "metrics": {
+          "llm_calls": 1,
+          "tokens": 20
+        }
+      }
+    },
+    {
+      "case_id": "PB14",
+      "family": "high_stakes",
+      "strategy": "tree_of_thoughts",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not a search method for high-stakes commits",
+      "llm_calls": 16,
+      "tokens": 96,
+      "latency_seconds": 7.4e-05,
+      "estimated_cost_usd": 0.00096,
+      "result": {
+        "status": "success",
+        "best_path": {
+          "state": "Candidate A",
+          "score": 0.35,
+          "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+        },
+        "search": {
+          "method": "BFS/beam",
+          "beam_width": 3,
+          "max_depth": 2,
+          "pruned": 0,
+          "levels": [
+            [
+              {
+                "parent": "Start | DISP-014 amount=370.78 status=escalated analyst=ANL-002",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | DISP-014 amount=370.78 status=escalated analyst=ANL-002",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | DISP-014 amount=370.78 status=escalated analyst=ANL-002",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ],
+            [
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ]
+          ]
+        },
+        "metrics": {
+          "llm_calls": 16,
+          "tokens": 96
+        }
+      }
+    },
+    {
+      "case_id": "PB14",
+      "family": "high_stakes",
+      "strategy": "lats_ungrounded",
+      "applicable": true,
+      "success": false,
+      "success_basis": "decision matches expected grounded policy outcome",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 3.1e-05,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "escalate_dispute",
+        "final_state": "Escalate DISP-014 using ANL-002",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Candidate self-approved; no external bank validator was consulted.",
+          "source": "ungrounded_model_score"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "DISP-014 amount=370.78 status=escalated analyst=ANL-002",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "escalate_dispute",
+            "state": "Escalate DISP-014 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Candidate self-approved; no external bank validator was consulted.",
+              "source": "ungrounded_model_score"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "escalate_dispute",
+            "state": "Escalate DISP-014 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "escalate_dispute",
+            "state": "Escalate DISP-014 using ANL-002",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB14",
+      "family": "high_stakes",
+      "strategy": "lats_grounded",
+      "applicable": true,
+      "success": true,
+      "success_basis": "decision matches expected grounded policy outcome",
+      "llm_calls": 14,
+      "tokens": 126,
+      "latency_seconds": 0.001203,
+      "estimated_cost_usd": 0.00126,
+      "result": {
+        "status": "failed",
+        "best_action": "escalate_dispute",
+        "final_state": "Escalate DISP-014 using ANL-002",
+        "environment_feedback": {
+          "success": false,
+          "score": 0.0,
+          "details": "Escalation blocked: current status is escalated.",
+          "source": "sterling_vance.db"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "DISP-014 amount=370.78 status=escalated analyst=ANL-002",
+            "visits": 6,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "escalate_dispute",
+            "state": "Escalate DISP-014 using ANL-002",
+            "visits": 4,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": false,
+              "score": 0.0,
+              "details": "Escalation blocked: current status is escalated.",
+              "source": "sterling_vance.db"
+            },
+            "reflections": [
+              "Validator rejected this branch; the next expansion should avoid the same policy violation or terminal-state conflict."
+            ]
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "escalate_dispute",
+            "state": "Escalate DISP-014 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": false,
+              "score": 0.0,
+              "details": "Escalation blocked: current status is escalated.",
+              "source": "sterling_vance.db"
+            },
+            "reflections": [
+              "Validator rejected this branch; the next expansion should avoid the same policy violation or terminal-state conflict."
+            ]
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "escalate_dispute",
+            "state": "Escalate DISP-014 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": false,
+              "score": 0.0,
+              "details": "Escalation blocked: current status is escalated.",
+              "source": "sterling_vance.db"
+            },
+            "reflections": [
+              "Validator rejected this branch; the next expansion should avoid the same policy violation or terminal-state conflict."
+            ]
+          },
+          {
+            "id": "n4",
+            "parent_id": "n1",
+            "action": "escalate_dispute",
+            "state": "Escalate DISP-014 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": false,
+              "score": 0.0,
+              "details": "Escalation blocked: current status is escalated.",
+              "source": "sterling_vance.db"
+            },
+            "reflections": [
+              "Validator rejected this branch; the next expansion should avoid the same policy violation or terminal-state conflict."
+            ]
+          },
+          {
+            "id": "n5",
+            "parent_id": "n1",
+            "action": "escalate_dispute",
+            "state": "Escalate DISP-014 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": false,
+              "score": 0.0,
+              "details": "Escalation blocked: current status is escalated.",
+              "source": "sterling_vance.db"
+            },
+            "reflections": [
+              "Validator rejected this branch; the next expansion should avoid the same policy violation or terminal-state conflict."
+            ]
+          },
+          {
+            "id": "n6",
+            "parent_id": "n1",
+            "action": "escalate_dispute",
+            "state": "Escalate DISP-014 using ANL-002",
+            "visits": 1,
+            "mean_value": 0.225,
+            "environment_score": 0.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": false,
+              "score": 0.0,
+              "details": "Escalation blocked: current status is escalated.",
+              "source": "sterling_vance.db"
+            },
+            "reflections": [
+              "Validator rejected this branch; the next expansion should avoid the same policy violation or terminal-state conflict."
+            ]
+          }
+        ],
+        "iterations": 2,
+        "metrics": {
+          "llm_calls": 14,
+          "tokens": 126
+        }
+      }
+    },
+    {
+      "case_id": "PB15",
+      "family": "high_stakes",
+      "strategy": "plan_and_solve",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not a search method for high-stakes commits",
+      "llm_calls": 1,
+      "tokens": 20,
+      "latency_seconds": 7e-06,
+      "estimated_cost_usd": 0.0002,
+      "result": {
+        "status": "success",
+        "final_result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked.",
+        "execution_trace": [
+          {
+            "phase": "plan",
+            "result": "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked."
+          }
+        ],
+        "metrics": {
+          "llm_calls": 1,
+          "tokens": 20
+        }
+      }
+    },
+    {
+      "case_id": "PB15",
+      "family": "high_stakes",
+      "strategy": "tree_of_thoughts",
+      "applicable": false,
+      "success": false,
+      "success_basis": "not a search method for high-stakes commits",
+      "llm_calls": 16,
+      "tokens": 96,
+      "latency_seconds": 7.6e-05,
+      "estimated_cost_usd": 0.00096,
+      "result": {
+        "status": "success",
+        "best_path": {
+          "state": "Candidate A",
+          "score": 0.35,
+          "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+        },
+        "search": {
+          "method": "BFS/beam",
+          "beam_width": 3,
+          "max_depth": 2,
+          "pruned": 0,
+          "levels": [
+            [
+              {
+                "parent": "Start | DISP-013 amount=1337.92 status=investigating senior analyst=ANL-008",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | DISP-013 amount=1337.92 status=investigating senior analyst=ANL-008",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Start | DISP-013 amount=1337.92 status=investigating senior analyst=ANL-008",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ],
+            [
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate A",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate B",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate A",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate B",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              },
+              {
+                "parent": "Candidate C",
+                "candidate": "Candidate C",
+                "score": 0.35,
+                "rationale": "SCORE 0.35 | RATIONALE weaker ordering"
+              }
+            ]
+          ]
+        },
+        "metrics": {
+          "llm_calls": 16,
+          "tokens": 96
+        }
+      }
+    },
+    {
+      "case_id": "PB15",
+      "family": "high_stakes",
+      "strategy": "lats_ungrounded",
+      "applicable": true,
+      "success": true,
+      "success_basis": "decision matches expected grounded policy outcome",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 4e-05,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-013 using ANL-008",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Candidate self-approved; no external bank validator was consulted.",
+          "source": "ungrounded_model_score"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "DISP-013 amount=1337.92 status=investigating senior analyst=ANL-008",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-013 using ANL-008",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Candidate self-approved; no external bank validator was consulted.",
+              "source": "ungrounded_model_score"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-013 using ANL-008",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-013 using ANL-008",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    },
+    {
+      "case_id": "PB15",
+      "family": "high_stakes",
+      "strategy": "lats_grounded",
+      "applicable": true,
+      "success": true,
+      "success_basis": "decision matches expected grounded policy outcome",
+      "llm_calls": 2,
+      "tokens": 13,
+      "latency_seconds": 0.000255,
+      "estimated_cost_usd": 0.00013,
+      "result": {
+        "status": "success",
+        "best_action": "process_refund",
+        "final_state": "Refund DISP-013 using ANL-008",
+        "environment_feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Refund candidate passes current DB constraints.",
+          "source": "sterling_vance.db"
+        },
+        "mcts": [
+          {
+            "id": "n0",
+            "parent_id": null,
+            "action": "root",
+            "state": "DISP-013 amount=1337.92 status=investigating senior analyst=ANL-008",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n1",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-013 using ANL-008",
+            "visits": 1,
+            "mean_value": 0.975,
+            "environment_score": 1.0,
+            "model_score": 0.9,
+            "feedback": {
+              "success": true,
+              "score": 1.0,
+              "details": "Refund candidate passes current DB constraints.",
+              "source": "sterling_vance.db"
+            },
+            "reflections": []
+          },
+          {
+            "id": "n2",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-013 using ANL-008",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          },
+          {
+            "id": "n3",
+            "parent_id": "n0",
+            "action": "process_refund",
+            "state": "Refund DISP-013 using ANL-008",
+            "visits": 0,
+            "mean_value": 0.0,
+            "environment_score": 0.0,
+            "model_score": 0.0,
+            "feedback": null,
+            "reflections": []
+          }
+        ],
+        "iterations": 1,
+        "metrics": {
+          "llm_calls": 2,
+          "tokens": 13
+        }
+      }
+    }
+  ]
+}
