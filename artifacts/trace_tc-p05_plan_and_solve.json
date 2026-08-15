@@ -1,0 +1,24 @@
+{
+  "case_id": "TC-P05",
+  "category": "planning_algorithm",
+  "method": "Plan-and-Solve",
+  "success": false,
+  "llm_calls": 1,
+  "tokens": 220,
+  "latency_s": 3.381,
+  "cost_usd": 3.3e-05,
+  "trace": {
+    "status": "success",
+    "final_result": "PLAN:\n1. Extract the risk and chargeback values for each merchant from the provided context.\n2. Organize the merchants in order of their risk ranking from highest to lowest.\n3. Prepare a summary of the risk ranking for each merchant.\n\nSOLUTION:\n1. Extracted values:\n   - MERCH-004: risk=92, cb=14\n   - MERCH-002: risk=75, cb=8\n   - MERCH-001: risk=35, cb=2\n   - MERCH-003: risk=50, cb=4\n\n2. Organized risk ranking:\n   - 1st: MERCH-004 (risk=92)\n   - 2nd: MERCH-002 (risk=75)\n   - 3rd: MERCH-003 (risk=50)\n   - 4th: MERCH-001 (risk=35)\n\n3. Summary of risk ranking:\n   - MERCH-004: Highest risk (92)\n   - MERCH-002: Second highest risk (75)\n   - MERCH-003: Third highest risk (50)\n   - MERCH-001: Lowest risk (35)",
+    "execution_trace": [
+      {
+        "phase": "plan",
+        "result": "PLAN:\n1. Extract the risk and chargeback values for each merchant from the provided context.\n2. Organize the merchants in order of their risk ranking from highest to lowest.\n3. Prepare a summary of the risk ranking for each merchant.\n\nSOLUTION:\n1. Extracted values:\n   - MERCH-004: risk=92, cb=14\n   - MERCH-002: risk=75, cb=8\n   - MERCH-001: risk=35, cb=2\n   - MERCH-003: risk=50, cb=4\n\n2. Organized risk ranking:\n   - 1st: MERCH-004 (risk=92)\n   - 2nd: MERCH-002 (risk=75)\n   - 3rd: MERCH-003 (risk=50)\n   - 4th: MERCH-001 (risk=35)\n\n3. Summary of risk ranking:\n   - MERCH-004: Highest risk (92)\n   - MERCH-002: Second highest risk (75)\n   - MERCH-003: Third highest risk (50)\n   - MERCH-001: Lowest risk (35)"
+      }
+    ],
+    "metrics": {
+      "llm_calls": 1,
+      "tokens": 107
+    }
+  }
+}

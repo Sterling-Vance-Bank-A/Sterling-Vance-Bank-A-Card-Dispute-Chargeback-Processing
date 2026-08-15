@@ -1,0 +1,69 @@
+{
+  "case_id": "TC-P02",
+  "category": "planning_algorithm",
+  "method": "LATS (Ungrounded)",
+  "success": true,
+  "llm_calls": 6,
+  "tokens": 730,
+  "latency_s": 4.044,
+  "cost_usd": 0.000109,
+  "trace": {
+    "status": "success",
+    "best_action": "verify_transaction",
+    "final_state": "1. Action: Calculate total monetary exposure and card network interchange fee impact for dispute ID DISP-006; Analyst ID: A12345",
+    "environment_feedback": {
+      "success": true,
+      "score": 1.0,
+      "details": "Candidate self-approved; no external bank validator was consulted.",
+      "source": "ungrounded_model_score"
+    },
+    "mcts": [
+      {
+        "id": "n0",
+        "parent_id": null,
+        "action": "root",
+        "state": "{'dispute_id': 'DISP-006', 'amount': 320.0, 'reason': 'fraud'}",
+        "visits": 1,
+        "mean_value": 1.0,
+        "environment_score": 0.0,
+        "model_score": 0.0,
+        "feedback": null,
+        "reflections": []
+      },
+      {
+        "id": "n1",
+        "parent_id": "n0",
+        "action": "verify_transaction",
+        "state": "1. Action: Calculate total monetary exposure and card network interchange fee impact for dispute ID DISP-006; Analyst ID: A12345",
+        "visits": 1,
+        "mean_value": 1.0,
+        "environment_score": 1.0,
+        "model_score": 1.0,
+        "feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Candidate self-approved; no external bank validator was consulted.",
+          "source": "ungrounded_model_score"
+        },
+        "reflections": []
+      },
+      {
+        "id": "n2",
+        "parent_id": "n0",
+        "action": "verify_transaction",
+        "state": "2. Action: Review transaction history and gather evidence for dispute ID DISP-006; Analyst ID: A12346",
+        "visits": 0,
+        "mean_value": 0.0,
+        "environment_score": 0.0,
+        "model_score": 0.0,
+        "feedback": null,
+        "reflections": []
+      }
+    ],
+    "iterations": 1,
+    "metrics": {
+      "llm_calls": 2,
+      "tokens": 167
+    }
+  }
+}

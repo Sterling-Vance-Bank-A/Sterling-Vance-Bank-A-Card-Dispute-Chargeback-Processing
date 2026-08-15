@@ -1,0 +1,106 @@
+{
+  "case_id": "TC-P04",
+  "category": "planning_algorithm",
+  "method": "Tree of Thoughts",
+  "success": false,
+  "llm_calls": 16,
+  "tokens": 1017,
+  "latency_s": 31.343,
+  "cost_usd": 0.000153,
+  "trace": {
+    "status": "success",
+    "best_path": {
+      "state": "1. Process D1 (1d, $120) and D4 (1d, $700) immediately due to their imminent deadlines, then address D3 (2d, $450), followed by D2 (3d, $900), and finally D5 (7d, $150).",
+      "score": 0.9,
+      "rationale": "SCORE: 0.9 | RATIONALE: The candidate correctly prioritizes disputes based on the closest deadlines first, which aligns with the urgency requirement. It also considers the dollar amounts appropriately, ensuring that higher-value disputes are addressed after the most urgent ones. The only minor issue is that it could have explicitly stated the rationale for the order of processing, but overall, it effectively balances urgency and value."
+    },
+    "search": {
+      "method": "BFS/beam",
+      "beam_width": 3,
+      "max_depth": 2,
+      "pruned": 0,
+      "levels": [
+        [
+          {
+            "parent": "Start | {'disputes': 'D1(1d, $120), D2(3d, $900), D3(2d, $450), D4(1d, $700), D5(7d, $150)'}",
+            "candidate": "1. Prioritize disputes based on urgency and dollar amount: Process D1 (1d, $120), D4 (1d, $700), D3 (2d, $450), D2 (3d, $900), and D5 (7d, $150) in that order.",
+            "score": 0.6,
+            "rationale": "SCORE: 0.6 | RATIONALE: The candidate correctly prioritizes disputes based on urgency (days until the deadline) but does not adequately balance the dollar amount, as it places a lower dollar amount dispute (D1) first despite having a higher urgency dispute (D4) with a larger dollar amount. A more balanced approach would consider both urgency and dollar amount more effectively."
+          },
+          {
+            "parent": "Start | {'disputes': 'D1(1d, $120), D2(3d, $900), D3(2d, $450), D4(1d, $700), D5(7d, $150)'}",
+            "candidate": "2. Focus on resolving the highest dollar amount disputes first while considering urgency: Start with D2 (3d, $900), then D4 (1d, $700), followed by D3 (2d, $450), D1 (1d, $120), and finally D5 (7d, $150).",
+            "score": 0.6,
+            "rationale": "SCORE: 0.6 | RATIONALE: The candidate prioritizes high dollar amounts but does not adequately consider the urgency of the disputes. D5, despite its low dollar amount, has the longest deadline and should be addressed sooner to comply with the Reg E deadline. A better approach would balance both urgency and dollar amount more effectively."
+          },
+          {
+            "parent": "Start | {'disputes': 'D1(1d, $120), D2(3d, $900), D3(2d, $450), D4(1d, $700), D5(7d, $150)'}",
+            "candidate": "3. Balance urgency and dollar amount by processing disputes with the closest deadlines first, then sorting by value: Handle D1 (1d, $120), D4 (1d, $700), D3 (2d, $450), D2 (3d, $900), and conclude with D5 (7d, $150).",
+            "score": 0.7,
+            "rationale": "SCORE: 0.7 | RATIONALE: The candidate correctly prioritizes disputes based on urgency (closest deadlines first) but does not adequately balance the dollar amount, as it could have prioritized higher-value disputes that are still within a reasonable deadline."
+          }
+        ],
+        [
+          {
+            "parent": "3. Balance urgency and dollar amount by processing disputes with the closest deadlines first, then sorting by value: Handle D1 (1d, $120), D4 (1d, $700), D3 (2d, $450), D2 (3d, $900), and conclude with D5 (7d, $150).",
+            "candidate": "1. Process D1 (1d, $120) and D4 (1d, $700) immediately due to their imminent deadlines, then address D3 (2d, $450), followed by D2 (3d, $900), and finally D5 (7d, $150).",
+            "score": 0.9,
+            "rationale": "SCORE: 0.9 | RATIONALE: The candidate correctly prioritizes disputes based on the closest deadlines first, which aligns with the urgency requirement. It also considers the dollar amounts appropriately, ensuring that higher-value disputes are addressed after the most urgent ones. The only minor issue is that it could have explicitly stated the rationale for the order of processing, but overall, it effectively balances urgency and value."
+          },
+          {
+            "parent": "3. Balance urgency and dollar amount by processing disputes with the closest deadlines first, then sorting by value: Handle D1 (1d, $120), D4 (1d, $700), D3 (2d, $450), D2 (3d, $900), and conclude with D5 (7d, $150).",
+            "candidate": "2. Prioritize D1 (1d, $120) and D4 (1d, $700) for immediate resolution, then sort D3 (2d, $450) next, followed by D2 (3d, $900), and conclude with D5 (7d, $150) based on urgency and value.",
+            "score": 0.8,
+            "rationale": "SCORE: 0.8 | RATIONALE: The candidate correctly prioritizes disputes based on urgency (closest deadlines first) and considers dollar amounts, but it could improve by explicitly stating the rationale for the order of D2 and D5, as D2 has a higher dollar amount but a later deadline than D3."
+          },
+          {
+            "parent": "3. Balance urgency and dollar amount by processing disputes with the closest deadlines first, then sorting by value: Handle D1 (1d, $120), D4 (1d, $700), D3 (2d, $450), D2 (3d, $900), and conclude with D5 (7d, $150).",
+            "candidate": "3. Start with D1 (1d, $120) and D4 (1d, $700) for urgent processing, then handle D3 (2d, $450), followed by D2 (3d, $900), and finish with D5 (7d, $150) to balance urgency and total chargeback amounts.",
+            "score": 0.9,
+            "rationale": "SCORE: 0.9 | RATIONALE: The candidate correctly prioritizes disputes based on urgency (closest deadlines first) and maintains a logical order by considering dollar amounts, ensuring that higher-value disputes are processed in a timely manner. The only minor issue is that it could explicitly state the rationale for balancing urgency and dollar amount, but overall, it effectively addresses the task requirements."
+          },
+          {
+            "parent": "1. Prioritize disputes based on urgency and dollar amount: Process D1 (1d, $120), D4 (1d, $700), D3 (2d, $450), D2 (3d, $900), and D5 (7d, $150) in that order.",
+            "candidate": "1. Process D2 (3d, $900) next, as it has the highest dollar amount and is approaching the Reg E deadline.",
+            "score": 0.4,
+            "rationale": "SCORE: 0.4 | RATIONALE: The candidate incorrectly prioritizes D2 despite it having a longer deadline (3 days) compared to D1 and D4, which are both due sooner (1 day). While D2 has the highest dollar amount, urgency based on the Reg E deadline should take precedence over dollar amount in this context."
+          },
+          {
+            "parent": "1. Prioritize disputes based on urgency and dollar amount: Process D1 (1d, $120), D4 (1d, $700), D3 (2d, $450), D2 (3d, $900), and D5 (7d, $150) in that order.",
+            "candidate": "2. Process D3 (2d, $450) next, as it balances a reasonable dollar amount with a shorter deadline than D2.",
+            "score": 0.4,
+            "rationale": "SCORE: 0.4 | RATIONALE: The candidate incorrectly prioritizes D3 over D2 despite D2 having a higher dollar amount and a longer deadline. The urgency should prioritize higher dollar amounts first, especially when considering the Reg E deadline."
+          },
+          {
+            "parent": "1. Prioritize disputes based on urgency and dollar amount: Process D1 (1d, $120), D4 (1d, $700), D3 (2d, $450), D2 (3d, $900), and D5 (7d, $150) in that order.",
+            "candidate": "3. Process D4 (1d, $700) next, as it has a high dollar amount and is the most urgent dispute to address immediately.",
+            "score": 0.8,
+            "rationale": "SCORE: 0.8 | RATIONALE: The candidate correctly identifies D4 as the most urgent dispute due to its 1-day deadline and high dollar amount. However, it does not consider the overall prioritization of all disputes, which may affect the final decision on processing order."
+          },
+          {
+            "parent": "2. Focus on resolving the highest dollar amount disputes first while considering urgency: Start with D2 (3d, $900), then D4 (1d, $700), followed by D3 (2d, $450), D1 (1d, $120), and finally D5 (7d, $150).",
+            "candidate": "1. Prioritize D2 (3d, $900) for immediate resolution, followed by D4 (1d, $700) to meet the Reg E deadline, then address D3 (2d, $450), D1 (1d, $120), and finally D5 (7d, $150) based on remaining urgency and dollar amount.",
+            "score": 0.9,
+            "rationale": "SCORE: 0.9 | RATIONALE: The candidate correctly prioritizes disputes based on urgency and dollar amount, aligning well with the statutory Reg E deadline while addressing higher value disputes first. However, it could be slightly improved by explicitly stating the rationale for the order of D3, D1, and D5, as their urgency and dollar amounts are less clear in the context of the overall strategy."
+          },
+          {
+            "parent": "2. Focus on resolving the highest dollar amount disputes first while considering urgency: Start with D2 (3d, $900), then D4 (1d, $700), followed by D3 (2d, $450), D1 (1d, $120), and finally D5 (7d, $150).",
+            "candidate": "2. Resolve D4 (1d, $700) first due to its imminent deadline, then tackle D2 (3d, $900) for its high dollar value, followed by D3 (2d, $450), D1 (1d, $120), and conclude with D5 (7d, $150) as the least urgent.",
+            "score": 0.8,
+            "rationale": "SCORE: 0.8 | RATIONALE: The candidate correctly prioritizes D4 first due to its imminent deadline, which aligns with the urgency requirement. However, it could be argued that D2, despite having a higher dollar amount, should be prioritized earlier than D3 and D1, which are lower in urgency and value. Overall, the approach is feasible and makes logical sense, but there is a slight misalignment in balancing urgency with dollar amount for D2."
+          },
+          {
+            "parent": "2. Focus on resolving the highest dollar amount disputes first while considering urgency: Start with D2 (3d, $900), then D4 (1d, $700), followed by D3 (2d, $450), D1 (1d, $120), and finally D5 (7d, $150).",
+            "candidate": "3. Start with D2 (3d, $900) for its high dollar amount, then move to D4 (1d, $700) to ensure compliance with the Reg E deadline, followed by D1 (1d, $120) for its urgency, then D3 (2d, $450), and finally D5 (7d, $150) as the lowest priority.",
+            "score": 0.6,
+            "rationale": "SCORE: 0.6 | RATIONALE: The candidate correctly prioritizes high dollar amount disputes and considers urgency, but it incorrectly places D1 before D3, despite D3 having a closer deadline. This could lead to non-compliance with the Reg E deadline for D3."
+          }
+        ]
+      ]
+    },
+    "metrics": {
+      "llm_calls": 16,
+      "tokens": 1017
+    }
+  }
+}

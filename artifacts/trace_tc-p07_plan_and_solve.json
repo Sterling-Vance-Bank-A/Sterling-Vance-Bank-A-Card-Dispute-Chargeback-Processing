@@ -1,0 +1,24 @@
+{
+  "case_id": "TC-P07",
+  "category": "planning_algorithm",
+  "method": "Plan-and-Solve",
+  "success": false,
+  "llm_calls": 1,
+  "tokens": 220,
+  "latency_s": 2.497,
+  "cost_usd": 3.3e-05,
+  "trace": {
+    "status": "success",
+    "final_result": "PLAN:\n1. Verify the dispute ID and ensure it matches the provided context.\n2. Check the transaction amount to confirm it is high-value.\n3. Confirm the current status of the dispute is 'investigating'.\n4. Validate that the assigned analyst is a senior analyst.\n5. Proceed with the evaluation of the high-value refund.\n\nSOLUTION:\n1. The dispute ID is verified as DISP-013.\n2. The transaction amount of $1,337.92 is confirmed to be high-value.\n3. The current status of the dispute is confirmed as 'investigating'.\n4. The assigned analyst ANL-008 is validated as a senior analyst.\n5. The evaluation of the high-value refund is now in progress.",
+    "execution_trace": [
+      {
+        "phase": "plan",
+        "result": "PLAN:\n1. Verify the dispute ID and ensure it matches the provided context.\n2. Check the transaction amount to confirm it is high-value.\n3. Confirm the current status of the dispute is 'investigating'.\n4. Validate that the assigned analyst is a senior analyst.\n5. Proceed with the evaluation of the high-value refund.\n\nSOLUTION:\n1. The dispute ID is verified as DISP-013.\n2. The transaction amount of $1,337.92 is confirmed to be high-value.\n3. The current status of the dispute is confirmed as 'investigating'.\n4. The assigned analyst ANL-008 is validated as a senior analyst.\n5. The evaluation of the high-value refund is now in progress."
+      }
+    ],
+    "metrics": {
+      "llm_calls": 1,
+      "tokens": 105
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "case_id": "TC-P03",
+  "category": "planning_algorithm",
+  "method": "Plan-and-Solve",
+  "success": false,
+  "llm_calls": 1,
+  "tokens": 220,
+  "latency_s": 4.112,
+  "cost_usd": 3.3e-05,
+  "trace": {
+    "status": "success",
+    "final_result": "PLAN:\n1. Parse the provided merchant recovery queues data.\n2. Extract the deadline, risk score, and recovery probability for each merchant.\n3. Rank the merchants primarily by filing deadline (ascending).\n4. For merchants with the same deadline, rank by risk score (ascending).\n5. For merchants with the same deadline and risk score, rank by recovery probability (descending).\n6. Compile the ranked list of merchants.\n\nSOLUTION:\n1. Parse the provided data:\n   - MERCH-A: deadline=2d, risk=60, recovery=0.70\n   - MERCH-B: deadline=5d, risk=90, recovery=0.60\n   - MERCH-C: deadline=1d, risk=30, recovery=0.80\n\n2. Extract the details:\n   - MERCH-A: (2, 60, 0.70)\n   - MERCH-B: (5, 90, 0.60)\n   - MERCH-C: (1, 30, 0.80)\n\n3. Rank by filing deadline:\n   - MERCH-C (1d)\n   - MERCH-A (2d)\n   - MERCH-B (5d)\n\n4. MERCH-C has the lowest deadline, so it ranks first. MERCH-A follows with a deadline of 2 days, and MERCH-B ranks last with a deadline of 5 days.\n\n5. No ties in deadlines, so no further ranking by risk score or recovery probability is needed.\n\n6. Compile the ranked list:\n   1. MERCH-C\n   2. MERCH-A\n   3. MERCH-B",
+    "execution_trace": [
+      {
+        "phase": "plan",
+        "result": "PLAN:\n1. Parse the provided merchant recovery queues data.\n2. Extract the deadline, risk score, and recovery probability for each merchant.\n3. Rank the merchants primarily by filing deadline (ascending).\n4. For merchants with the same deadline, rank by risk score (ascending).\n5. For merchants with the same deadline and risk score, rank by recovery probability (descending).\n6. Compile the ranked list of merchants.\n\nSOLUTION:\n1. Parse the provided data:\n   - MERCH-A: deadline=2d, risk=60, recovery=0.70\n   - MERCH-B: deadline=5d, risk=90, recovery=0.60\n   - MERCH-C: deadline=1d, risk=30, recovery=0.80\n\n2. Extract the details:\n   - MERCH-A: (2, 60, 0.70)\n   - MERCH-B: (5, 90, 0.60)\n   - MERCH-C: (1, 30, 0.80)\n\n3. Rank by filing deadline:\n   - MERCH-C (1d)\n   - MERCH-A (2d)\n   - MERCH-B (5d)\n\n4. MERCH-C has the lowest deadline, so it ranks first. MERCH-A follows with a deadline of 2 days, and MERCH-B ranks last with a deadline of 5 days.\n\n5. No ties in deadlines, so no further ranking by risk score or recovery probability is needed.\n\n6. Compile the ranked list:\n   1. MERCH-C\n   2. MERCH-A\n   3. MERCH-B"
+      }
+    ],
+    "metrics": {
+      "llm_calls": 1,
+      "tokens": 174
+    }
+  }
+}
