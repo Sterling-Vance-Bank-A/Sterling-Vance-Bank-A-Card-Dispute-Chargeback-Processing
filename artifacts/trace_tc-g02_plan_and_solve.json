@@ -1,0 +1,24 @@
+{
+  "case_id": "TC-G02",
+  "category": "grounding_comparison",
+  "method": "Plan-and-Solve",
+  "success": false,
+  "llm_calls": 1,
+  "tokens": 220,
+  "latency_s": 3.072,
+  "cost_usd": 3.3e-05,
+  "trace": {
+    "status": "success",
+    "final_result": "PLAN:\n1. Verify the dispute ID and ensure it matches the provided context.\n2. Check the current status of the dispute to confirm it is in 'escalated' status.\n3. Review the transaction amount to ensure it is $370.78.\n4. Determine if the escalation request is valid based on the current status and amount.\n5. Document the findings and prepare a response regarding the escalation request.\n\nSOLUTION:\n1. The dispute ID is verified as DISP-014.\n2. The current status of the dispute is confirmed to be 'escalated'.\n3. The transaction amount is verified to be $370.78.\n4. The escalation request is deemed valid since the dispute is already in 'escalated' status.\n5. Findings are documented, and a response is prepared indicating that the escalation request is acknowledged and will be processed accordingly.",
+    "execution_trace": [
+      {
+        "phase": "plan",
+        "result": "PLAN:\n1. Verify the dispute ID and ensure it matches the provided context.\n2. Check the current status of the dispute to confirm it is in 'escalated' status.\n3. Review the transaction amount to ensure it is $370.78.\n4. Determine if the escalation request is valid based on the current status and amount.\n5. Document the findings and prepare a response regarding the escalation request.\n\nSOLUTION:\n1. The dispute ID is verified as DISP-014.\n2. The current status of the dispute is confirmed to be 'escalated'.\n3. The transaction amount is verified to be $370.78.\n4. The escalation request is deemed valid since the dispute is already in 'escalated' status.\n5. Findings are documented, and a response is prepared indicating that the escalation request is acknowledged and will be processed accordingly."
+      }
+    ],
+    "metrics": {
+      "llm_calls": 1,
+      "tokens": 131
+    }
+  }
+}

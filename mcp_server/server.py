@@ -413,10 +413,10 @@ async def handle_call_tool(ctx, params) -> types.CallToolResult:
                 else:
                     progress_token = getattr(meta, "progressToken", None) or getattr(meta, "progress_token", None)
 
-            if progress_token is not None:
+            if ctx is not None and hasattr(ctx, "session") and ctx.session is not None:
                 await ctx.session.send_progress_notification(
                     progress_token=progress_token,
-                    progress=i,
+                    progress=i + 1,
                     total=total_txns,
                 )
 
@@ -491,7 +491,8 @@ async def handle_call_tool(ctx, params) -> types.CallToolResult:
             should_escalate = check_escalation(cursor, dispute)
             if should_escalate and not session_state["escalated"]:
                 session_state["escalated"] = True
-                await ctx.session.send_tool_list_changed()
+                if ctx is not None and hasattr(ctx, "session") and ctx.session is not None:
+                    await ctx.session.send_tool_list_changed()
 
         conn.close()
 

@@ -1,0 +1,24 @@
+{
+  "case_id": "TC-G01",
+  "category": "grounding_comparison",
+  "method": "Plan-and-Solve",
+  "success": false,
+  "llm_calls": 1,
+  "tokens": 220,
+  "latency_s": 2.706,
+  "cost_usd": 3.3e-05,
+  "trace": {
+    "status": "success",
+    "final_result": "PLAN:\n1. Verify the dispute ID and ensure it matches the request.\n2. Check the transaction amount to confirm it is $150.00.\n3. Assess the current status of the dispute to confirm it is 'refunded'.\n4. Determine if the refund request can be processed based on the current status.\n5. Document the findings and prepare a response regarding the refund request.\n\nSOLUTION:\n1. The dispute ID is verified as DISP-003.\n2. The transaction amount is confirmed to be $150.00.\n3. The current status of the dispute is confirmed to be 'refunded'.\n4. Since the dispute is already in a 'refunded' status, the refund request cannot be processed further.\n5. Findings are documented, and the response indicates that the refund request is not applicable as the dispute has already been refunded.",
+    "execution_trace": [
+      {
+        "phase": "plan",
+        "result": "PLAN:\n1. Verify the dispute ID and ensure it matches the request.\n2. Check the transaction amount to confirm it is $150.00.\n3. Assess the current status of the dispute to confirm it is 'refunded'.\n4. Determine if the refund request can be processed based on the current status.\n5. Document the findings and prepare a response regarding the refund request.\n\nSOLUTION:\n1. The dispute ID is verified as DISP-003.\n2. The transaction amount is confirmed to be $150.00.\n3. The current status of the dispute is confirmed to be 'refunded'.\n4. Since the dispute is already in a 'refunded' status, the refund request cannot be processed further.\n5. Findings are documented, and the response indicates that the refund request is not applicable as the dispute has already been refunded."
+      }
+    ],
+    "metrics": {
+      "llm_calls": 1,
+      "tokens": 130
+    }
+  }
+}

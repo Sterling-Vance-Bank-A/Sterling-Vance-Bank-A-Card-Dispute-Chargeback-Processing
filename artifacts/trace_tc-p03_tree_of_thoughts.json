@@ -1,0 +1,106 @@
+{
+  "case_id": "TC-P03",
+  "category": "planning_algorithm",
+  "method": "Tree of Thoughts",
+  "success": false,
+  "llm_calls": 16,
+  "tokens": 715,
+  "latency_s": 34.14,
+  "cost_usd": 0.000107,
+  "trace": {
+    "status": "success",
+    "best_path": {
+      "state": "1. MERCH-C (recovery=0.80, deadline=1d, risk=30), MERCH-A (recovery=0.70, deadline=2d, risk=60), MERCH-B (recovery=0.60, deadline=5d, risk=90)",
+      "score": 1.0,
+      "rationale": "SCORE: 1 | RATIONALE: The candidate correctly ranks the merchant recovery queues according to the specified criteria: recovery probability first, then filing deadline, and lastly merchant risk score. The order of MERCH-C, MERCH-A, and MERCH-B is accurate based on the provided data."
+    },
+    "search": {
+      "method": "BFS/beam",
+      "beam_width": 3,
+      "max_depth": 2,
+      "pruned": 0,
+      "levels": [
+        [
+          {
+            "parent": "Start | {'queues': 'MERCH-A deadline=2d risk=60 recovery=.70; MERCH-B deadline=5d risk=90 recovery=.60; MERCH-C deadline=1d risk=30 recovery=.80'}",
+            "candidate": "1. Rank the queues primarily by filing deadline, then by recovery probability, and finally by merchant risk score: MERCH-C (deadline=1d, risk=30, recovery=0.80), MERCH-A (deadline=2d, risk=60, recovery=0.70), MERCH-B (deadline=5d, risk=90, recovery=0.60).",
+            "score": 0.9,
+            "rationale": "SCORE 0.9 | RATIONALE The candidate correctly ranks the merchant recovery queues primarily by filing deadline, which is the most critical factor, and then appropriately considers recovery probability and merchant risk score as secondary criteria. The ranking is logical and aligns with the provided data. However, it could be slightly improved by explicitly stating the rationale for the order of secondary criteria."
+          },
+          {
+            "parent": "Start | {'queues': 'MERCH-A deadline=2d risk=60 recovery=.70; MERCH-B deadline=5d risk=90 recovery=.60; MERCH-C deadline=1d risk=30 recovery=.80'}",
+            "candidate": "2. Rank the queues by recovery probability first, then by filing deadline, and lastly by merchant risk score: MERCH-C (recovery=0.80, deadline=1d, risk=30), MERCH-A (recovery=0.70, deadline=2d, risk=60), MERCH-B (recovery=0.60, deadline=5d, risk=90).",
+            "score": 1.0,
+            "rationale": "SCORE: 1 | RATIONALE: The candidate correctly ranks the merchant recovery queues based on the specified criteria: recovery probability first, then filing deadline, and finally merchant risk score. The order of the queues is accurate according to these parameters."
+          },
+          {
+            "parent": "Start | {'queues': 'MERCH-A deadline=2d risk=60 recovery=.70; MERCH-B deadline=5d risk=90 recovery=.60; MERCH-C deadline=1d risk=30 recovery=.80'}",
+            "candidate": "3. Rank the queues by merchant risk score first, then by filing deadline, and finally by recovery probability: MERCH-C (risk=30, deadline=1d, recovery=0.80), MERCH-A (risk=60, deadline=2d, recovery=0.70), MERCH-B (risk=90, deadline=5d, recovery=0.60).",
+            "score": 1.0,
+            "rationale": "SCORE: 1 | RATIONALE: The candidate correctly ranks the merchant recovery queues first by risk score (lowest to highest), then by filing deadline (earliest to latest), and finally by recovery probability (highest to lowest). The order is accurate based on the provided criteria."
+          }
+        ],
+        [
+          {
+            "parent": "2. Rank the queues by recovery probability first, then by filing deadline, and lastly by merchant risk score: MERCH-C (recovery=0.80, deadline=1d, risk=30), MERCH-A (recovery=0.70, deadline=2d, risk=60), MERCH-B (recovery=0.60, deadline=5d, risk=90).",
+            "candidate": "1. MERCH-C (recovery=0.80, deadline=1d, risk=30), MERCH-A (recovery=0.70, deadline=2d, risk=60), MERCH-B (recovery=0.60, deadline=5d, risk=90)",
+            "score": 1.0,
+            "rationale": "SCORE: 1 | RATIONALE: The candidate correctly ranks the merchant recovery queues according to the specified criteria: recovery probability first, then filing deadline, and lastly merchant risk score. The order of MERCH-C, MERCH-A, and MERCH-B is accurate based on the provided data."
+          },
+          {
+            "parent": "2. Rank the queues by recovery probability first, then by filing deadline, and lastly by merchant risk score: MERCH-C (recovery=0.80, deadline=1d, risk=30), MERCH-A (recovery=0.70, deadline=2d, risk=60), MERCH-B (recovery=0.60, deadline=5d, risk=90).",
+            "candidate": "2. MERCH-C (recovery=0.80, deadline=1d, risk=30), MERCH-B (recovery=0.60, deadline=5d, risk=90), MERCH-A (recovery=0.70, deadline=2d, risk=60)",
+            "score": 0.5,
+            "rationale": "SCORE: 0.5 | RATIONALE: The candidate ranks the queues incorrectly based on the specified criteria. While it correctly prioritizes recovery probability, it fails to properly order the remaining queues by filing deadline and merchant risk score. MERCH-A should be ranked before MERCH-B due to its earlier deadline, despite having a lower recovery probability."
+          },
+          {
+            "parent": "2. Rank the queues by recovery probability first, then by filing deadline, and lastly by merchant risk score: MERCH-C (recovery=0.80, deadline=1d, risk=30), MERCH-A (recovery=0.70, deadline=2d, risk=60), MERCH-B (recovery=0.60, deadline=5d, risk=90).",
+            "candidate": "3. MERCH-A (recovery=0.70, deadline=2d, risk=60), MERCH-C (recovery=0.80, deadline=1d, risk=30), MERCH-B (recovery=0.60, deadline=5d, risk=90)",
+            "score": 0.2,
+            "rationale": "SCORE: 0.2 | RATIONALE: The candidate ranks the queues incorrectly. It prioritizes MERCH-A over MERCH-C despite MERCH-C having a higher recovery probability, which contradicts the specified ranking criteria."
+          },
+          {
+            "parent": "3. Rank the queues by merchant risk score first, then by filing deadline, and finally by recovery probability: MERCH-C (risk=30, deadline=1d, recovery=0.80), MERCH-A (risk=60, deadline=2d, recovery=0.70), MERCH-B (risk=90, deadline=5d, recovery=0.60).",
+            "candidate": "1. Rank the queues by filing deadline first, then by merchant risk score, and finally by recovery probability: MERCH-C (deadline=1d, risk=30, recovery=0.80), MERCH-A (deadline=2d, risk=60, recovery=0.70), MERCH-B (deadline=5d, risk=90, recovery=0.60).",
+            "score": 0.2,
+            "rationale": "SCORE: 0.2 | RATIONALE: The candidate incorrectly prioritizes the ranking criteria by filing deadline first instead of merchant risk score, which is the primary criterion in the parent task. This leads to an incorrect order of the queues."
+          },
+          {
+            "parent": "3. Rank the queues by merchant risk score first, then by filing deadline, and finally by recovery probability: MERCH-C (risk=30, deadline=1d, recovery=0.80), MERCH-A (risk=60, deadline=2d, recovery=0.70), MERCH-B (risk=90, deadline=5d, recovery=0.60).",
+            "candidate": "2. Rank the queues by recovery probability first, then by merchant risk score, and finally by filing deadline: MERCH-C (recovery=0.80, risk=30, deadline=1d), MERCH-A (recovery=0.70, risk=60, deadline=2d), MERCH-B (recovery=0.60, risk=90, deadline=5d).",
+            "score": 0.2,
+            "rationale": "SCORE: 0.2 | RATIONALE: The candidate incorrectly prioritizes recovery probability over merchant risk score, which contradicts the specified ranking criteria."
+          },
+          {
+            "parent": "3. Rank the queues by merchant risk score first, then by filing deadline, and finally by recovery probability: MERCH-C (risk=30, deadline=1d, recovery=0.80), MERCH-A (risk=60, deadline=2d, recovery=0.70), MERCH-B (risk=90, deadline=5d, recovery=0.60).",
+            "candidate": "3. Rank the queues by merchant risk score first, then by recovery probability, and finally by filing deadline: MERCH-C (risk=30, recovery=0.80, deadline=1d), MERCH-A (risk=60, recovery=0.70, deadline=2d), MERCH-B (risk=90, recovery=0.60, deadline=5d).",
+            "score": 0.2,
+            "rationale": "SCORE 0.2 | RATIONALE The candidate incorrectly prioritizes the ranking criteria by placing recovery probability before filing deadline, which does not align with the specified ranking order."
+          },
+          {
+            "parent": "1. Rank the queues primarily by filing deadline, then by recovery probability, and finally by merchant risk score: MERCH-C (deadline=1d, risk=30, recovery=0.80), MERCH-A (deadline=2d, risk=60, recovery=0.70), MERCH-B (deadline=5d, risk=90, recovery=0.60).",
+            "candidate": "1. MERCH-C (deadline=1d, risk=30, recovery=0.80), MERCH-A (deadline=2d, risk=60, recovery=0.70), MERCH-B (deadline=5d, risk=90, recovery=0.60)",
+            "score": 1.0,
+            "rationale": "SCORE: 1 | RATIONALE: The candidate correctly ranks the merchant recovery queues according to the specified criteria: filing deadline first, then recovery probability, and finally merchant risk score. The order of MERCH-C, MERCH-A, and MERCH-B is accurate based on the provided data."
+          },
+          {
+            "parent": "1. Rank the queues primarily by filing deadline, then by recovery probability, and finally by merchant risk score: MERCH-C (deadline=1d, risk=30, recovery=0.80), MERCH-A (deadline=2d, risk=60, recovery=0.70), MERCH-B (deadline=5d, risk=90, recovery=0.60).",
+            "candidate": "2. MERCH-C (deadline=1d, risk=30, recovery=0.80), MERCH-B (deadline=5d, risk=90, recovery=0.60), MERCH-A (deadline=2d, risk=60, recovery=0.70)",
+            "score": 0.33,
+            "rationale": "SCORE: 0.33 | RATIONALE: The candidate incorrectly ranks MERCH-B before MERCH-A despite having a longer filing deadline and lower recovery probability. The correct order should prioritize filing deadlines first, followed by recovery probability, and finally merchant risk score."
+          },
+          {
+            "parent": "1. Rank the queues primarily by filing deadline, then by recovery probability, and finally by merchant risk score: MERCH-C (deadline=1d, risk=30, recovery=0.80), MERCH-A (deadline=2d, risk=60, recovery=0.70), MERCH-B (deadline=5d, risk=90, recovery=0.60).",
+            "candidate": "3. MERCH-A (deadline=2d, risk=60, recovery=0.70), MERCH-C (deadline=1d, risk=30, recovery=0.80), MERCH-B (deadline=5d, risk=90, recovery=0.60)",
+            "score": 0.2,
+            "rationale": "SCORE: 0.2 | RATIONALE: The candidate incorrectly ranks MERCH-A before MERCH-C despite MERCH-C having a closer filing deadline, which is the primary criterion for ranking."
+          }
+        ]
+      ]
+    },
+    "metrics": {
+      "llm_calls": 16,
+      "tokens": 715
+    }
+  }
+}

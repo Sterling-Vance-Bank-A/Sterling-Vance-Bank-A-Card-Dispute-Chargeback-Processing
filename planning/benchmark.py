@@ -27,33 +27,50 @@ class MockLLMClient:
             return "PLAN\n1. Identify the dispute and constraints.\n2. Summarize evidence and compute exposure.\nSOLUTION\nDispute summary prepared with constraints checked."
 
         if "generate distinct candidate next steps" in p:
-            ranking = {
-                6: ["M-C -> M-A -> M-B", "M-A -> M-C -> M-B", "M-B -> M-A -> M-C"],
-                7: ["D1 -> D4 -> D3 -> D2 -> D5", "D4 -> D1 -> D3 -> D2 -> D5", "D2 -> D3 -> D1 -> D4 -> D5"],
-                8: ["MERCH-A -> MERCH-C -> MERCH-B -> MERCH-D", "MERCH-C -> MERCH-A -> MERCH-B -> MERCH-D", "MERCH-B -> MERCH-A -> MERCH-C -> MERCH-D"],
-                9: ["TX-A -> TX-C -> TX-B", "TX-C -> TX-A -> TX-B", "TX-B -> TX-C -> TX-A"],
-                10: ["P1 -> P3 -> P4 -> P2", "P3 -> P1 -> P4 -> P2", "P2 -> P3 -> P1 -> P4"],
-            }
-            return "\n".join(ranking.get(case_id, ["Candidate A", "Candidate B", "Candidate C"]))
+            if "merch-" in p or "queue" in p:
+                return "1. MERCH-C (1d, risk=30, recovery=.80) -> MERCH-A (2d, risk=60, recovery=.70) -> MERCH-B (5d, risk=90, recovery=.60)\n2. MERCH-A (2d) -> MERCH-C (1d) -> MERCH-B (5d)"
+            if "d1" in p or "d2" in p or "urgency" in p:
+                return "1. D1 (1d, $120) -> D4 (1d, $700) -> D3 (2d, $450) -> D2 (3d, $900) -> D5 (7d, $150)\n2. D4 (1d) -> D1 (1d) -> D3 (2d) -> D2 (3d) -> D5 (7d)"
+            if "portfolio" in p or "risk concentration" in p:
+                return "1. MERCH-004 (risk=92) -> MERCH-002 (risk=75) -> MERCH-003 (risk=50) -> MERCH-001 (risk=35)\n2. MERCH-002 -> MERCH-004 -> MERCH-003 -> MERCH-001"
+            return "1. Option A: Prioritize by statutory deadline\n2. Option B: Prioritize by dollar exposure"
 
         if "evaluate this tree-of-thoughts candidate" in p:
-            expected = {
-                6: "m-c -> m-a -> m-b",
-                7: "d1 -> d4 -> d3 -> d2 -> d5",
-                8: "merch-a -> merch-c -> merch-b -> merch-d",
-                9: "tx-a -> tx-c -> tx-b",
-                10: "p1 -> p3 -> p4 -> p2",
-            }.get(case_id, "")
-            return "SCORE 0.95 | RATIONALE preferred ordering" if expected and expected in p else "SCORE 0.35 | RATIONALE weaker ordering"
+            if any(opt in p for opt in ("merch-c (1d", "d1 (1d", "merch-004 (risk=92", "statutory deadline")):
+                return "SCORE 0.95 | RATIONALE Optimal sequence balancing statutory timeline and recovery likelihood."
+            return "SCORE 0.40 | RATIONALE Sub-optimal ordering."
 
         if "generate candidate actions" in p or "lats action generator" in p:
             dispute = re.search(r"disp-\d+", p)
             analyst = re.search(r"anl-\d+", p)
             dispute_id = dispute.group(0).upper() if dispute else "DISP-001"
             analyst_id = analyst.group(0).upper() if analyst else "ANL-002"
-            if case_id == 14:
-                return f"Escalate {dispute_id} using {analyst_id}\nEscalate {dispute_id} using {analyst_id}\nEscalate {dispute_id} using {analyst_id}"
+            if ("escalat" in p and "refund or escalat" not in p and "refund or escalation" not in p) or "disp-002" in p or "disp-014" in p:
+                esc_analyst = analyst_id if analyst_id in ("ANL-002", "ANL-008") else "ANL-002"
+                return f"Escalate {dispute_id} using {esc_analyst}\nEscalate {dispute_id} using {esc_analyst}\nEscalate {dispute_id} using {esc_analyst}"
             return f"Refund {dispute_id} using {analyst_id}\nRefund {dispute_id} using {analyst_id}\nRefund {dispute_id} using {analyst_id}"
+
+        # Self-Refine generation, critique, and refinement
+        if "independent compliance critic" in p or "evaluate the following draft" in p:
+            return (
+                "CRITIQUE:\n"
+                "1. The draft omits the formal dispute reference identifier (DISP-001).\n"
+                "2. The draft omits the exact disputed amount ($29.99).\n"
+                "3. Regulation E § 1005.11 requires explicit notice that the cardholder may request documentation copies.\n"
+                "REVISION REQUIRED: State DISP-001, specify $29.99, and include the statutory document request disclosure."
+            )
+        if "banking dispute specialist" in p or "revise and improve the deliverable" in p or "critic feedback:" in p:
+            return (
+                "Formal Dispute Resolution Notice — Sterling Vance Bank\n\n"
+                "Dear Cardholder,\n\n"
+                "Re: Dispute Reference DISP-001 ($29.99 - Duplicate Charge)\n"
+                "We have completed our investigation into transaction TXN-002 ($29.99). In accordance with Regulation E "
+                "(12 CFR § 1005.11), a permanent credit of $29.99 has been posted to your account. You have the right to request "
+                "copies of all documents and evidence relied upon in making this determination.\n\n"
+                "Sincerely,\nSterling Vance Bank Dispute Operations"
+            )
+        if "compliance drafting assistant" in p or "draft a formal customer" in p or "draft formal customer" in p or "notification_draft" in p:
+            return "Customer Notice: Your recent duplicate transaction has been reviewed and a provisional adjustment was posted. Contact customer service for details."
 
         if "estimate future usefulness" in p:
             return "0.90"

@@ -1,0 +1,69 @@
+{
+  "case_id": "TC-O02",
+  "category": "general_dispute",
+  "method": "LATS (Ungrounded)",
+  "success": true,
+  "llm_calls": 6,
+  "tokens": 730,
+  "latency_s": 5.545,
+  "cost_usd": 0.000109,
+  "trace": {
+    "status": "success",
+    "best_action": "escalate_dispute",
+    "final_state": "1. Review transaction details and customer account history for dispute ID DISP-009; escalate findings to fraud department for further investigation. Analyst ID: ANL-002.",
+    "environment_feedback": {
+      "success": true,
+      "score": 1.0,
+      "details": "Candidate self-approved; no external bank validator was consulted.",
+      "source": "ungrounded_model_score"
+    },
+    "mcts": [
+      {
+        "id": "n0",
+        "parent_id": null,
+        "action": "root",
+        "state": "{'dispute_id': 'DISP-009', 'amount': 793.78, 'status': 'investigating', 'analyst_id': 'ANL-002'}",
+        "visits": 1,
+        "mean_value": 0.875,
+        "environment_score": 0.0,
+        "model_score": 0.0,
+        "feedback": null,
+        "reflections": []
+      },
+      {
+        "id": "n1",
+        "parent_id": "n0",
+        "action": "escalate_dispute",
+        "state": "1. Review transaction details and customer account history for dispute ID DISP-009; escalate findings to fraud department for further investigation. Analyst ID: ANL-002.",
+        "visits": 1,
+        "mean_value": 0.875,
+        "environment_score": 1.0,
+        "model_score": 0.5,
+        "feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Candidate self-approved; no external bank validator was consulted.",
+          "source": "ungrounded_model_score"
+        },
+        "reflections": []
+      },
+      {
+        "id": "n2",
+        "parent_id": "n0",
+        "action": "verify_transaction",
+        "state": "2. Contact the customer to gather additional information regarding the unauthorized transaction for dispute ID DISP-009; document the conversation and update the case notes. Analyst ID: ANL-002.",
+        "visits": 0,
+        "mean_value": 0.0,
+        "environment_score": 0.0,
+        "model_score": 0.0,
+        "feedback": null,
+        "reflections": []
+      }
+    ],
+    "iterations": 1,
+    "metrics": {
+      "llm_calls": 2,
+      "tokens": 208
+    }
+  }
+}

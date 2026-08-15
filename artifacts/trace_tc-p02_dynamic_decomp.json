@@ -1,0 +1,82 @@
+{
+  "case_id": "TC-P02",
+  "category": "planning_algorithm",
+  "method": "Dynamic Decomposition",
+  "success": true,
+  "llm_calls": 3,
+  "tokens": 610,
+  "latency_s": 6.474,
+  "cost_usd": 9.1e-05,
+  "trace": {
+    "status": "success",
+    "method": "dynamic_decomposition",
+    "dag_tasks": {
+      "task_1": {
+        "id": "task_1",
+        "description": "aggregate evidence related to the fraud dispute for DISP-006",
+        "task_type": "evidence_aggregation",
+        "depends_on": [],
+        "context": {
+          "request": "Calculate total monetary exposure and card network interchange fee impact for DISP-006 ($320.00).",
+          "initial_context": {
+            "dispute_id": "DISP-006",
+            "amount": 320.0,
+            "reason": "fraud"
+          },
+          "prior_observations": "No completed sub-tasks yet.",
+          "step": 1
+        },
+        "result": {
+          "status": "success",
+          "final_result": "PLAN:\n1. Retrieve the transaction details for DISP-006.\n2. Calculate the total monetary exposure for the dispute.\n3. Determine the card network interchange fee impact based on the transaction amount.\n4. Aggregate the findings into a summary report.\n\nSOLUTION:\n1. Retrieve the transaction details for DISP-006.\n   - Transaction amount: $320.00\n   - Reason for dispute: Fraud\n\n2. Calculate the total monetary exposure for the dispute.\n   - Total monetary exposure = $320.00\n\n3. Determine the card network interchange fee impact based on the transaction amount.\n   - Assuming a standard interchange fee rate of 2.5%, the interchange fee impact = $320.00 * 0.025 = $8.00\n\n4. Aggregate the findings into a summary report.\n   - Summary: For DISP-006, the total monetary exposure is $320.00, and the card network interchange fee impact is $8.00.",
+          "execution_trace": [
+            {
+              "phase": "plan",
+              "result": "PLAN:\n1. Retrieve the transaction details for DISP-006.\n2. Calculate the total monetary exposure for the dispute.\n3. Determine the card network interchange fee impact based on the transaction amount.\n4. Aggregate the findings into a summary report.\n\nSOLUTION:\n1. Retrieve the transaction details for DISP-006.\n   - Transaction amount: $320.00\n   - Reason for dispute: Fraud\n\n2. Calculate the total monetary exposure for the dispute.\n   - Total monetary exposure = $320.00\n\n3. Determine the card network interchange fee impact based on the transaction amount.\n   - Assuming a standard interchange fee rate of 2.5%, the interchange fee impact = $320.00 * 0.025 = $8.00\n\n4. Aggregate the findings into a summary report.\n   - Summary: For DISP-006, the total monetary exposure is $320.00, and the card network interchange fee impact is $8.00."
+            }
+          ],
+          "metrics": {
+            "llm_calls": 38,
+            "tokens": 5474
+          },
+          "routed_algorithm": "plan_and_solve",
+          "task_id": "task_1"
+        },
+        "status": "completed"
+      }
+    },
+    "execution_order": [
+      "task_1"
+    ],
+    "results": {
+      "task_1": {
+        "status": "success",
+        "final_result": "PLAN:\n1. Retrieve the transaction details for DISP-006.\n2. Calculate the total monetary exposure for the dispute.\n3. Determine the card network interchange fee impact based on the transaction amount.\n4. Aggregate the findings into a summary report.\n\nSOLUTION:\n1. Retrieve the transaction details for DISP-006.\n   - Transaction amount: $320.00\n   - Reason for dispute: Fraud\n\n2. Calculate the total monetary exposure for the dispute.\n   - Total monetary exposure = $320.00\n\n3. Determine the card network interchange fee impact based on the transaction amount.\n   - Assuming a standard interchange fee rate of 2.5%, the interchange fee impact = $320.00 * 0.025 = $8.00\n\n4. Aggregate the findings into a summary report.\n   - Summary: For DISP-006, the total monetary exposure is $320.00, and the card network interchange fee impact is $8.00.",
+        "execution_trace": [
+          {
+            "phase": "plan",
+            "result": "PLAN:\n1. Retrieve the transaction details for DISP-006.\n2. Calculate the total monetary exposure for the dispute.\n3. Determine the card network interchange fee impact based on the transaction amount.\n4. Aggregate the findings into a summary report.\n\nSOLUTION:\n1. Retrieve the transaction details for DISP-006.\n   - Transaction amount: $320.00\n   - Reason for dispute: Fraud\n\n2. Calculate the total monetary exposure for the dispute.\n   - Total monetary exposure = $320.00\n\n3. Determine the card network interchange fee impact based on the transaction amount.\n   - Assuming a standard interchange fee rate of 2.5%, the interchange fee impact = $320.00 * 0.025 = $8.00\n\n4. Aggregate the findings into a summary report.\n   - Summary: For DISP-006, the total monetary exposure is $320.00, and the card network interchange fee impact is $8.00."
+          }
+        ],
+        "metrics": {
+          "llm_calls": 38,
+          "tokens": 5474
+        },
+        "routed_algorithm": "plan_and_solve",
+        "task_id": "task_1"
+      }
+    },
+    "history": [
+      [
+        "aggregate evidence related to the fraud dispute for DISP-006",
+        "{'status': 'success', 'final_result': 'PLAN:\\n1. Retrieve the transaction details for DISP-006.\\n2. Calculate the total monetary exposure for the dispute.\\n3. Determine the card network interchange fee impact based on the transaction amount.\\n4. Aggregate the findings into a summary report.\\n\\nSOLUTION:\\n1. Retrieve the transaction details for DISP-006.\\n   - Transaction amount: $320.00\\n   - Reason for dispute: Fraud\\n\\n2. Calculate the total monetary exposure for the dispute.\\n   - Total monetary exposure = $320.00\\n\\n3. Determine the card network interchange fee impact based on the transaction amount.\\n   - Assuming a standard interchange fee rate of 2.5%, the interchange fee impact = $320.00 * 0.025 = $8.00\\n\\n4. Aggregate the findings into a summary report.\\n   - Summary: For DISP-006, the total monetary exposure is $320.00, and the card network interchange fee impact is $8.00.', 'execution_trace': [{'phase': 'plan', 'result': 'PLAN:\\n1. Retrieve the transaction details for DISP-006.\\n2. Calculate the total monetary exposure for the dispute.\\n3. Determine the card network interchange fee impact based on the transaction amount.\\n4. Aggregate the findings into a summary report.\\n\\nSOLUTION:\\n1. Retrieve the transaction details for DISP-006.\\n   - Transaction amount: $320.00\\n   - Reason for dispute: Fraud\\n\\n2. Calculate the total monetary exposure for the dispute.\\n   - Total monetary exposure = $320.00\\n\\n3. Determine the card network interchange fee impact based on the transaction amount.\\n   - Assuming a standard interchange fee rate of 2.5%, the interchange fee impact = $320.00 * 0.025 = $8.00\\n\\n4. Aggregate the findings into a summary report.\\n   - Summary: For DISP-006, the total monetary exposure is $320.00, and the card network interchange fee impact is $8.00.'}], 'metrics': {'llm_calls': 38, 'tokens': 5474}, 'routed_algorithm': 'plan_and_solve', 'task_id': 'task_1'}"
+      ]
+    ],
+    "diverged": false,
+    "steps_taken": 1,
+    "metrics": {
+      "llm_calls": 2,
+      "tokens": 36
+    }
+  }
+}
