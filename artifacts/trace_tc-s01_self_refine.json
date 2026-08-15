@@ -1,0 +1,29 @@
+{
+  "case_id": "TC-S01",
+  "category": "self_correction",
+  "method": "Self-Refine",
+  "success": true,
+  "llm_calls": 3,
+  "tokens": 778,
+  "latency_s": 13.095,
+  "cost_usd": 0.000117,
+  "trace": {
+    "status": "success",
+    "method": "self_refine",
+    "draft": "[Your Name]  \nBanking Dispute Specialist  \nSterling Vance Bank  \n[Bank Address]  \n[City, State, Zip Code]  \n[Email Address]  \n[Phone Number]  \n[Date]  \n\n[Customer Name]  \n[Customer Address]  \n[City, State, Zip Code]  \n\nSubject: Provisional Credit Notification for Dispute ID: DISP-001\n\nDear [Customer Name],\n\nWe are writing to inform you about the status of your recent dispute regarding the transaction associated with Dispute ID: DISP-001. The transaction in question, amounting to $29.99, is currently under investigation as per your request.\n\nIn accordance with Regulation E, we have provisionally credited your account for the disputed amount of $29.99. This provisional credit will be reflected in your account within the next business day. Please note that this credit is temporary and subject to the outcome of our investigation.\n\n**Details of the Dispute:**\n- **Dispute ID:** DISP-001\n- **Transaction Amount:** $29.99\n- **Status:** Open\n\nAs we continue our investigation, we may require additional information from you to resolve this matter. If you have any further documentation or details that could assist us, please provide them at your earliest convenience.\n\n**Next Steps:**\n1. Review your account statement to ensure that the provisional credit has been applied.\n2. If you have any additional information regarding this dispute, please contact us at [Phone Number] or [Email Address].\n3. We will complete our investigation within 10 business days from the date of this letter. If we require more time, we will notify you accordingly.\n\nThank you for your patience as we work to resolve this matter. We value your business and are committed to providing you with the highest level of service.\n\nSincerely,\n\n[Your Name]  \nBanking Dispute Specialist  \nSterling Vance Bank  \n\n[Enclosures: If applicable]",
+    "critique": "1. **Correctness**: The draft accurately states the dispute ID (DISP-001), the dollar figure ($29.99), and the status (Open). This section meets the correctness requirement.\n\n2. **Regulatory Compliance**: The letter correctly cites Regulation E and mentions the provisional credit. However, it does not specify the statutory timeline for notifying the customer about the outcome of the investigation, which is typically 45 days for a final resolution. This is a significant oversight.\n\n3. **Internal Consistency**: The draft adheres to grounded bank constraints, as it reflects the bank's procedures for handling disputes and provisional credits.\n\n4. **Completeness & Structure**: The letter has clear headings and a resolution summary. However, it lacks a clear statement of the customer's rights under Regulation E, which is essential for completeness.\n\n**Defects Found**:\n- Missing specific statutory timeline for the final resolution (45 days).\n- Lack of explicit mention of the customer's rights under Regulation E.\n\nOverall, while the draft is mostly compliant, the missing elements regarding regulatory compliance and customer rights are critical defects.\n\n**Final Evaluation**: The draft does not fully satisfy the rubric due to the identified defects.",
+    "revised": "[Your Name]  \nBanking Dispute Specialist  \nSterling Vance Bank  \n[Bank Address]  \n[City, State, Zip Code]  \n[Email Address]  \n[Phone Number]  \n[Date]  \n\n[Customer Name]  \n[Customer Address]  \n[City, State, Zip Code]  \n\nSubject: Provisional Credit Notification for Dispute ID: DISP-001\n\nDear [Customer Name],\n\nWe are writing to inform you about the status of your recent dispute regarding the transaction associated with Dispute ID: DISP-001. The transaction in question, amounting to $29.99, is currently under investigation as per your request.\n\nIn accordance with Regulation E, we have provisionally credited your account for the disputed amount of $29.99. This provisional credit will be reflected in your account within the next business day. Please note that this credit is temporary and subject to the outcome of our investigation.\n\n**Details of the Dispute:**\n- **Dispute ID:** DISP-001\n- **Transaction Amount:** $29.99\n- **Status:** Open\n\nAs we continue our investigation, we may require additional information from you to resolve this matter. If you have any further documentation or details that could assist us, please provide them at your earliest convenience.\n\n**Your Rights Under Regulation E:**\nYou have the right to dispute unauthorized transactions and to receive a provisional credit while we investigate. We will complete our investigation within 10 business days from the date of this letter. If we require more time, we will notify you and extend the provisional credit for up to 45 days. You will receive a final resolution regarding your dispute within this timeframe.\n\n**Next Steps:**\n1. Review your account statement to ensure that the provisional credit has been applied.\n2. If you have any additional information regarding this dispute, please contact us at [Phone Number] or [Email Address].\n3. We will keep you updated on the progress of our investigation.\n\nThank you for your patience as we work to resolve this matter. We value your business and are committed to providing you with the highest level of service.\n\nSincerely,\n\n[Your Name]  \nBanking Dispute Specialist  \nSterling Vance Bank  \n\n[Enclosures: If applicable]",
+    "grounded_issues": [],
+    "grounded_feedback": {
+      "success": true,
+      "score": 0.7,
+      "details": "Read-only validation succeeded; no write action requested.",
+      "source": "sterling_vance.db"
+    },
+    "passed_initially": false,
+    "metrics": {
+      "llm_calls": 3,
+      "tokens": 778
+    }
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "case_id": "TC-O02",
+  "category": "general_dispute",
+  "method": "LATS (Grounded)",
+  "success": true,
+  "llm_calls": 6,
+  "tokens": 790,
+  "latency_s": 4.184,
+  "cost_usd": 0.000118,
+  "trace": {
+    "status": "success",
+    "best_action": "escalate_dispute",
+    "final_state": "1. Review transaction details and customer account history for dispute ID DISP-009, and escalate findings to the fraud department for further investigation. Analyst ID: ANL-002.",
+    "environment_feedback": {
+      "success": true,
+      "score": 1.0,
+      "details": "Escalation candidate passes current DB constraints.",
+      "source": "sterling_vance.db"
+    },
+    "mcts": [
+      {
+        "id": "n0",
+        "parent_id": null,
+        "action": "root",
+        "state": "{'dispute_id': 'DISP-009', 'amount': 793.78, 'status': 'investigating', 'analyst_id': 'ANL-002'}",
+        "visits": 1,
+        "mean_value": 1.0,
+        "environment_score": 0.0,
+        "model_score": 0.0,
+        "feedback": null,
+        "reflections": []
+      },
+      {
+        "id": "n1",
+        "parent_id": "n0",
+        "action": "escalate_dispute",
+        "state": "1. Review transaction details and customer account history for dispute ID DISP-009, and escalate findings to the fraud department for further investigation. Analyst ID: ANL-002.",
+        "visits": 1,
+        "mean_value": 1.0,
+        "environment_score": 1.0,
+        "model_score": 1.0,
+        "feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Escalation candidate passes current DB constraints.",
+          "source": "sterling_vance.db"
+        },
+        "reflections": []
+      },
+      {
+        "id": "n2",
+        "parent_id": "n0",
+        "action": "verify_transaction",
+        "state": "2. Contact the customer to gather additional information regarding the unauthorized transaction for dispute ID DISP-009, and document their feedback for resolution. Analyst ID: ANL-002.",
+        "visits": 0,
+        "mean_value": 0.0,
+        "environment_score": 0.0,
+        "model_score": 0.0,
+        "feedback": null,
+        "reflections": []
+      }
+    ],
+    "iterations": 1,
+    "metrics": {
+      "llm_calls": 2,
+      "tokens": 160
+    }
+  }
+}

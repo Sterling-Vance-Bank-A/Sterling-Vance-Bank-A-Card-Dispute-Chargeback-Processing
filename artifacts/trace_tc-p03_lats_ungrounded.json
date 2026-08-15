@@ -1,0 +1,69 @@
+{
+  "case_id": "TC-P03",
+  "category": "planning_algorithm",
+  "method": "LATS (Ungrounded)",
+  "success": true,
+  "llm_calls": 6,
+  "tokens": 730,
+  "latency_s": 5.038,
+  "cost_usd": 0.000109,
+  "trace": {
+    "status": "success",
+    "best_action": "verify_transaction",
+    "final_state": "1. File dispute for MERCH-C with dispute ID 12345 and analyst ID A001.",
+    "environment_feedback": {
+      "success": true,
+      "score": 1.0,
+      "details": "Candidate self-approved; no external bank validator was consulted.",
+      "source": "ungrounded_model_score"
+    },
+    "mcts": [
+      {
+        "id": "n0",
+        "parent_id": null,
+        "action": "root",
+        "state": "{'queues': 'MERCH-A deadline=2d risk=60 recovery=.70; MERCH-B deadline=5d risk=90 recovery=.60; MERCH-C deadline=1d risk=30 recovery=.80'}",
+        "visits": 1,
+        "mean_value": 1.0,
+        "environment_score": 0.0,
+        "model_score": 0.0,
+        "feedback": null,
+        "reflections": []
+      },
+      {
+        "id": "n1",
+        "parent_id": "n0",
+        "action": "verify_transaction",
+        "state": "1. File dispute for MERCH-C with dispute ID 12345 and analyst ID A001.",
+        "visits": 1,
+        "mean_value": 1.0,
+        "environment_score": 1.0,
+        "model_score": 1.0,
+        "feedback": {
+          "success": true,
+          "score": 1.0,
+          "details": "Candidate self-approved; no external bank validator was consulted.",
+          "source": "ungrounded_model_score"
+        },
+        "reflections": []
+      },
+      {
+        "id": "n2",
+        "parent_id": "n0",
+        "action": "verify_transaction",
+        "state": "2. File dispute for MERCH-A with dispute ID 12346 and analyst ID A002.",
+        "visits": 0,
+        "mean_value": 0.0,
+        "environment_score": 0.0,
+        "model_score": 0.0,
+        "feedback": null,
+        "reflections": []
+      }
+    ],
+    "iterations": 1,
+    "metrics": {
+      "llm_calls": 2,
+      "tokens": 262
+    }
+  }
+}

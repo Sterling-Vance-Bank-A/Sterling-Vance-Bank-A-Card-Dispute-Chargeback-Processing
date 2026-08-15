@@ -1,62 +1,81 @@
-# Agent & Client Layer (`agent/`)
+# Agent Layer (`agent/`)
 
-**Role:** Dispute Agent Client, Protocol Negotiation, LLM Sampling Integration, & Demo Evidence Suite.
-
----
-
-## 🛠️ Overview & Key Components
-
-The `agent/` module contains the client-side implementation of the Sterling Vance Dispute Processing system:
-- **`agent_client.py` (`DisputeAgentClient`):** Asynchronous MCP client wrapping stdio and HTTP sessions. Performs protocol capability negotiation during `initialize`, maintains dynamic tool discovery (`tools/list_changed`), enforces client-side capability gating, and integrates OpenRouter sampling callbacks.
-- **`run_demo_evidence.py`:** Automated scenario runner executing 8 test cases (`tc01` – `tc08`) and populating the `agent/evidence/` directory with verified protocol traces.
+**Sterling Vance Bank Enterprise Agent Suite**  
+Provides specialized, modular AI agents and clients interacting over the Model Context Protocol (MCP) server and SQLite database:
+1. **`agent_client.py` (`DisputeAgentClient`):** Asynchronous protocol client handling capability negotiation, dynamic tool discovery (`tools/list_changed`), capability gating, and LLM sampling (`sampling/createMessage`).
+2. **`memory_agent.py` (`DisputeMemoryAgent`):** Long-term memory & RAG retrieval agent integrating the rolling buffer, scratchpad, episodic store, semantic fact store, and ChromaDB vector store.
+3. **`dispute_planning_agent.py` (`DisputePlanningAgent`):** Autonomous multi-step planning and decomposition agent executing dynamic DAGs, algorithmic routing (PS/ToT/LATS), self-correction (SelfRefine/Reflexion), and planning-driven MCP tool execution.
+4. **`demo_dispute_planning.py`:** Consolidated demonstration script covering all 5 planning concerns end-to-end.
 
 ---
 
 ## 📂 File Directory
 
-| File | Description |
-|---|---|
-| `agent_client.py` | `DisputeAgentClient` class with capability negotiation, `call_tool_gated()`, resource/prompt methods, and OpenRouter sampling. |
-| `run_demo_evidence.py` | 8 automated evidence scenario runners that reset test DB rows and generate trace outputs. |
-| `evidence/` | Directory containing captured proof files (`tc01` through `tc08`) for all protocol concerns. |
-
----
-
-## 📄 Evidence File Reference (`agent/evidence/`)
-
-| File | Protocol Concern Proved | Description |
+| File | Subsystem | Description |
 |---|---|---|
-| `tc01_handshake_discovery_and_routine_refund.txt` | **Capability Negotiation & Elicitation** | Opening handshake, dynamic tool discovery, and auto-approved refund ($\le \$500.00$). |
-| `tc02_large_dispute_escalation_trigger.txt` | **Notifications & Elicitation Pause** | Refund $> \$500$ fires `tools/list_changed` notification unlocking `escalate_dispute` and triggering elicitation pause. |
-| `tc03_unauthorized_action_blocked.txt` | **Authorization & RBAC** | Junior analyst (`ANL-001`) attempted refund/escalation rejected server-side. |
-| `tc04_repeat_pattern_and_slow_scan.txt` | **Progress Tracking** | Long-running transaction scan (`CUST-073` / `MERCH-006`) sending 35 live progress updates. |
-| `tc05_missing_capability_blocked.txt` | **Capability Gating** | Client refuses client-side to call tool requiring unadvertised capabilities (`PermissionError`). |
-| `tc06_resource_read.txt` | **Resources** | Reading policy guidelines from `policy://disputes/reason-codes`. |
-| `tc07_prompt_template_used.txt` | **Prompts** | Fetching parameterized `draft_denial_explanation` prompt template for `DISP-003`. |
-| `tc08_real_llm_sampling.txt` | **Sampling (`sampling/createMessage`)** | `summarize_dispute_evidence` invoking client OpenRouter LLM (`openai/gpt-4o-mini`) for AI evidence summary. |
+| `dispute_planning_agent.py` | **Planning & Decomposition** | Autonomous planning agent with Dynamic Decomposition, SubTaskRouter, Grounded LATS, SelfRefine, Reflexion, and MCP tool execution. |
+| `demo_dispute_planning.py` | **Planning & Decomposition** | Consolidated 5-part demonstration script (Divergence, Routing, Self-Refine, Reflexion, Grounding). |
+| `agent_client.py` | **MCP Client** | Async MCP client with protocol handshake, capability gating, and OpenRouter sampling. |
+| `memory_agent.py` | **Memory & RAG** | Multi-session dispute analyst agent with short-term buffer, episodic/semantic memory, and RAG policy lookup. |
+| `run_demo_evidence.py` | **MCP Evidence** | Automated scenario runner generating protocol evidence files (`tc01`–`tc08`). |
+| `evidence/` | **MCP Traces** | Captured protocol proof files for capability negotiation, notifications, elicitation, and progress tracking. |
 
 ---
 
-## 🛠️ Tool Capabilities & Policy Matrix
+## 🛠️ Dispute Planning Agent Execution Flow
 
-| Tool Name | Type | Elicitation Threshold | Authorization Rule |
-|---|---|:---:|---|
-| `get_dispute_details` | Read-only | None | Safe for all analyst roles |
-| `get_transaction_history` | Read-only | None | Safe for all analyst roles |
-| `get_merchant_info` | Read-only | None | Safe for all analyst roles |
-| `summarize_dispute_evidence` | Read-only | None (Triggers Sampling) | Safe for all analyst roles |
-| `scan_repeat_dispute_patterns` | Read-only | None (Progress Tracked) | Safe for all analyst roles |
-| `process_refund` | **Write** | **Pause at $> \$500.00$** | **Senior Analyst Required** for $> \$500$ |
-| `escalate_dispute` | **Write** | None | **Senior Analyst Required** |
+```
+                     Incoming Complex Dispute Request
+                                   │
+                                   ▼
+                   ┌───────────────────────────────┐
+                   │  1. Context Grounding (MCP)   │
+                   │   get_dispute_details / merch │
+                   └───────────────┬───────────────┘
+                                   │
+                                   ▼
+                   ┌───────────────────────────────┐
+                   │  2. Dynamic Decomposition DAG │
+                   │    (Adaptive step-by-step)    │
+                   └───────────────┬───────────────┘
+                                   │
+          ┌────────────────────────┼────────────────────────┐
+          ▼                        ▼                        ▼
+┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
+│ Plan-and-Solve   │     │ Tree of Thoughts │     │  Grounded LATS   │
+│ (Evidence/Lines) │     │ (Queue Rankings) │     │ (State Actions)  │
+└─────────┬────────┘     └────────┬─────────┘     └────────┬─────────┘
+          │                       │                        │
+          └───────────────────────┼────────────────────────┘
+                                  │
+                                  ▼
+                   ┌───────────────────────────────┐
+                   │ 3. Self-Correction & Memories │
+                   │  - SelfRefine on disclosures  │
+                   │  - Reflexion on high-stakes   │
+                   └───────────────┬───────────────┘
+                                   │
+                                   ▼
+                   ┌───────────────────────────────┐
+                   │ 4. Planning-Driven MCP Action │
+                   │   process_refund / escalate   │
+                   └───────────────────────────────┘
+```
 
 ---
 
 ## 🚀 Execution Commands
 
 ```bash
-# Run agent smoke test (Handshake + tool discovery + DISP-001 lookup)
+# 1. Run the Dispute Planning Agent demo (Consolidated 5-part demo)
+python agent/demo_dispute_planning.py
+
+# 2. Run planning agent unit tests
+python tests/test_dispute_planning_agent.py
+
+# 3. Run MCP client smoke test
 python agent/agent_client.py
 
-# Run full demo evidence suite (Generates all 8 evidence files in agent/evidence/)
-python agent/run_demo_evidence.py
+# 4. Run Memory & RAG agent demo
+python memory_rag_demo.py
 ```

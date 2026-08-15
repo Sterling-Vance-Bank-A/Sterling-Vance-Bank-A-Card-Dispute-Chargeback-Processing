@@ -1,0 +1,69 @@
+{
+  "case_id": "TC-P07",
+  "category": "planning_algorithm",
+  "method": "LATS (Grounded)",
+  "success": true,
+  "llm_calls": 6,
+  "tokens": 790,
+  "latency_s": 3.974,
+  "cost_usd": 0.000118,
+  "trace": {
+    "status": "success",
+    "best_action": "verify_transaction",
+    "final_state": "1. Review transaction history and customer communication for DISP-013 assigned to analyst ANL-008 to gather additional evidence for the investigation.",
+    "environment_feedback": {
+      "success": true,
+      "score": 0.7,
+      "details": "Read-only validation succeeded; no write action requested.",
+      "source": "sterling_vance.db"
+    },
+    "mcts": [
+      {
+        "id": "n0",
+        "parent_id": null,
+        "action": "root",
+        "state": "{'dispute_id': 'DISP-013', 'amount': 1337.92, 'status': 'investigating', 'analyst_id': 'ANL-008'}",
+        "visits": 1,
+        "mean_value": 0.7,
+        "environment_score": 0.0,
+        "model_score": 0.0,
+        "feedback": null,
+        "reflections": []
+      },
+      {
+        "id": "n1",
+        "parent_id": "n0",
+        "action": "verify_transaction",
+        "state": "1. Review transaction history and customer communication for DISP-013 assigned to analyst ANL-008 to gather additional evidence for the investigation.",
+        "visits": 1,
+        "mean_value": 0.7,
+        "environment_score": 0.7,
+        "model_score": 0.7,
+        "feedback": {
+          "success": true,
+          "score": 0.7,
+          "details": "Read-only validation succeeded; no write action requested.",
+          "source": "sterling_vance.db"
+        },
+        "reflections": []
+      },
+      {
+        "id": "n2",
+        "parent_id": "n0",
+        "action": "process_refund",
+        "state": "2. Schedule a meeting with the customer to discuss the details of DISP-013 and clarify any discrepancies related to the $1,337.92 refund request, assigned to analyst ANL-008.",
+        "visits": 0,
+        "mean_value": 0.0,
+        "environment_score": 0.0,
+        "model_score": 0.0,
+        "feedback": null,
+        "reflections": []
+      }
+    ],
+    "iterations": 1,
+    "metrics": {
+      "llm_calls": 2,
+      "tokens": 167
+    }
+  }
+}

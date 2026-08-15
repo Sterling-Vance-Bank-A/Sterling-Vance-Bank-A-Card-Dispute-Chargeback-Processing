@@ -1,0 +1,24 @@
+{
+  "case_id": "TC-P04",
+  "category": "planning_algorithm",
+  "method": "Plan-and-Solve",
+  "success": false,
+  "llm_calls": 1,
+  "tokens": 220,
+  "latency_s": 4.087,
+  "cost_usd": 3.3e-05,
+  "trace": {
+    "status": "success",
+    "final_result": "PLAN:\n1. Parse the dispute data to extract the days since the dispute was filed and the dollar amounts for each dispute.\n2. Create a list of disputes with their respective urgency based on the days since the dispute was filed and the dollar amount.\n3. Sort the disputes primarily by urgency (days since filed) and secondarily by dollar amount (higher amounts first).\n4. Prepare the sorted list for output.\n\nSOLUTION:\n1. Dispute data parsed: D1(1d, $120), D2(3d, $900), D3(2d, $450), D4(1d, $700), D5(7d, $150).\n2. Urgency list created: \n   - D1: (1d, $120)\n   - D4: (1d, $700)\n   - D3: (2d, $450)\n   - D2: (3d, $900)\n   - D5: (7d, $150)\n3. Sorted disputes: \n   - D1: (1d, $120)\n   - D4: (1d, $700)\n   - D3: (2d, $450)\n   - D2: (3d, $900)\n   - D5: (7d, $150)\n4. Final sorted list: D1, D4, D3, D2, D5.",
+    "execution_trace": [
+      {
+        "phase": "plan",
+        "result": "PLAN:\n1. Parse the dispute data to extract the days since the dispute was filed and the dollar amounts for each dispute.\n2. Create a list of disputes with their respective urgency based on the days since the dispute was filed and the dollar amount.\n3. Sort the disputes primarily by urgency (days since filed) and secondarily by dollar amount (higher amounts first).\n4. Prepare the sorted list for output.\n\nSOLUTION:\n1. Dispute data parsed: D1(1d, $120), D2(3d, $900), D3(2d, $450), D4(1d, $700), D5(7d, $150).\n2. Urgency list created: \n   - D1: (1d, $120)\n   - D4: (1d, $700)\n   - D3: (2d, $450)\n   - D2: (3d, $900)\n   - D5: (7d, $150)\n3. Sorted disputes: \n   - D1: (1d, $120)\n   - D4: (1d, $700)\n   - D3: (2d, $450)\n   - D2: (3d, $900)\n   - D5: (7d, $150)\n4. Final sorted list: D1, D4, D3, D2, D5."
+      }
+    ],
+    "metrics": {
+      "llm_calls": 1,
+      "tokens": 141
+    }
+  }
+}

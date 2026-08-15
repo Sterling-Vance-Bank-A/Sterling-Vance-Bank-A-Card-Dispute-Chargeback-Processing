@@ -33,3 +33,5 @@ logs/
 # MCP / runtime
 mcp_server/.cache/
 agent/.cache/
+
+rag/chroma_db/

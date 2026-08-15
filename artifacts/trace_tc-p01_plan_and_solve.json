@@ -1,0 +1,24 @@
+{
+  "case_id": "TC-P01",
+  "category": "planning_algorithm",
+  "method": "Plan-and-Solve",
+  "success": false,
+  "llm_calls": 1,
+  "tokens": 220,
+  "latency_s": 3.158,
+  "cost_usd": 3.3e-05,
+  "trace": {
+    "status": "success",
+    "final_result": "PLAN:\n1. Identify the dispute ID and transaction amount.\n2. Determine the reason for the dispute.\n3. Review the statutory deadlines for unauthorized transaction disputes.\n4. Summarize the timeline of events related to the dispute.\n5. Compile the information into a clear summary.\n\nSOLUTION:\n1. Dispute ID: DISP-002, Transaction Amount: $899.00.\n2. Reason for the dispute: Unauthorized transaction.\n3. Statutory deadlines for unauthorized transaction disputes typically require the bank to investigate and respond within 30 days of receiving the dispute.\n4. Timeline of events:\n   - Dispute initiated: [Insert date of initiation]\n   - Investigation period: 30 days from initiation.\n   - Final resolution deadline: [Insert date 30 days after initiation].\n5. Summary: The dispute DISP-002 for the amount of $899.00, categorized as an unauthorized transaction, must be resolved within 30 days from the date it was initiated.",
+    "execution_trace": [
+      {
+        "phase": "plan",
+        "result": "PLAN:\n1. Identify the dispute ID and transaction amount.\n2. Determine the reason for the dispute.\n3. Review the statutory deadlines for unauthorized transaction disputes.\n4. Summarize the timeline of events related to the dispute.\n5. Compile the information into a clear summary.\n\nSOLUTION:\n1. Dispute ID: DISP-002, Transaction Amount: $899.00.\n2. Reason for the dispute: Unauthorized transaction.\n3. Statutory deadlines for unauthorized transaction disputes typically require the bank to investigate and respond within 30 days of receiving the dispute.\n4. Timeline of events:\n   - Dispute initiated: [Insert date of initiation]\n   - Investigation period: 30 days from initiation.\n   - Final resolution deadline: [Insert date 30 days after initiation].\n5. Summary: The dispute DISP-002 for the amount of $899.00, categorized as an unauthorized transaction, must be resolved within 30 days from the date it was initiated."
+      }
+    ],
+    "metrics": {
+      "llm_calls": 1,
+      "tokens": 135
+    }
+  }
+}
