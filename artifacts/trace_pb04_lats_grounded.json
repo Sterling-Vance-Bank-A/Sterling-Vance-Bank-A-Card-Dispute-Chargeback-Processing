@@ -1,0 +1,27 @@
+{
+  "case_id": "PB04",
+  "family": "linear",
+  "strategy": "lats_grounded",
+  "applicable": false,
+  "success": false,
+  "success_basis": "not the production method for this sub-task shape",
+  "llm_calls": 4,
+  "tokens": 600,
+  "latency_seconds": 0.003157,
+  "estimated_cost_usd": 0.006,
+  "result": {
+    "status": "success",
+    "best_action": "escalate_dispute",
+    "final_state": "Escalate dispute DISP-009 to senior analyst ANL-002.",
+    "environment_feedback": {
+      "success": true,
+      "score": 1.0,
+      "details": "Escalation candidate passes current DB constraints.",
+      "source": "sterling_vance.db"
+    },
+    "metrics": {
+      "llm_calls": 4,
+      "tokens": 600
+    }
+  }
+}

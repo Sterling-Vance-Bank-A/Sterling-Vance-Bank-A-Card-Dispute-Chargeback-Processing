@@ -1,0 +1,26 @@
+{
+  "case_id": "PB08",
+  "family": "ranking",
+  "strategy": "plan_and_solve",
+  "applicable": false,
+  "success": false,
+  "success_basis": "not the production method for this sub-task shape",
+  "llm_calls": 1,
+  "tokens": 24,
+  "latency_seconds": 6e-05,
+  "estimated_cost_usd": 0.00024,
+  "result": {
+    "status": "success",
+    "final_result": "0.50",
+    "execution_trace": [
+      {
+        "phase": "plan_and_solve",
+        "result": "0.50"
+      }
+    ],
+    "metrics": {
+      "llm_calls": 1,
+      "tokens": 24
+    }
+  }
+}

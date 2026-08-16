@@ -1,0 +1,41 @@
+{
+  "case_id": "PB13",
+  "family": "high_stakes",
+  "strategy": "tree_of_thoughts",
+  "applicable": false,
+  "success": false,
+  "success_basis": "not a search method for high-stakes commits",
+  "llm_calls": 6,
+  "tokens": 450,
+  "latency_seconds": 0.001224,
+  "estimated_cost_usd": 0.0045,
+  "result": {
+    "status": "success",
+    "best_path": {
+      "state": "1. Option A: Prioritize by statutory deadline",
+      "score": 0.5,
+      "rationale": "0.50"
+    },
+    "all_paths": [
+      {
+        "state": "1. Option A: Prioritize by statutory deadline",
+        "score": 0.5,
+        "rationale": "0.50"
+      },
+      {
+        "state": "2. Option B: Prioritize by dollar exposure",
+        "score": 0.5,
+        "rationale": "0.50"
+      },
+      {
+        "state": "1. Option A: Prioritize by statutory deadline",
+        "score": 0.5,
+        "rationale": "0.50"
+      }
+    ],
+    "metrics": {
+      "llm_calls": 6,
+      "tokens": 450
+    }
+  }
+}

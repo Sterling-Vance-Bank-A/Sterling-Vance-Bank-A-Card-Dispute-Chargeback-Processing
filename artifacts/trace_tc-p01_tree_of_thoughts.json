@@ -2,105 +2,33 @@
   "case_id": "TC-P01",
   "category": "planning_algorithm",
   "method": "Tree of Thoughts",
-  "success": false,
-  "llm_calls": 16,
-  "tokens": 971,
-  "latency_s": 29.237,
-  "cost_usd": 0.000146,
+  "success": true,
+  "llm_calls": 5,
+  "tokens": 580,
+  "latency_s": 28.422,
+  "cost_usd": 0.0,
   "trace": {
     "status": "success",
     "best_path": {
-      "state": "3. Evaluate the applicable consumer protection laws and regulations relevant to the dispute, ensuring compliance with statutory deadlines for resolution by [insert specific date].",
-      "score": 0.8,
-      "rationale": "SCORE: 0.8 | RATIONALE: The candidate effectively addresses the need to evaluate consumer protection laws and regulations, which is crucial for understanding statutory deadlines. However, it lacks specificity regarding the actual deadlines and the context of the dispute, which could enhance its feasibility and clarity."
+      "state": "1. **Retrieve and Analyze Transaction Records**",
+      "score": 1.0,
+      "rationale": "### **Evaluation of Candidate Path: \"Retrieve and Analyze Transaction Records\"**\n\n#### **1. Correctness**\n- **Score: 5/10**\n  - The step is partially correct in that analyzing transaction records is a necessary part of dispute resolution (e.g., verifying the unauthorized transaction).\n  - However, it is **incomplete**\u2014it does not address the **timeline of the dispute** or **statutory deadlines**, which are explicitly requested in the problem.\n  - A full solution would require:\n    - Retrieving the dispute initiation date.\n    - Identifying relevant regulatory deadlines (e.g., Regulation E for unauthorized transactions in the U.S.).\n    - Mapping key milestones (e.g., issuer response deadlines, consumer appeal periods).\n\n#### **2. Feasibility**\n- **Score: 7/10**\n  - **Feasible** in practice\u2014transaction records (e.g., bank statements, merchant logs) are typically retrievable via internal systems or third-party APIs.\n  - **Assumptions**:\n    - The dispute system has access to transaction data (e.g., linked to the account in question).\n    - The candidate has tools/methods to extract and parse records (e.g., SQL queries, API calls).\n  - **Limitations**:\n    - Does not account for **external factors** (e.g., delays in merchant responses, regulatory jurisdiction).\n    - May not cover **statutory deadlines** unless the system has a built-in compliance module.\n\n#### **3. Progress**\n- **Score: 3/10**\n  - **Minimal progress**\u2014this step is a **prerequisite** but does not directly address the core requirements (timeline + deadlines).\n  - **Next steps needed**:\n    - Cross-reference transaction date with dispute initiation date.\n    - Identify applicable laws (e.g., **Regulation E (U.S.)**"
     },
-    "search": {
-      "method": "BFS/beam",
-      "beam_width": 3,
-      "max_depth": 2,
-      "pruned": 0,
-      "levels": [
-        [
-          {
-            "parent": "Start | {'dispute_id': 'DISP-002', 'amount': 899.0, 'reason': 'unauthorized_transaction'}",
-            "candidate": "1. Review the initial dispute submission for DISP-002, including the details of the unauthorized transaction, and confirm the receipt of all necessary documentation by the deadline of [insert specific date].",
-            "score": 0.7,
-            "rationale": "SCORE: 0.7 | RATIONALE: The candidate correctly identifies the need to review the initial dispute submission and confirm documentation receipt, which is essential for processing the dispute. However, it lacks specificity regarding the statutory deadlines and does not outline the complete timeline of the dispute process, which is crucial for a comprehensive summary."
-          },
-          {
-            "parent": "Start | {'dispute_id': 'DISP-002', 'amount': 899.0, 'reason': 'unauthorized_transaction'}",
-            "candidate": "2. Conduct a thorough investigation into the unauthorized transaction, including gathering evidence from the merchant and the cardholder, and prepare a summary report by the statutory deadline of [insert specific date].",
-            "score": 0.7,
-            "rationale": "SCORE: 0.7 | RATIONALE: The candidate outlines a reasonable approach to investigating the unauthorized transaction and emphasizes the importance of preparing a summary report by a statutory deadline. However, it lacks specificity regarding the actual statutory deadline and the details of the investigation process, which are crucial for completeness and clarity."
-          },
-          {
-            "parent": "Start | {'dispute_id': 'DISP-002', 'amount': 899.0, 'reason': 'unauthorized_transaction'}",
-            "candidate": "3. Communicate the findings of the investigation to the cardholder and the merchant, and outline the next steps for resolution, ensuring all parties are informed before the final decision deadline of [insert specific date].",
-            "score": 0.7,
-            "rationale": "SCORE: 0.7 | RATIONALE: The candidate addresses the need to communicate findings and outline next steps, which is crucial for resolution. However, it lacks specificity regarding the final decision deadline and does not summarize the dispute timeline or statutory deadlines, which are essential for a complete evaluation."
-          }
-        ],
-        [
-          {
-            "parent": "1. Review the initial dispute submission for DISP-002, including the details of the unauthorized transaction, and confirm the receipt of all necessary documentation by the deadline of [insert specific date].",
-            "candidate": "1. Analyze the response from the merchant regarding the unauthorized transaction and assess any evidence provided to support their position by the deadline of [insert specific date].",
-            "score": 0.7,
-            "rationale": "SCORE: 0.7 | RATIONALE: The candidate correctly identifies the need to analyze the merchant's response and assess evidence, which is crucial for the dispute process. However, it lacks specificity regarding the timeline and statutory deadlines, which are essential for a complete evaluation of the dispute."
-          },
-          {
-            "parent": "1. Review the initial dispute submission for DISP-002, including the details of the unauthorized transaction, and confirm the receipt of all necessary documentation by the deadline of [insert specific date].",
-            "candidate": "2. Compile a summary of all communications between the disputing parties, including any attempts at resolution, and prepare a report for review by the deadline of [insert specific date].",
-            "score": 0.7,
-            "rationale": "SCORE: 0.7 | RATIONALE: The candidate is feasible and relevant as it addresses the need to summarize communications and attempts at resolution, which are crucial for understanding the dispute timeline. However, it lacks specificity regarding the statutory deadlines and does not directly summarize the dispute timeline itself, which is essential for a complete evaluation."
-          },
-          {
-            "parent": "1. Review the initial dispute submission for DISP-002, including the details of the unauthorized transaction, and confirm the receipt of all necessary documentation by the deadline of [insert specific date].",
-            "candidate": "3. Evaluate the applicable consumer protection laws and regulations relevant to the dispute, ensuring compliance with statutory deadlines for resolution by [insert specific date].",
-            "score": 0.8,
-            "rationale": "SCORE: 0.8 | RATIONALE: The candidate effectively addresses the need to evaluate consumer protection laws and regulations, which is crucial for understanding statutory deadlines. However, it lacks specificity regarding the actual deadlines and the context of the dispute, which could enhance its feasibility and clarity."
-          },
-          {
-            "parent": "2. Conduct a thorough investigation into the unauthorized transaction, including gathering evidence from the merchant and the cardholder, and prepare a summary report by the statutory deadline of [insert specific date].",
-            "candidate": "1. Compile all relevant documentation related to DISP-002, including transaction records, communication logs, and any previous dispute resolutions, to ensure a comprehensive understanding of the case by the statutory deadline of [insert specific date].",
-            "score": 0.7,
-            "rationale": "SCORE: 0.7 | RATIONALE: The candidate outlines a necessary step in the investigation process by compiling relevant documentation, which is crucial for understanding the case. However, it lacks specificity regarding the timeline and statutory deadlines, which are essential for ensuring timely resolution. Additionally, it does not explicitly mention the need to gather evidence from the merchant and cardholder, which is critical for a thorough investigation."
-          },
-          {
-            "parent": "2. Conduct a thorough investigation into the unauthorized transaction, including gathering evidence from the merchant and the cardholder, and prepare a summary report by the statutory deadline of [insert specific date].",
-            "candidate": "2. Schedule and conduct interviews with the cardholder and merchant to gather firsthand accounts of the unauthorized transaction, ensuring all testimonies are documented and analyzed before the statutory deadline of [insert specific date].",
-            "score": 0.8,
-            "rationale": "SCORE: 0.8 | RATIONALE: The candidate effectively outlines a method for gathering evidence through interviews, which is a crucial step in the investigation process. However, it lacks specificity regarding the timeline and statutory deadlines, which are essential for ensuring compliance and timely resolution of the dispute."
-          },
-          {
-            "parent": "2. Conduct a thorough investigation into the unauthorized transaction, including gathering evidence from the merchant and the cardholder, and prepare a summary report by the statutory deadline of [insert specific date].",
-            "candidate": "3. Review applicable laws and regulations governing unauthorized transactions to ensure compliance and identify any potential legal implications that must be addressed by the statutory deadline of [insert specific date].",
-            "score": 0.7,
-            "rationale": "SCORE: 0.7 | RATIONALE: The candidate is relevant and feasible as it addresses the need to understand legal implications related to unauthorized transactions, which is crucial for the investigation. However, it does not directly summarize the dispute timeline or statutory deadlines, which is the primary task. It could be improved by explicitly linking the review of laws to the specific deadlines and timeline of the dispute."
-          },
-          {
-            "parent": "3. Communicate the findings of the investigation to the cardholder and the merchant, and outline the next steps for resolution, ensuring all parties are informed before the final decision deadline of [insert specific date].",
-            "candidate": "1. Prepare a detailed summary of the investigation findings, including key evidence and points of contention, and share it with both the cardholder and the merchant by [insert specific date].",
-            "score": 0.8,
-            "rationale": "SCORE: 0.8 | RATIONALE: The candidate effectively addresses the need to summarize the investigation findings and communicate them to both parties, which is crucial for transparency and resolution. However, it lacks specificity regarding the statutory deadlines and the final decision deadline, which are essential for completeness and clarity in the dispute timeline."
-          },
-          {
-            "parent": "3. Communicate the findings of the investigation to the cardholder and the merchant, and outline the next steps for resolution, ensuring all parties are informed before the final decision deadline of [insert specific date].",
-            "candidate": "2. Schedule a mediation session between the cardholder and the merchant to discuss the findings and explore potential resolutions before the final decision deadline of [insert specific date].",
-            "score": 0.7,
-            "rationale": "SCORE: 0.7 | RATIONALE: The candidate is feasible and aligns with the goal of resolving the dispute, but it does not directly summarize the dispute timeline or statutory deadlines, which are critical components of the task. It focuses on mediation rather than providing a comprehensive overview of the timeline and deadlines."
-          },
-          {
-            "parent": "3. Communicate the findings of the investigation to the cardholder and the merchant, and outline the next steps for resolution, ensuring all parties are informed before the final decision deadline of [insert specific date].",
-            "candidate": "3. Draft a formal notice outlining the dispute resolution process and the implications of the findings for both parties, ensuring it is sent out by [insert specific date].",
-            "score": 0.7,
-            "rationale": "SCORE: 0.7 | RATIONALE: The candidate is feasible and relevant as it addresses the need to communicate the dispute resolution process, but it lacks specificity regarding the timeline and statutory deadlines, which are crucial for clarity and compliance."
-          }
-        ]
-      ]
-    },
+    "all_paths": [
+      {
+        "state": "1. **Retrieve and Analyze Transaction Records**",
+        "score": 1.0,
+        "rationale": "### **Evaluation of Candidate Path: \"Retrieve and Analyze Transaction Records\"**\n\n#### **1. Correctness**\n- **Score: 5/10**\n  - The step is partially correct in that analyzing transaction records is a necessary part of dispute resolution (e.g., verifying the unauthorized transaction).\n  - However, it is **incomplete**\u2014it does not address the **timeline of the dispute** or **statutory deadlines**, which are explicitly requested in the problem.\n  - A full solution would require:\n    - Retrieving the dispute initiation date.\n    - Identifying relevant regulatory deadlines (e.g., Regulation E for unauthorized transactions in the U.S.).\n    - Mapping key milestones (e.g., issuer response deadlines, consumer appeal periods).\n\n#### **2. Feasibility**\n- **Score: 7/10**\n  - **Feasible** in practice\u2014transaction records (e.g., bank statements, merchant logs) are typically retrievable via internal systems or third-party APIs.\n  - **Assumptions**:\n    - The dispute system has access to transaction data (e.g., linked to the account in question).\n    - The candidate has tools/methods to extract and parse records (e.g., SQL queries, API calls).\n  - **Limitations**:\n    - Does not account for **external factors** (e.g., delays in merchant responses, regulatory jurisdiction).\n    - May not cover **statutory deadlines** unless the system has a built-in compliance module.\n\n#### **3. Progress**\n- **Score: 3/10**\n  - **Minimal progress**\u2014this step is a **prerequisite** but does not directly address the core requirements (timeline + deadlines).\n  - **Next steps needed**:\n    - Cross-reference transaction date with dispute initiation date.\n    - Identify applicable laws (e.g., **Regulation E (U.S.)**"
+      },
+      {
+        "state": "Here are two distinct candidate next steps for the Tree-of-Thoughts search to summarize the dispute timeline and statutory deadlines for **DISP-002 ($899.00)**:",
+        "score": 0.02,
+        "rationale": "### **Evaluation of Candidate Paths for Summarizing DISP-002 ($899.00) Dispute Timeline and Statutory Deadlines**\n\n#### **Candidate Path 1:**\n*\"Retrieve the dispute\u2019s chronological events (e.g., filing date, issuer response deadlines, chargeback deadlines) from the issuer\u2019s portal, then cross-reference with Regulation E (for unauthorized transactions) and the card network\u2019s operating rules (e.g., Visa/MC chargeback timelines). Finally, compile a timeline with key statutory deadlines (e.g., 60 days for provisional credit under Reg E, 45 days for issuer response).\"*\n\n**Scoring:**\n- **Correctness (3/5):** Partially correct. Regulation E applies to unauthorized transactions, but the candidate omits:\n  - The **120-day chargeback deadline** (for Visa/MC under Rule 10.4).\n  - The **issuer\u2019s 2-day provisional credit obligation** (Reg E \u00a71005.11(c)).\n  - The **consumer\u2019s 60-day reporting window** for unauthorized transactions (Reg E \u00a71005.6(b)).\n- **Feasibility (4/5):** Highly feasible if the issuer\u2019s portal and network rules are accessible. Assumes data availability.\n- **Progress (3/5):** Makes progress but misses critical statutory nuances (e.g., provisional credit timing, network-specific deadlines).\n\n**Verdict:** *Partially correct but incomplete. Needs refinement to include all relevant deadlines.*\n\n---\n\n#### **Candidate Path 2:**\n*\"Start by identifying the dispute\u2019s filing date (e.g., 2023-10-15) from the case file, then map statutory deadlines backward: Reg E\u2019s 60-day consumer reporting window, issuer\u2019s 2-day provisional credit deadline, and the"
+      }
+    ],
     "metrics": {
-      "llm_calls": 16,
-      "tokens": 971
+      "llm_calls": 4,
+      "tokens": 450
     }
   }
 }

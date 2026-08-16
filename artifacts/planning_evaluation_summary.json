@@ -7,78 +7,78 @@
       "success_rate": "71.4%",
       "avg_calls": 1,
       "avg_tokens": 260,
-      "avg_latency": "96.401s",
-      "avg_cost": "$0.000039"
+      "avg_latency": "72.097s",
+      "avg_cost": "$0.000000"
     },
     {
       "method": "Dynamic Decomposition",
       "total_runs": 7,
       "successes": 7,
       "success_rate": "100.0%",
-      "avg_calls": 3.9,
-      "avg_tokens": 610,
-      "avg_latency": "18.018s",
-      "avg_cost": "$0.000091"
+      "avg_calls": 3,
+      "avg_tokens": 560,
+      "avg_latency": "47.188s",
+      "avg_cost": "$0.000000"
     },
     {
       "method": "Plan-and-Solve",
       "total_runs": 11,
-      "successes": 0,
-      "success_rate": "0.0%",
+      "successes": 6,
+      "success_rate": "54.5%",
       "avg_calls": 1,
-      "avg_tokens": 220,
-      "avg_latency": "2.996s",
-      "avg_cost": "$0.000033"
+      "avg_tokens": 246,
+      "avg_latency": "2.942s",
+      "avg_cost": "$0.000000"
     },
     {
       "method": "Tree of Thoughts",
       "total_runs": 11,
-      "successes": 0,
-      "success_rate": "0.0%",
-      "avg_calls": 16,
-      "avg_tokens": 952,
-      "avg_latency": "29.646s",
-      "avg_cost": "$0.000143"
+      "successes": 9,
+      "success_rate": "81.8%",
+      "avg_calls": 5,
+      "avg_tokens": 580,
+      "avg_latency": "26.670s",
+      "avg_cost": "$0.000000"
     },
     {
       "method": "LATS (Ungrounded)",
       "total_runs": 11,
       "successes": 9,
       "success_rate": "81.8%",
-      "avg_calls": 6,
-      "avg_tokens": 730,
-      "avg_latency": "4.799s",
-      "avg_cost": "$0.000109"
+      "avg_calls": 4,
+      "avg_tokens": 640,
+      "avg_latency": "5.532s",
+      "avg_cost": "$0.000000"
     },
     {
       "method": "LATS (Grounded)",
       "total_runs": 11,
-      "successes": 6,
-      "success_rate": "54.5%",
-      "avg_calls": 7.1,
-      "avg_tokens": 901,
-      "avg_latency": "12.124s",
-      "avg_cost": "$0.000135"
+      "successes": 5,
+      "success_rate": "45.5%",
+      "avg_calls": 4,
+      "avg_tokens": 690,
+      "avg_latency": "18.677s",
+      "avg_cost": "$0.000000"
     },
     {
       "method": "Self-Refine",
       "total_runs": 4,
       "successes": 2,
       "success_rate": "50.0%",
-      "avg_calls": 3,
-      "avg_tokens": 904,
-      "avg_latency": "16.561s",
-      "avg_cost": "$0.000136"
+      "avg_calls": 2,
+      "avg_tokens": 500,
+      "avg_latency": "3.430s",
+      "avg_cost": "$0.000000"
     },
     {
       "method": "Reflexion",
       "total_runs": 4,
       "successes": 4,
       "success_rate": "100.0%",
-      "avg_calls": 4.8,
-      "avg_tokens": 760,
-      "avg_latency": "9.319s",
-      "avg_cost": "$0.000114"
+      "avg_calls": 6,
+      "avg_tokens": 720,
+      "avg_latency": "8.610s",
+      "avg_cost": "$0.000000"
     }
   ],
   "ps_vs_tot_breakdown": [
@@ -86,113 +86,114 @@
       "case_id": "TC-P01",
       "task_family": "linear",
       "description": "Summarize dispute timeline and statutory d...",
-      "ps_success": false,
-      "ps_latency": "3.158s",
-      "tot_success": false,
-      "tot_latency": "29.237s",
-      "tot_score": 0.0
+      "ps_success": true,
+      "ps_latency": "3.219s",
+      "tot_success": true,
+      "tot_latency": "28.422s",
+      "tot_score": 1.0
     },
     {
       "case_id": "TC-P02",
       "task_family": "linear",
       "description": "Calculate total monetary exposure and card...",
-      "ps_success": false,
-      "ps_latency": "2.791s",
-      "tot_success": false,
-      "tot_latency": "32.850s",
-      "tot_score": 0.0
+      "ps_success": true,
+      "ps_latency": "2.729s",
+      "tot_success": true,
+      "tot_latency": "25.709s",
+      "tot_score": 1.0
     },
     {
       "case_id": "TC-P03",
       "task_family": "ranking",
       "description": "Rank 3 competing merchant recovery queues ...",
       "ps_success": false,
-      "ps_latency": "4.112s",
-      "tot_success": false,
-      "tot_latency": "34.140s",
-      "tot_score": 0.0
+      "ps_latency": "2.615s",
+      "tot_success": true,
+      "tot_latency": "28.246s",
+      "tot_score": 1.0
     },
     {
       "case_id": "TC-P04",
       "task_family": "ranking",
       "description": "Sort 5 high-value chargeback disputes by u...",
       "ps_success": false,
-      "ps_latency": "4.087s",
-      "tot_success": false,
-      "tot_latency": "31.343s",
-      "tot_score": 0.0
+      "ps_latency": "2.708s",
+      "tot_success": true,
+      "tot_latency": "24.985s",
+      "tot_score": 1.0
     },
     {
       "case_id": "TC-P05",
       "task_family": "ranking",
       "description": "Evaluate multi-merchant portfolio risk ran...",
       "ps_success": false,
-      "ps_latency": "3.381s",
-      "tot_success": false,
-      "tot_latency": "27.932s",
-      "tot_score": 0.0
+      "ps_latency": "2.730s",
+      "tot_success": true,
+      "tot_latency": "26.242s",
+      "tot_score": 1.0
     },
     {
       "case_id": "TC-P06",
       "task_family": "high_stakes",
       "description": "Evaluate and commit refund for routine dis...",
-      "ps_success": false,
-      "ps_latency": "1.881s",
-      "tot_success": false,
-      "tot_latency": "28.523s",
-      "tot_score": 0.0
+      "ps_success": true,
+      "ps_latency": "2.953s",
+      "tot_success": true,
+      "tot_latency": "25.171s",
+      "tot_score": 1.0
     },
     {
       "case_id": "TC-P07",
       "task_family": "high_stakes",
       "description": "Evaluate high-value refund for DISP-013 ($...",
-      "ps_success": false,
-      "ps_latency": "2.497s",
-      "tot_success": false,
-      "tot_latency": "28.216s",
-      "tot_score": 0.0
+      "ps_success": true,
+      "ps_latency": "2.897s",
+      "tot_success": true,
+      "tot_latency": "25.123s",
+      "tot_score": 1.0
     },
     {
       "case_id": "TC-G01",
       "task_family": "high_stakes",
       "description": "Evaluate refund request for DISP-003 ($150...",
       "ps_success": false,
-      "ps_latency": "2.706s",
+      "ps_latency": "3.048s",
       "tot_success": false,
-      "tot_latency": "29.256s",
-      "tot_score": 0.0
+      "tot_latency": "24.874s",
+      "tot_score": 0.03
     },
     {
       "case_id": "TC-G02",
       "task_family": "high_stakes",
       "description": "Evaluate escalation request for DISP-014 (...",
-      "ps_success": false,
-      "ps_latency": "3.072s",
-      "tot_success": false,
-      "tot_latency": "25.738s",
-      "tot_score": 0.0
+      "ps_success": true,
+      "ps_latency": "3.037s",
+      "tot_success": true,
+      "tot_latency": "27.875s",
+      "tot_score": 1.0
     },
     {
       "case_id": "TC-O01",
       "task_family": "linear",
       "description": "Aggregate transaction history and dispute ...",
-      "ps_success": false,
-      "ps_latency": "2.556s",
-      "tot_success": false,
-      "tot_latency": "30.429s",
-      "tot_score": 0.0
+      "ps_success": true,
+      "ps_latency": "3.128s",
+      "tot_success": true,
+      "tot_latency": "26.325s",
+      "tot_score": 1.0
     },
     {
       "case_id": "TC-O02",
       "task_family": "high_stakes",
       "description": "Execute senior analyst review and resoluti...",
       "ps_success": false,
-      "ps_latency": "2.715s",
+      "ps_latency": "3.298s",
       "tot_success": false,
-      "tot_latency": "28.446s",
-      "tot_score": 0.0
+      "tot_latency": "30.401s",
+      "tot_score": 0.09
     }
   ],
   "total_runs": 66,
-  "model": "openai/gpt-4o-mini"
+  "model": "mistral-small-latest",
+  "provider": "mistral"
 }

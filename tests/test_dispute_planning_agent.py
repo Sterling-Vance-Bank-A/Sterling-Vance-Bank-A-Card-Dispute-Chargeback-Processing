@@ -14,7 +14,7 @@ if MCP_SERVER_DIR not in sys.path:
     sys.path.insert(0, MCP_SERVER_DIR)
 
 from agent.dispute_planning_agent import DisputePlanningAgent
-from planning.algorithms.environment import GroundedDisputeEnvironment
+from planning import GroundedDisputeEnvironment
 from planning.benchmark import MockLLMClient
 
 

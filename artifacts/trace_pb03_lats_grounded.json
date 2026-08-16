@@ -1,0 +1,27 @@
+{
+  "case_id": "PB03",
+  "family": "linear",
+  "strategy": "lats_grounded",
+  "applicable": false,
+  "success": false,
+  "success_basis": "not the production method for this sub-task shape",
+  "llm_calls": 4,
+  "tokens": 600,
+  "latency_seconds": 0.007372,
+  "estimated_cost_usd": 0.006,
+  "result": {
+    "status": "failed",
+    "best_action": "process_refund",
+    "final_state": "Process refund for DISP-006 with analyst ANL-001.",
+    "environment_feedback": {
+      "success": false,
+      "score": 0.0,
+      "details": "Refund blocked: dispute already terminal (refunded).",
+      "source": "sterling_vance.db"
+    },
+    "metrics": {
+      "llm_calls": 4,
+      "tokens": 600
+    }
+  }
+}

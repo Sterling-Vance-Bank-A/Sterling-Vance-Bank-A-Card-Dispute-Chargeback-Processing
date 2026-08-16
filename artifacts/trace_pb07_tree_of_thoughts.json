@@ -1,0 +1,41 @@
+{
+  "case_id": "PB07",
+  "family": "ranking",
+  "strategy": "tree_of_thoughts",
+  "applicable": true,
+  "success": false,
+  "success_basis": "expected priority ordering present in best beam",
+  "llm_calls": 6,
+  "tokens": 450,
+  "latency_seconds": 0.000433,
+  "estimated_cost_usd": 0.0045,
+  "result": {
+    "status": "success",
+    "best_path": {
+      "state": "1. D1 (1d, $120) -> D4 (1d, $700) -> D3 (2d, $450) -> D2 (3d, $900) -> D5 (7d, $150)",
+      "score": 0.5,
+      "rationale": "0.50"
+    },
+    "all_paths": [
+      {
+        "state": "1. D1 (1d, $120) -> D4 (1d, $700) -> D3 (2d, $450) -> D2 (3d, $900) -> D5 (7d, $150)",
+        "score": 0.5,
+        "rationale": "0.50"
+      },
+      {
+        "state": "2. D4 (1d) -> D1 (1d) -> D3 (2d) -> D2 (3d) -> D5 (7d)",
+        "score": 0.5,
+        "rationale": "0.50"
+      },
+      {
+        "state": "1. D1 (1d, $120) -> D4 (1d, $700) -> D3 (2d, $450) -> D2 (3d, $900) -> D5 (7d, $150)",
+        "score": 0.5,
+        "rationale": "0.50"
+      }
+    ],
+    "metrics": {
+      "llm_calls": 6,
+      "tokens": 450
+    }
+  }
+}

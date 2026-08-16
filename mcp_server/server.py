@@ -413,7 +413,7 @@ async def handle_call_tool(ctx, params) -> types.CallToolResult:
                 else:
                     progress_token = getattr(meta, "progressToken", None) or getattr(meta, "progress_token", None)
 
-            if ctx is not None and hasattr(ctx, "session") and ctx.session is not None:
+            if progress_token is not None and ctx is not None and hasattr(ctx, "session") and ctx.session is not None:
                 await ctx.session.send_progress_notification(
                     progress_token=progress_token,
                     progress=i + 1,

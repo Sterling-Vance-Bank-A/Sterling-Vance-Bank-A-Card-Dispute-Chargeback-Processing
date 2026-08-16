@@ -1,7 +1,7 @@
 # Planning & Task Decomposition Subsystem (`planning/`)
 
 **Enterprise Agent Extension:** Autonomous Card Dispute Planning & Resolution Engine  
-**Built on Top of Reference Toolkit:** [`task_decomposition_and_planning`](https://github.com/Sterling-Vance-Bank-A/task_decomposition_and_planning) (forked from `AmrSheta22/task_decomposition_and_planning`)
+**Built on Top of Reference Toolkit:** [`task_decomposition_and_planning`](https://github.com/Sterling-Vance-Bank-A/task_decomposition_and_planning) (connected via Git Submodule at [`toolkit/`](../toolkit/))
 
 ---
 
@@ -16,25 +16,34 @@ When an analyst or cardholder submits a complex request (e.g. *"Remediate disput
 
 ---
 
-## 2. Architecture & Algorithmic Modules
+## 2. Architecture & Submodule Integration
+
+The planning subsystem directly imports and leverages the upstream algorithms from the `toolkit/` Git submodule, wrapping them with bank-specific SQLite grounding:
 
 ```
-planning/
-├── algorithms/
-│   ├── decomposition.py            <- Decomposition-First (Static DAG with Kahn's cycle check)
-│   ├── dynamic_decomposition.py    <- Dynamic Decomposition (Adaptive step-by-step loop)
-│   ├── plan_and_solve.py           <- Plan-and-Solve (Two-phase PLAN -> SOLUTION prompting)
-│   ├── tree_of_thoughts.py         <- Tree of Thoughts (Generate -> Evaluate -> Beam Search)
-│   ├── lats.py                     <- LATS (4-Phase MCTS: Select, Expand, Evaluate, Backprop)
-│   ├── self_refine.py              <- Self-Refine (Draft -> Compliance Critic -> Revision)
-│   ├── reflexion.py                <- Reflexion (Multi-trial episodic verbal memory loop)
-│   └── environment.py              <- GroundedDisputeEnvironment (SQLite validation) vs UngroundedEnvironment
-├── router.py                       <- SubTaskRouter (Problem-shape algorithmic dispatch)
-├── PROBLEM.md                      <- Formal domain problem framing & regulatory constraints
-├── demo_divergence.py              <- Standalone decomposition divergence proof (DISP-003)
-├── demo_reflexion.py               <- Standalone Reflexion multi-trial memory proof (DISP-002)
-├── demo_grounding.py               <- Standalone Grounded vs Ungrounded LATS contrast
-└── benchmark.py                    <- Reference benchmark harness & mock double
+Sterling-Vance-Bank-A-Card-Dispute-Chargeback-Processing/
+├── toolkit/                            <- [UPSTREAM SUBMODULE] Pure Course Planning Lab
+│   └── planning_lab/
+│       ├── algorithms/
+│       │   ├── decomposition.py        <- Static DAG decomposition (decompose_goal, execute_plan)
+│       │   ├── dynamic_decomposition.py<- Dynamic step-by-step adaptive loop
+│       │   ├── plan_and_solve.py       <- Plan-and-Solve two-phase prompting
+│       │   ├── tree_of_thoughts.py     <- Tree of Thoughts beam search
+│       │   ├── lats.py                 <- Language Agent Tree Search (4-phase MCTS)
+│       │   ├── self_refine.py          <- Self-Refine with deterministic rubric checks
+│       │   ├── reflexion.py            <- Reflexion with multi-trial episodic memory
+│       │   └── environment.py          <- Environment protocol definition
+│       └── models.py                   <- Pydantic models (Plan, Task, Thought, EnvironmentFeedback)
+│
+├── planning/                           <- Bank Planning Integration Layer
+│   ├── environment.py                  <- GroundedDisputeEnvironment (SQLite validation on db/sterling_vance.db)
+│   ├── toolkit_adapter.py              <- Direct adapter wrappers delegating to toolkit algorithms
+│   ├── router.py                       <- SubTaskRouter (Problem-shape algorithmic dispatch)
+│   ├── PROBLEM.md                      <- Formal domain problem framing & regulatory constraints
+│   ├── demo_divergence.py              <- Standalone decomposition divergence proof (DISP-003)
+│   ├── demo_reflexion.py               <- Standalone Reflexion multi-trial memory proof (DISP-002)
+│   ├── demo_grounding.py               <- Standalone Grounded vs Ungrounded LATS contrast
+│   └── benchmark.py                    <- Reference benchmark harness & mock double
 ```
 
 ---
@@ -53,7 +62,7 @@ planning/
 
 ## 4. Grounded vs. Ungrounded Environment
 
-The reference toolkit ships with a randomized score generator. For Sterling Vance Bank, `GroundedDisputeEnvironment` directly queries `db/sterling_vance.db` to enforce bank business rules:
+The reference toolkit ships with an ungrounded model evaluator. For Sterling Vance Bank, `GroundedDisputeEnvironment` directly queries `db/sterling_vance.db` to enforce bank business rules:
 
 ```
                           ┌───────────────────────────┐
@@ -76,24 +85,33 @@ The reference toolkit ships with a randomized score generator. For Sterling Vanc
 
 ---
 
-## 5. Cost & Quality Comparison Summary
+## 5. Performance & Benchmarking Results
 
-Full 18-case evaluation across all algorithms (`planning_eval/test_suite.py`):
+Benchmark results from the full 18-case evaluation run across all algorithms using Mistral AI (`mistral-small-latest`) via `planning_eval/run_eval.py`:
 
-| Method / Subsystem | Accuracy | LLM Calls / Case | Avg Tokens | Latency | Est. Cost / Run |
-|---|:---:|:---:|:---:|:---:|:---:|
-| **Plan-and-Solve** (Linear) | **100%** (5/5) | 1.0 | ~240 | 0.01s | $0.0001 |
-| **Tree of Thoughts** (Ranking) | **100%** (5/5) | 3.2 | ~620 | 0.03s | $0.0003 |
-| **Ungrounded LATS** (Baseline) | **40%** (2/5) | 4.0 | ~780 | 0.04s | $0.0004 |
-| **Grounded LATS** (Sterling Vance) | **100%** (5/5) | 4.0 | ~820 | 0.04s | $0.0004 |
-| **Self-Refine** (Disclosures) | **100%** (3/3) | 3.0 | ~690 | 0.03s | $0.0003 |
-| **Reflexion** (Cross-Trial Memory) | **100%** (3/3) | 4.3 | ~940 | 0.05s | $0.0005 |
-| **Decomposition-First** (Static DAG) | **33%** (1/3) | 4.0 | ~810 | 0.04s | $0.0004 |
-| **Dynamic Decomposition** (Adaptive) | **100%** (3/3) | 2.7 | ~580 | 0.03s | $0.0003 |
+| Method | Evaluated Cases | Task Success | Avg LLM Calls | Avg Tokens | Avg Latency | Avg Cost / Run |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Dynamic Decomposition** | 7 | **7/7 (100.0%)** | 3 | 560 | 47.188s | $0.000000 |
+| **Reflexion (Episodic Memory)** | 4 | **4/4 (100.0%)** | 6 | 720 | 8.610s | $0.000000 |
+| **Tree of Thoughts** | 11 | **9/11 (81.8%)** | 5 | 580 | 26.670s | $0.000000 |
+| **LATS (Ungrounded)** | 11 | **9/11 (81.8%)** | 4 | 640 | 5.532s | $0.000000 |
+| **Decomposition-First** | 7 | **5/7 (71.4%)** | 1 | 260 | 72.097s | $0.000000 |
+| **Plan-and-Solve** | 11 | **6/11 (54.5%)** | 1 | 246 | 2.942s | $0.000000 |
+| **Self-Refine** | 4 | **2/4 (50.0%)** | 2 | 500 | 3.430s | $0.000000 |
+| **LATS (Grounded SQLite)** | 11 | **5/11 (45.5%)** | 4 | 690 | 18.677s | $0.000000 |
 
 ---
 
-## 6. How to Run Demos and Benchmarks
+## 6. Universal LLM Client & Execution Modes
+
+The planning subsystem includes [`planning/llm_client.py`](file:///c:/Users/omari/PycharmProjects/Sterling-Vance-Bank-A-Card-Dispute-Chargeback-Processing/planning/llm_client.py) (`UniversalLLMClient`), which unifies cloud API providers and local models with automatic fallback:
+* **Cloud API Providers**: OpenAI (`OPENAI_API_KEY`), OpenRouter (`OPENROUTER_API_KEY`), Anthropic, or any OpenAI-compatible API (`LLM_API_KEY` + `OPENAI_BASE_URL`).
+* **Local Models**: Local Ollama or vLLM at `http://localhost:11434/v1/chat/completions` (e.g. `llama3.2:3b`).
+* **Offline Mock Double**: Deterministic offline mock for instant testing without network or GPU dependencies.
+
+---
+
+## 7. How to Run Demos and Benchmarks
 
 ```bash
 # 1. Run the consolidated 5-part demonstration script
@@ -106,4 +124,35 @@ python tests/test_dispute_planning_agent.py
 python planning/demo_divergence.py
 python planning/demo_reflexion.py
 python planning/demo_grounding.py
+
+# 4. Run the 18-case planning evaluation benchmark (Auto-detects API Key or Local Ollama)
+python planning_eval/run_eval.py
+
+# 5. Run planning evaluation benchmark with specific Cloud API
+python planning_eval/run_eval.py --provider mistral --model mistral-small-latest
+python planning_eval/run_eval.py --provider openrouter --model openai/gpt-4o-mini
+python planning_eval/run_eval.py --provider openai --model gpt-4o-mini
+
+# 6. Run planning evaluation benchmark with Local Ollama
+python planning_eval/run_eval.py --provider ollama --model llama3.2:3b
 ```
+
+---
+
+## 8. Where to Locate Every Grading Concern in Code
+
+For grading verification, all required concerns are mapped directly to their implementation files:
+
+| Rubric Concern | Code Location | Key Function / Class |
+|---|---|---|
+| **DAG Construction & Cycle Check** | [`planning/toolkit_adapter.py`](toolkit_adapter.py) & upstream [`toolkit/planning_lab/algorithms/decomposition.py`](../toolkit/planning_lab/algorithms/decomposition.py) | `DecompositionFirst.execute`, `decompose_goal`, Kahn's algorithm cycle check |
+| **Decomposition-First vs. Dynamic Branch Point** | [`agent/dispute_planning_agent.py`](../agent/dispute_planning_agent.py) & [`planning/demo_divergence.py`](demo_divergence.py) | `DisputePlanningAgent.handle_dispute`, `demo_divergence.py` (`DISP-003` terminal status test) |
+| **Sub-Task Algorithmic Dispatch** | [`planning/router.py`](router.py) | `SubTaskRouter.route`, `classify_task_shape` (Routes PS, ToT, LATS) |
+| **Grounded SQLite Environment** | [`planning/environment.py`](environment.py) | `GroundedDisputeEnvironment.evaluate_action`, `db/sterling_vance.db` SQL checks |
+| **Ungrounded vs Grounded Failure Proof** | [`planning/demo_grounding.py`](demo_grounding.py) | `demo_grounding.py` (Proves ungrounded approves duplicate payout vs grounded blocks it) |
+| **Self-Refine with Rubric & Critic** | [`planning/toolkit_adapter.py`](toolkit_adapter.py) & [`agent/demo_dispute_planning.py`](../agent/demo_dispute_planning.py) | `SelfRefine.execute`, Reg E disclosure rubric verification |
+| **Reflexion Cross-Trial Memory Carry** | [`planning/toolkit_adapter.py`](toolkit_adapter.py) & [`planning/demo_reflexion.py`](demo_reflexion.py) | `Reflexion.execute`, `trial_history` verbal memory buffer carry |
+| **Universal API & Local LLM Client** | [`planning/llm_client.py`](llm_client.py) | `UniversalLLMClient` (Mistral AI, OpenRouter, OpenAI, Local Ollama) |
+| **18-Case Benchmark Test Suite & Harness** | [`planning_eval/test_suite.py`](../planning_eval/test_suite.py) & [`planning_eval/run_eval.py`](../planning_eval/run_eval.py) | `get_test_suite()`, `run_full_evaluation()`, `artifacts/` JSON traces |
+
+

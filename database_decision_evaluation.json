@@ -2,17 +2,17 @@
   "evaluation_summary": {
     "total_disputes": 501,
     "total_checks": 1002,
-    "overall_accuracy_pct": 92.52,
+    "overall_accuracy_pct": 92.42,
     "senior_accuracy_pct": 98.4,
-    "junior_accuracy_pct": 86.63,
-    "runtime_seconds": 5.7
+    "junior_accuracy_pct": 86.43,
+    "runtime_seconds": 7.16
   },
   "dispute_status_distribution": {
-    "refunded": 151,
+    "open": 117,
     "investigating": 110,
+    "refunded": 150,
     "denied": 72,
-    "escalated": 52,
-    "open": 116
+    "escalated": 52
   },
   "amount_distribution": {
     "under_500": 133,
@@ -20,7 +20,7 @@
   },
   "decisions_breakdown": {
     "elicitation_triggers": 211,
-    "routine_approved": 67,
-    "closed_rejected": 223
+    "routine_approved": 68,
+    "closed_rejected": 222
   }
 }

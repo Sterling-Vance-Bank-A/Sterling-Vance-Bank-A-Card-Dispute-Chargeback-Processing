@@ -3,67 +3,23 @@
   "category": "planning_algorithm",
   "method": "LATS (Ungrounded)",
   "success": true,
-  "llm_calls": 6,
-  "tokens": 730,
-  "latency_s": 4.584,
-  "cost_usd": 0.000109,
+  "llm_calls": 4,
+  "tokens": 640,
+  "latency_s": 7.459,
+  "cost_usd": 0.0,
   "trace": {
     "status": "success",
-    "best_action": "escalate_dispute",
-    "final_state": "1. Review and escalate D4 (1d, $700) for immediate resolution; Analyst ID: A123",
+    "best_action": "process_refund",
+    "final_state": "Process refund for DISP-001 with analyst ANL-001.",
     "environment_feedback": {
       "success": true,
       "score": 1.0,
       "details": "Candidate self-approved; no external bank validator was consulted.",
       "source": "ungrounded_model_score"
     },
-    "mcts": [
-      {
-        "id": "n0",
-        "parent_id": null,
-        "action": "root",
-        "state": "{'disputes': 'D1(1d, $120), D2(3d, $900), D3(2d, $450), D4(1d, $700), D5(7d, $150)'}",
-        "visits": 1,
-        "mean_value": 0.875,
-        "environment_score": 0.0,
-        "model_score": 0.0,
-        "feedback": null,
-        "reflections": []
-      },
-      {
-        "id": "n1",
-        "parent_id": "n0",
-        "action": "escalate_dispute",
-        "state": "1. Review and escalate D4 (1d, $700) for immediate resolution; Analyst ID: A123",
-        "visits": 1,
-        "mean_value": 0.875,
-        "environment_score": 1.0,
-        "model_score": 0.5,
-        "feedback": {
-          "success": true,
-          "score": 1.0,
-          "details": "Candidate self-approved; no external bank validator was consulted.",
-          "source": "ungrounded_model_score"
-        },
-        "reflections": []
-      },
-      {
-        "id": "n2",
-        "parent_id": "n0",
-        "action": "verify_transaction",
-        "state": "2. Initiate investigation for D2 (3d, $900) to meet Reg E deadline; Analyst ID: A456",
-        "visits": 0,
-        "mean_value": 0.0,
-        "environment_score": 0.0,
-        "model_score": 0.0,
-        "feedback": null,
-        "reflections": []
-      }
-    ],
-    "iterations": 1,
     "metrics": {
-      "llm_calls": 2,
-      "tokens": 135
+      "llm_calls": 4,
+      "tokens": 600
     }
   }
 }

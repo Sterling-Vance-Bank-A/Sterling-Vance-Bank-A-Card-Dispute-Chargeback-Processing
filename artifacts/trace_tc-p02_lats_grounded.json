@@ -2,75 +2,24 @@
   "case_id": "TC-P02",
   "category": "planning_algorithm",
   "method": "LATS (Grounded)",
-  "success": true,
-  "llm_calls": 6,
-  "tokens": 790,
-  "latency_s": 9.504,
-  "cost_usd": 0.000118,
+  "success": false,
+  "llm_calls": 4,
+  "tokens": 690,
+  "latency_s": 23.385,
+  "cost_usd": 0.0,
   "trace": {
-    "status": "success",
-    "best_action": "verify_transaction",
-    "final_state": "Dispute ID: DISP-006",
+    "status": "failed",
+    "best_action": "process_refund",
+    "final_state": "Process refund for DISP-006 with analyst ANL-001.",
     "environment_feedback": {
-      "success": true,
-      "score": 0.7,
-      "details": "Read-only validation succeeded; no write action requested.",
+      "success": false,
+      "score": 0.0,
+      "details": "Refund blocked: dispute already terminal (refunded).",
       "source": "sterling_vance.db"
     },
-    "mcts": [
-      {
-        "id": "n0",
-        "parent_id": null,
-        "action": "root",
-        "state": "{'dispute_id': 'DISP-006', 'amount': 320.0, 'reason': 'fraud'}",
-        "visits": 2,
-        "mean_value": 0.45,
-        "environment_score": 0.0,
-        "model_score": 0.0,
-        "feedback": null,
-        "reflections": []
-      },
-      {
-        "id": "n1",
-        "parent_id": "n0",
-        "action": "verify_transaction",
-        "state": "1. Action: Calculate total monetary exposure including the disputed amount and potential interchange fees.",
-        "visits": 1,
-        "mean_value": 0.125,
-        "environment_score": 0.0,
-        "model_score": 0.5,
-        "feedback": {
-          "success": false,
-          "score": 0.0,
-          "details": "Missing dispute ID.",
-          "source": "sterling_vance.db"
-        },
-        "reflections": [
-          "**Branch Reflection: External Validator Review**\n\nIn evaluating the candidate's action to calculate the total monetary exposure for DISP-006, which amounts to $320.00, it is evident that the calculation was incomplete due to the omission of the dispute ID. This missing element is critical for tracking and validating the dispute process, as it ensures that all related transactions and fees can be accurately assessed.\n\nThe next expansion should avoid overlooking essential identifiers, such as dispute IDs, that are necessary for comprehensive financial assessments. Additionally, it should ensure that all relevant factors, including potential interchange fees, are included in the calculations to provide a complete picture of the monetary exposure. This will enhance the accuracy and reliability of the financial analysis."
-        ]
-      },
-      {
-        "id": "n2",
-        "parent_id": "n0",
-        "action": "verify_transaction",
-        "state": "Dispute ID: DISP-006",
-        "visits": 1,
-        "mean_value": 0.775,
-        "environment_score": 0.7,
-        "model_score": 1.0,
-        "feedback": {
-          "success": true,
-          "score": 0.7,
-          "details": "Read-only validation succeeded; no write action requested.",
-          "source": "sterling_vance.db"
-        },
-        "reflections": []
-      }
-    ],
-    "iterations": 1,
     "metrics": {
       "llm_calls": 4,
-      "tokens": 411
+      "tokens": 600
     }
   }
 }

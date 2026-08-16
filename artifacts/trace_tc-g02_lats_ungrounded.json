@@ -3,67 +3,23 @@
   "category": "grounding_comparison",
   "method": "LATS (Ungrounded)",
   "success": false,
-  "llm_calls": 6,
-  "tokens": 730,
-  "latency_s": 4.692,
-  "cost_usd": 0.000109,
+  "llm_calls": 4,
+  "tokens": 640,
+  "latency_s": 4.702,
+  "cost_usd": 0.0,
   "trace": {
     "status": "success",
-    "best_action": "escalate_dispute",
-    "final_state": "1. Review the escalated dispute details and gather additional documentation to support the resolution process for dispute ID DISP-014. Analyst ID: A12345.",
+    "best_action": "process_refund",
+    "final_state": "Process refund for DISP-014 with analyst ANL-001.",
     "environment_feedback": {
       "success": true,
       "score": 1.0,
       "details": "Candidate self-approved; no external bank validator was consulted.",
       "source": "ungrounded_model_score"
     },
-    "mcts": [
-      {
-        "id": "n0",
-        "parent_id": null,
-        "action": "root",
-        "state": "{'dispute_id': 'DISP-014', 'amount': 370.78, 'status': 'escalated'}",
-        "visits": 1,
-        "mean_value": 1.0,
-        "environment_score": 0.0,
-        "model_score": 0.0,
-        "feedback": null,
-        "reflections": []
-      },
-      {
-        "id": "n1",
-        "parent_id": "n0",
-        "action": "escalate_dispute",
-        "state": "1. Review the escalated dispute details and gather additional documentation to support the resolution process for dispute ID DISP-014. Analyst ID: A12345.",
-        "visits": 1,
-        "mean_value": 1.0,
-        "environment_score": 1.0,
-        "model_score": 1.0,
-        "feedback": {
-          "success": true,
-          "score": 1.0,
-          "details": "Candidate self-approved; no external bank validator was consulted.",
-          "source": "ungrounded_model_score"
-        },
-        "reflections": []
-      },
-      {
-        "id": "n2",
-        "parent_id": "n0",
-        "action": "verify_transaction",
-        "state": "2. Schedule a follow-up meeting with the customer to discuss the status of dispute ID DISP-014 and address any concerns they may have. Analyst ID: A12345.",
-        "visits": 0,
-        "mean_value": 0.0,
-        "environment_score": 0.0,
-        "model_score": 0.0,
-        "feedback": null,
-        "reflections": []
-      }
-    ],
-    "iterations": 1,
     "metrics": {
-      "llm_calls": 2,
-      "tokens": 191
+      "llm_calls": 4,
+      "tokens": 600
     }
   }
 }

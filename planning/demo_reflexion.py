@@ -23,8 +23,7 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from planning.algorithms.environment import GroundedDisputeEnvironment
-from planning.algorithms.reflexion import Reflexion
+from planning import GroundedDisputeEnvironment, Reflexion
 
 
 class ReflexionScenarioLLM:

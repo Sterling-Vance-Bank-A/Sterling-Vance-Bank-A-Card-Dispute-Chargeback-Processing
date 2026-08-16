@@ -2,68 +2,24 @@
   "case_id": "TC-P06",
   "category": "planning_algorithm",
   "method": "LATS (Grounded)",
-  "success": true,
-  "llm_calls": 6,
-  "tokens": 790,
-  "latency_s": 3.62,
-  "cost_usd": 0.000118,
+  "success": false,
+  "llm_calls": 4,
+  "tokens": 690,
+  "latency_s": 23.061,
+  "cost_usd": 0.0,
   "trace": {
-    "status": "success",
+    "status": "failed",
     "best_action": "process_refund",
-    "final_state": "1. Commit refund for dispute ID DISP-001 in the amount of $29.99, assigned to analyst ID ANL-001.",
+    "final_state": "Process refund for DISP-001 with analyst ANL-001.",
     "environment_feedback": {
-      "success": true,
-      "score": 1.0,
-      "details": "Refund candidate passes current DB constraints.",
+      "success": false,
+      "score": 0.0,
+      "details": "Refund blocked: dispute already terminal (refunded).",
       "source": "sterling_vance.db"
     },
-    "mcts": [
-      {
-        "id": "n0",
-        "parent_id": null,
-        "action": "root",
-        "state": "{'dispute_id': 'DISP-001', 'amount': 29.99, 'status': 'open', 'analyst_id': 'ANL-001'}",
-        "visits": 1,
-        "mean_value": 1.0,
-        "environment_score": 0.0,
-        "model_score": 0.0,
-        "feedback": null,
-        "reflections": []
-      },
-      {
-        "id": "n1",
-        "parent_id": "n0",
-        "action": "process_refund",
-        "state": "1. Commit refund for dispute ID DISP-001 in the amount of $29.99, assigned to analyst ID ANL-001.",
-        "visits": 1,
-        "mean_value": 1.0,
-        "environment_score": 1.0,
-        "model_score": 1.0,
-        "feedback": {
-          "success": true,
-          "score": 1.0,
-          "details": "Refund candidate passes current DB constraints.",
-          "source": "sterling_vance.db"
-        },
-        "reflections": []
-      },
-      {
-        "id": "n2",
-        "parent_id": "n0",
-        "action": "process_refund",
-        "state": "2. Approve refund for dispute DISP-001 for $29.99, handled by analyst ANL-001.",
-        "visits": 0,
-        "mean_value": 0.0,
-        "environment_score": 0.0,
-        "model_score": 0.0,
-        "feedback": null,
-        "reflections": []
-      }
-    ],
-    "iterations": 1,
     "metrics": {
-      "llm_calls": 2,
-      "tokens": 103
+      "llm_calls": 4,
+      "tokens": 600
     }
   }
 }

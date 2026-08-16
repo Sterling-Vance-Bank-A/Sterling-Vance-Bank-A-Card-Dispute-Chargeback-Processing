@@ -1,0 +1,27 @@
+{
+  "case_id": "PB13",
+  "family": "high_stakes",
+  "strategy": "lats_grounded",
+  "applicable": true,
+  "success": true,
+  "success_basis": "decision matches expected grounded policy outcome",
+  "llm_calls": 4,
+  "tokens": 600,
+  "latency_seconds": 0.006076,
+  "estimated_cost_usd": 0.006,
+  "result": {
+    "status": "failed",
+    "best_action": "process_refund",
+    "final_state": "Process refund for DISP-003 with analyst ANL-002.",
+    "environment_feedback": {
+      "success": false,
+      "score": 0.0,
+      "details": "Refund blocked: dispute already terminal (refunded).",
+      "source": "sterling_vance.db"
+    },
+    "metrics": {
+      "llm_calls": 4,
+      "tokens": 600
+    }
+  }
+}

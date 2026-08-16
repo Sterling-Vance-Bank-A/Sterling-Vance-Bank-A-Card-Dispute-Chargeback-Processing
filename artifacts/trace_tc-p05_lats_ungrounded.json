@@ -3,67 +3,23 @@
   "category": "planning_algorithm",
   "method": "LATS (Ungrounded)",
   "success": true,
-  "llm_calls": 6,
-  "tokens": 730,
-  "latency_s": 5.111,
-  "cost_usd": 0.000109,
+  "llm_calls": 4,
+  "tokens": 640,
+  "latency_s": 4.772,
+  "cost_usd": 0.0,
   "trace": {
     "status": "success",
-    "best_action": "verify_transaction",
-    "final_state": "1. Initiate a high-risk review for MERCH-004 due to its elevated risk score of 92. Dispute ID: DISPUTE-001, Analyst ID: ANALYST-101.",
+    "best_action": "process_refund",
+    "final_state": "Process refund for DISP-001 with analyst ANL-001.",
     "environment_feedback": {
       "success": true,
       "score": 1.0,
       "details": "Candidate self-approved; no external bank validator was consulted.",
       "source": "ungrounded_model_score"
     },
-    "mcts": [
-      {
-        "id": "n0",
-        "parent_id": null,
-        "action": "root",
-        "state": "{'merchants': 'MERCH-004(risk=92, cb=14), MERCH-002(risk=75, cb=8), MERCH-001(risk=35, cb=2), MERCH-003(risk=50, cb=4)'}",
-        "visits": 1,
-        "mean_value": 1.0,
-        "environment_score": 0.0,
-        "model_score": 0.0,
-        "feedback": null,
-        "reflections": []
-      },
-      {
-        "id": "n1",
-        "parent_id": "n0",
-        "action": "verify_transaction",
-        "state": "1. Initiate a high-risk review for MERCH-004 due to its elevated risk score of 92. Dispute ID: DISPUTE-001, Analyst ID: ANALYST-101.",
-        "visits": 1,
-        "mean_value": 1.0,
-        "environment_score": 1.0,
-        "model_score": 1.0,
-        "feedback": {
-          "success": true,
-          "score": 1.0,
-          "details": "Candidate self-approved; no external bank validator was consulted.",
-          "source": "ungrounded_model_score"
-        },
-        "reflections": []
-      },
-      {
-        "id": "n2",
-        "parent_id": "n0",
-        "action": "verify_transaction",
-        "state": "2. Conduct a follow-up investigation on MERCH-002, which has a risk score of 75, to assess potential fraudulent activities. Dispute ID: DISPUTE-002, Analyst ID: ANALYST-102.",
-        "visits": 0,
-        "mean_value": 0.0,
-        "environment_score": 0.0,
-        "model_score": 0.0,
-        "feedback": null,
-        "reflections": []
-      }
-    ],
-    "iterations": 1,
     "metrics": {
-      "llm_calls": 2,
-      "tokens": 242
+      "llm_calls": 4,
+      "tokens": 600
     }
   }
 }

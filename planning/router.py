@@ -3,11 +3,13 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from planning.algorithms.decomposition import SubTask
-from planning.algorithms.environment import Environment, GroundedDisputeEnvironment
-from planning.algorithms.lats import LATS
-from planning.algorithms.plan_and_solve import PlanAndSolve
-from planning.algorithms.tree_of_thoughts import TreeOfThoughts
+from .environment import Environment, GroundedDisputeEnvironment
+from .toolkit_adapter import (
+    LATS,
+    PlanAndSolve,
+    SubTask,
+    TreeOfThoughts,
+)
 
 logger = logging.getLogger(__name__)
 

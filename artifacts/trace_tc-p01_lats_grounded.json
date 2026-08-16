@@ -3,67 +3,23 @@
   "category": "planning_algorithm",
   "method": "LATS (Grounded)",
   "success": true,
-  "llm_calls": 6,
-  "tokens": 790,
-  "latency_s": 5.162,
-  "cost_usd": 0.000118,
+  "llm_calls": 4,
+  "tokens": 690,
+  "latency_s": 5.392,
+  "cost_usd": 0.0,
   "trace": {
     "status": "success",
-    "best_action": "verify_transaction",
-    "final_state": "1. Review transaction details and gather evidence for dispute ID DISP-002; Analyst ID: A12345.",
+    "best_action": "escalate_dispute",
+    "final_state": "Escalate dispute DISP-002 to senior analyst ANL-002.",
     "environment_feedback": {
       "success": true,
-      "score": 0.7,
-      "details": "Read-only validation succeeded; no write action requested.",
+      "score": 1.0,
+      "details": "Escalation candidate passes current DB constraints.",
       "source": "sterling_vance.db"
     },
-    "mcts": [
-      {
-        "id": "n0",
-        "parent_id": null,
-        "action": "root",
-        "state": "{'dispute_id': 'DISP-002', 'amount': 899.0, 'reason': 'unauthorized_transaction'}",
-        "visits": 1,
-        "mean_value": 0.7,
-        "environment_score": 0.0,
-        "model_score": 0.0,
-        "feedback": null,
-        "reflections": []
-      },
-      {
-        "id": "n1",
-        "parent_id": "n0",
-        "action": "verify_transaction",
-        "state": "1. Review transaction details and gather evidence for dispute ID DISP-002; Analyst ID: A12345.",
-        "visits": 1,
-        "mean_value": 0.7,
-        "environment_score": 0.7,
-        "model_score": 0.7,
-        "feedback": {
-          "success": true,
-          "score": 0.7,
-          "details": "Read-only validation succeeded; no write action requested.",
-          "source": "sterling_vance.db"
-        },
-        "reflections": []
-      },
-      {
-        "id": "n2",
-        "parent_id": "n0",
-        "action": "verify_transaction",
-        "state": "2. Contact the customer to confirm unauthorized transaction details and discuss next steps for dispute ID DISP-002; Analyst ID: A12345.",
-        "visits": 0,
-        "mean_value": 0.0,
-        "environment_score": 0.0,
-        "model_score": 0.0,
-        "feedback": null,
-        "reflections": []
-      }
-    ],
-    "iterations": 1,
     "metrics": {
-      "llm_calls": 2,
-      "tokens": 204
+      "llm_calls": 4,
+      "tokens": 600
     }
   }
 }

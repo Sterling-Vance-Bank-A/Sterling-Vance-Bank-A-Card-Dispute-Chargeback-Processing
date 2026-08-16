@@ -1,0 +1,26 @@
+{
+  "case_id": "PB02",
+  "family": "linear",
+  "strategy": "plan_and_solve",
+  "applicable": true,
+  "success": false,
+  "success_basis": "explicit PLAN/SOLUTION output",
+  "llm_calls": 1,
+  "tokens": 13,
+  "latency_seconds": 5.6e-05,
+  "estimated_cost_usd": 0.00013,
+  "result": {
+    "status": "success",
+    "final_result": "0.50",
+    "execution_trace": [
+      {
+        "phase": "plan_and_solve",
+        "result": "0.50"
+      }
+    ],
+    "metrics": {
+      "llm_calls": 1,
+      "tokens": 13
+    }
+  }
+}

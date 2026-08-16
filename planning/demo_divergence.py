@@ -22,8 +22,7 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from planning.algorithms.decomposition import DecompositionFirst
-from planning.algorithms.dynamic_decomposition import DynamicDecomposition
+from planning import DecompositionFirst, DynamicDecomposition
 from planning.benchmark import MockLLMClient
 
 

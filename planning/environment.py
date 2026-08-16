@@ -1,14 +1,22 @@
+"""
+Grounded Dispute Environment — Sterling Vance Bank
+Subclasses the toolkit's Environment (toolkit.planning_lab.algorithms.environment.Environment)
+and replaces randomized scoring with read-only SQLite validation on db/sterling_vance.db.
+"""
+
 from __future__ import annotations
 
 import os
 import re
 import sqlite3
 from dataclasses import dataclass
-from typing import Iterable
+from typing import Any
 
+from toolkit.planning_lab.algorithms.environment import Environment as ToolkitEnvironment
+from toolkit.planning_lab.models import EnvironmentFeedback as ToolkitEnvironmentFeedback
 
 DB_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "..", "db", "sterling_vance.db")
+    os.path.join(os.path.dirname(__file__), "..", "db", "sterling_vance.db")
 )
 ELICITATION_THRESHOLD = 500.0
 
@@ -21,10 +29,10 @@ class EnvironmentFeedback:
     source: str
 
 
-class Environment:
-    """Small environment protocol matching the reference toolkit's evaluator seam."""
+class Environment(ToolkitEnvironment):
+    """Base environment protocol matching toolkit.planning_lab.algorithms.environment."""
 
-    def evaluate(self, state: str) -> EnvironmentFeedback:  # pragma: no cover - interface
+    def evaluate(self, state: str) -> EnvironmentFeedback:  # pragma: no cover
         raise NotImplementedError
 
 
@@ -89,14 +97,14 @@ class GroundedDisputeEnvironment(Environment):
                 if status in {"refunded", "denied"}:
                     return EnvironmentFeedback(False, 0.0, f"Refund blocked: dispute already terminal ({status}).", "sterling_vance.db")
                 if amount > ELICITATION_THRESHOLD and (analyst is None or analyst["role"] != "senior"):
-                    return EnvironmentFeedback(False, 0.0, "Refund blocked: amount above $500 requires a senior analyst.", "sterling_vance.db")
+                    return EnvironmentFeedback(False, 0.0, f"Junior analyst ({analyst_id}) cannot approve refund above ${ELICITATION_THRESHOLD:,.0f}.", "sterling_vance.db")
                 return EnvironmentFeedback(True, 1.0, "Refund candidate passes current DB constraints.", "sterling_vance.db")
 
             if action == "escalate":
-                if status in {"refunded", "denied", "escalated"}:
-                    return EnvironmentFeedback(False, 0.0, f"Escalation blocked: current status is {status}.", "sterling_vance.db")
+                if status in {"refunded", "denied"}:
+                    return EnvironmentFeedback(False, 0.0, f"Escalation blocked: dispute already in terminal state ({status}).", "sterling_vance.db")
                 if analyst is None or analyst["role"] != "senior":
-                    return EnvironmentFeedback(False, 0.0, "Escalation blocked: senior analyst required.", "sterling_vance.db")
+                    return EnvironmentFeedback(False, 0.0, f"Escalation blocked: senior analyst required ({analyst_id or 'none'} provided).", "sterling_vance.db")
                 return EnvironmentFeedback(True, 1.0, "Escalation candidate passes current DB constraints.", "sterling_vance.db")
 
-            return EnvironmentFeedback(True, 0.7, "Read-only validation succeeded; no write action requested.", "sterling_vance.db")
+            return EnvironmentFeedback(True, 0.7, f"Observed {dispute_id} (status: {status}).", "sterling_vance.db")

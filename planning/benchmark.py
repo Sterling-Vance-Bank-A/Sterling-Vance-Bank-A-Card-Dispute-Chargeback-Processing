@@ -3,13 +3,19 @@ from __future__ import annotations
 import json
 import os
 import re
+import sys
 import time
 from statistics import mean
 
-from planning.algorithms.environment import GroundedDisputeEnvironment, UngroundedEnvironment
-from planning.algorithms.lats import LATS
-from planning.algorithms.plan_and_solve import PlanAndSolve
-from planning.algorithms.tree_of_thoughts import TreeOfThoughts
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from planning import (
+    GroundedDisputeEnvironment,
+    LATS,
+    PlanAndSolve,
+    TreeOfThoughts,
+    UngroundedEnvironment,
+)
 
 ARTIFACTS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "artifacts")
 COST_PER_1K_TOKENS = 0.01
@@ -189,9 +195,9 @@ def run_benchmark() -> dict:
         "benchmark": "Person B Planning & Search",
         "cases": cases,
         "strategies": strategies,
-        "model": "deterministic MockLLMClient",
+        "model": getattr(llm, "model", "deterministic MockLLMClient"),
+        "provider": getattr(llm, "provider", "mock"),
         "grounded_source": "db/sterling_vance.db (read-only)",
-        "note": "This local run verifies control flow and reproducibility. Replace MockLLMClient with the team's live model adapter for final quality measurements.",
         "summary": summary,
         "runs": records,
     }
@@ -206,6 +212,16 @@ def run_benchmark() -> dict:
 
 
 if __name__ == "__main__":
-    report = run_benchmark()
+    import argparse
+    from planning.llm_client import UniversalLLMClient
+
+    parser = argparse.ArgumentParser(description="Planning & Search Benchmark Harness")
+    parser.add_argument("--live", action="store_true", help="Use live UniversalLLMClient (API or local Ollama) instead of MockLLMClient")
+    parser.add_argument("--provider", type=str, default=None, help="LLM Provider ('openrouter', 'openai', 'ollama')")
+    parser.add_argument("--model", type=str, default=None, help="Model name")
+    args = parser.parse_args()
+
+    active_llm = UniversalLLMClient(provider=args.provider, model=args.model) if args.live else MockLLMClient()
+    report = run_benchmark(llm=active_llm)
     for row in report["summary"]:
         print(row)

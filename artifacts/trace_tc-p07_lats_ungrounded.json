@@ -3,67 +3,23 @@
   "category": "planning_algorithm",
   "method": "LATS (Ungrounded)",
   "success": true,
-  "llm_calls": 6,
-  "tokens": 730,
-  "latency_s": 5.346,
-  "cost_usd": 0.000109,
+  "llm_calls": 4,
+  "tokens": 640,
+  "latency_s": 5.591,
+  "cost_usd": 0.0,
   "trace": {
     "status": "success",
-    "best_action": "verify_transaction",
-    "final_state": "1. Review transaction history and customer communication for DISP-013 to gather additional evidence, assigned to analyst ANL-008.",
+    "best_action": "process_refund",
+    "final_state": "Process refund for DISP-013 with analyst ANL-008.",
     "environment_feedback": {
       "success": true,
       "score": 1.0,
       "details": "Candidate self-approved; no external bank validator was consulted.",
       "source": "ungrounded_model_score"
     },
-    "mcts": [
-      {
-        "id": "n0",
-        "parent_id": null,
-        "action": "root",
-        "state": "{'dispute_id': 'DISP-013', 'amount': 1337.92, 'status': 'investigating', 'analyst_id': 'ANL-008'}",
-        "visits": 1,
-        "mean_value": 1.0,
-        "environment_score": 0.0,
-        "model_score": 0.0,
-        "feedback": null,
-        "reflections": []
-      },
-      {
-        "id": "n1",
-        "parent_id": "n0",
-        "action": "verify_transaction",
-        "state": "1. Review transaction history and customer communication for DISP-013 to gather additional evidence, assigned to analyst ANL-008.",
-        "visits": 1,
-        "mean_value": 1.0,
-        "environment_score": 1.0,
-        "model_score": 1.0,
-        "feedback": {
-          "success": true,
-          "score": 1.0,
-          "details": "Candidate self-approved; no external bank validator was consulted.",
-          "source": "ungrounded_model_score"
-        },
-        "reflections": []
-      },
-      {
-        "id": "n2",
-        "parent_id": "n0",
-        "action": "verify_transaction",
-        "state": "2. Schedule a meeting with the customer to discuss the details of the dispute for DISP-013, assigned to analyst ANL-008.",
-        "visits": 0,
-        "mean_value": 0.0,
-        "environment_score": 0.0,
-        "model_score": 0.0,
-        "feedback": null,
-        "reflections": []
-      }
-    ],
-    "iterations": 1,
     "metrics": {
-      "llm_calls": 2,
-      "tokens": 205
+      "llm_calls": 4,
+      "tokens": 600
     }
   }
 }

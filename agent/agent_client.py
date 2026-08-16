@@ -69,15 +69,32 @@ class DisputeAgentClient:
             from openai import AsyncOpenAI
             from dotenv import load_dotenv
             load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
+            load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
 
-            api_key = os.getenv("OPENROUTER_API_KEY")
-            if not api_key:
-                raise EnvironmentError("OPENROUTER_API_KEY not set in agent/.env")
+            mistral_key = os.getenv("MISTRAL_API_KEY")
+            openrouter_key = os.getenv("OPENROUTER_API_KEY")
+            openai_key = os.getenv("OPENAI_API_KEY")
 
-            client = AsyncOpenAI(
-                api_key=api_key,
-                base_url="https://openrouter.ai/api/v1",
-            )
+            if mistral_key:
+                client = AsyncOpenAI(
+                    api_key=mistral_key,
+                    base_url="https://api.mistral.ai/v1",
+                )
+                model_name = os.getenv("MISTRAL_MODEL", "mistral-small-latest")
+            elif openrouter_key:
+                client = AsyncOpenAI(
+                    api_key=openrouter_key,
+                    base_url="https://openrouter.ai/api/v1",
+                )
+                model_name = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
+            elif openai_key:
+                client = AsyncOpenAI(
+                    api_key=openai_key,
+                    base_url="https://api.openai.com/v1",
+                )
+                model_name = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+            else:
+                raise EnvironmentError("No API key set (MISTRAL_API_KEY / OPENAI_API_KEY / OPENROUTER_API_KEY)")
 
             openai_messages = []
             if system_prompt:
@@ -88,16 +105,16 @@ class DisputeAgentClient:
                     openai_messages.append({"role": m.role, "content": block.text})
 
             response = await client.chat.completions.create(
-                model="openai/gpt-4o-mini",
+                model=model_name,
                 messages=openai_messages,
                 max_tokens=max_tokens or 512,
             )
             summary = response.choices[0].message.content
-            log.info("LLM sampling complete via OpenRouter (gpt-4o-mini)")
+            log.info("LLM sampling complete via %s (%s)", "Mistral AI" if mistral_key else "Cloud Provider", model_name)
             return types.CreateMessageResult(
                 role="assistant",
                 content=types.TextContent(type="text", text=summary),
-                model="openai/gpt-4o-mini",
+                model=model_name,
             )
         except Exception as e:
             log.warning("LLM sampling failed (%s) — falling back to echo", e)

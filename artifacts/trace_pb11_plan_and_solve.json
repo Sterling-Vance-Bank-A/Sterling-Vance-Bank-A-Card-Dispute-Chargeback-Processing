@@ -1,0 +1,26 @@
+{
+  "case_id": "PB11",
+  "family": "high_stakes",
+  "strategy": "plan_and_solve",
+  "applicable": false,
+  "success": false,
+  "success_basis": "not a search method for high-stakes commits",
+  "llm_calls": 1,
+  "tokens": 17,
+  "latency_seconds": 6.1e-05,
+  "estimated_cost_usd": 0.00017,
+  "result": {
+    "status": "success",
+    "final_result": "0.50",
+    "execution_trace": [
+      {
+        "phase": "plan_and_solve",
+        "result": "0.50"
+      }
+    ],
+    "metrics": {
+      "llm_calls": 1,
+      "tokens": 17
+    }
+  }
+}

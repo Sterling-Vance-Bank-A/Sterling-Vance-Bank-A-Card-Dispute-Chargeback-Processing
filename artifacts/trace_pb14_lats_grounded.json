@@ -1,0 +1,27 @@
+{
+  "case_id": "PB14",
+  "family": "high_stakes",
+  "strategy": "lats_grounded",
+  "applicable": true,
+  "success": false,
+  "success_basis": "decision matches expected grounded policy outcome",
+  "llm_calls": 4,
+  "tokens": 600,
+  "latency_seconds": 0.001886,
+  "estimated_cost_usd": 0.006,
+  "result": {
+    "status": "success",
+    "best_action": "process_refund",
+    "final_state": "Process refund for DISP-014 with analyst ANL-002.",
+    "environment_feedback": {
+      "success": true,
+      "score": 1.0,
+      "details": "Refund candidate passes current DB constraints.",
+      "source": "sterling_vance.db"
+    },
+    "metrics": {
+      "llm_calls": 4,
+      "tokens": 600
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "case_id": "PB13",
+  "family": "high_stakes",
+  "strategy": "lats_ungrounded",
+  "applicable": true,
+  "success": false,
+  "success_basis": "decision matches expected grounded policy outcome",
+  "llm_calls": 4,
+  "tokens": 600,
+  "latency_seconds": 0.00024,
+  "estimated_cost_usd": 0.006,
+  "result": {
+    "status": "success",
+    "best_action": "process_refund",
+    "final_state": "Process refund for DISP-003 with analyst ANL-002.",
+    "environment_feedback": {
+      "success": true,
+      "score": 1.0,
+      "details": "Candidate self-approved; no external bank validator was consulted.",
+      "source": "ungrounded_model_score"
+    },
+    "metrics": {
+      "llm_calls": 4,
+      "tokens": 600
+    }
+  }
+}

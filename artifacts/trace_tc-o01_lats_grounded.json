@@ -2,68 +2,24 @@
   "case_id": "TC-O01",
   "category": "general_dispute",
   "method": "LATS (Grounded)",
-  "success": true,
-  "llm_calls": 6,
-  "tokens": 790,
-  "latency_s": 5.543,
-  "cost_usd": 0.000118,
+  "success": false,
+  "llm_calls": 4,
+  "tokens": 690,
+  "latency_s": 22.14,
+  "cost_usd": 0.0,
   "trace": {
-    "status": "success",
-    "best_action": "verify_transaction",
-    "final_state": "1. Review transaction history for DISP-004 to confirm the purchase date and merchant details; Analyst ID: A12345",
+    "status": "failed",
+    "best_action": "process_refund",
+    "final_state": "Process refund for DISP-004 with analyst ANL-001.",
     "environment_feedback": {
-      "success": true,
-      "score": 0.7,
-      "details": "Read-only validation succeeded; no write action requested.",
+      "success": false,
+      "score": 0.0,
+      "details": "Refund blocked: dispute already terminal (refunded).",
       "source": "sterling_vance.db"
     },
-    "mcts": [
-      {
-        "id": "n0",
-        "parent_id": null,
-        "action": "root",
-        "state": "{'dispute_id': 'DISP-004', 'amount': 75.0, 'reason': 'item_not_received'}",
-        "visits": 1,
-        "mean_value": 0.775,
-        "environment_score": 0.0,
-        "model_score": 0.0,
-        "feedback": null,
-        "reflections": []
-      },
-      {
-        "id": "n1",
-        "parent_id": "n0",
-        "action": "verify_transaction",
-        "state": "1. Review transaction history for DISP-004 to confirm the purchase date and merchant details; Analyst ID: A12345",
-        "visits": 1,
-        "mean_value": 0.775,
-        "environment_score": 0.7,
-        "model_score": 1.0,
-        "feedback": {
-          "success": true,
-          "score": 0.7,
-          "details": "Read-only validation succeeded; no write action requested.",
-          "source": "sterling_vance.db"
-        },
-        "reflections": []
-      },
-      {
-        "id": "n2",
-        "parent_id": "n0",
-        "action": "verify_transaction",
-        "state": "2. Contact the merchant for confirmation of shipment status regarding DISP-004; Analyst ID: A12345",
-        "visits": 0,
-        "mean_value": 0.0,
-        "environment_score": 0.0,
-        "model_score": 0.0,
-        "feedback": null,
-        "reflections": []
-      }
-    ],
-    "iterations": 1,
     "metrics": {
-      "llm_calls": 2,
-      "tokens": 203
+      "llm_calls": 4,
+      "tokens": 600
     }
   }
 }

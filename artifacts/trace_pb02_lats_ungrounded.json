@@ -1,0 +1,27 @@
+{
+  "case_id": "PB02",
+  "family": "linear",
+  "strategy": "lats_ungrounded",
+  "applicable": false,
+  "success": false,
+  "success_basis": "not the production method for this sub-task shape",
+  "llm_calls": 4,
+  "tokens": 600,
+  "latency_seconds": 0.00049,
+  "estimated_cost_usd": 0.006,
+  "result": {
+    "status": "success",
+    "best_action": "escalate_dispute",
+    "final_state": "Escalate dispute DISP-002 to senior analyst ANL-002.",
+    "environment_feedback": {
+      "success": true,
+      "score": 1.0,
+      "details": "Candidate self-approved; no external bank validator was consulted.",
+      "source": "ungrounded_model_score"
+    },
+    "metrics": {
+      "llm_calls": 4,
+      "tokens": 600
+    }
+  }
+}

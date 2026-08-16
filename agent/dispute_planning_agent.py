@@ -33,16 +33,19 @@ MCP_SERVER_DIR = os.path.join(ROOT_DIR, "mcp_server")
 if MCP_SERVER_DIR not in sys.path:
     sys.path.insert(0, MCP_SERVER_DIR)
 
-from planning.algorithms.decomposition import DecompositionFirst, SubTask
-from planning.algorithms.dynamic_decomposition import DynamicDecomposition
-from planning.algorithms.environment import GroundedDisputeEnvironment
-from planning.algorithms.lats import LATS
-from planning.algorithms.plan_and_solve import PlanAndSolve
-from planning.algorithms.reflexion import Reflexion
-from planning.algorithms.self_refine import SelfRefine
-from planning.algorithms.tree_of_thoughts import TreeOfThoughts
+from planning import (
+    DecompositionFirst,
+    DynamicDecomposition,
+    GroundedDisputeEnvironment,
+    LATS,
+    PlanAndSolve,
+    Reflexion,
+    SelfRefine,
+    SubTask,
+    SubTaskRouter,
+    TreeOfThoughts,
+)
 from planning.benchmark import MockLLMClient
-from planning.router import SubTaskRouter
 
 import mcp.types as mcp_types
 from mcp_server.server import handle_call_tool
@@ -273,9 +276,14 @@ class DisputePlanningAgent:
                 final_action_status = lats_subtask.get("final_state", "Action completed by LATS.")
 
         elif diverged:
-            # Dynamic decomposition detected an environmental surprise and pivoted
-            final_action = "remediated_via_dynamic_pivot"
-            final_action_status = "Dynamic decomposition adapted execution path to address environmental surprise."
+            # Dynamic decomposition detected an environmental surprise (such as terminal state) and halted safely
+            curr_status = str(ctx.get("status", "")).lower()
+            if curr_status in ("refunded", "denied"):
+                final_action = "blocked_grounded_constraint"
+                final_action_status = f"Dispute {dispute_id} is already terminal ({curr_status}); dynamic planner halted without payout."
+            else:
+                final_action = "remediated_via_dynamic_pivot"
+                final_action_status = "Dynamic decomposition adapted execution path to address environmental surprise."
 
         elif tot_subtask:
             # Tree-of-Thoughts determined optimal ranking / prioritization
@@ -320,10 +328,20 @@ class DisputePlanningAgent:
 
 
 if __name__ == "__main__":
-    agent = DisputePlanningAgent()
+    import argparse
+    from planning.llm_client import UniversalLLMClient
+
+    parser = argparse.ArgumentParser(description="Dispute Planning Agent")
+    parser.add_argument("--live", action="store_true", help="Use live cloud API / Ollama model instead of MockLLMClient")
+    parser.add_argument("--provider", type=str, default=None, help="LLM Provider ('openrouter', 'openai', 'ollama')")
+    parser.add_argument("--model", type=str, default=None, help="Model name")
+    args = parser.parse_args()
+
+    active_llm = UniversalLLMClient(provider=args.provider, model=args.model) if args.live else MockLLMClient()
+    agent = DisputePlanningAgent(llm=active_llm)
     print("DisputePlanningAgent initialized successfully.")
     sample_request = "Remediate dispute DISP-001 ($29.99 duplicate charge) for customer."
-    
+
     # Ensure DISP-001 is open
     import sqlite3
     conn = sqlite3.connect(os.path.join(ROOT_DIR, "db", "sterling_vance.db"))
